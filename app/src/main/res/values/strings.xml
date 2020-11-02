@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Plate</string>
+    <string name="main">메인</string>
+    <string name="search">검색</string>
+    <string name="bookmark">북마크</string>
+    <string name="mypage">마이페이지</string>
+</resources>
