@@ -1,5 +1,6 @@
 package com.petabyte.plate.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,4 +21,6 @@ public class ResultFragment extends Fragment {
 
         return v;
     }
+
+
 }
