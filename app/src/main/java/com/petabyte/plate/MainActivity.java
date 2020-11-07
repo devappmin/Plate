@@ -8,10 +8,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.petabyte.plate.fragment.BookmarkFragment;
-import com.petabyte.plate.fragment.HomeFragment;
-import com.petabyte.plate.fragment.MyPageFragment;
-import com.petabyte.plate.fragment.ResultFragment;
+import com.petabyte.plate.ui.fragment.*;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 

@@ -1,4 +1,4 @@
-package com.petabyte.plate.fragment;
+package com.petabyte.plate.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
