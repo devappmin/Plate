@@ -10,14 +10,17 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Title"/>
+        android:layout_margin="10dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="추천 음식"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_v_homehorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/title_tv_v_homehorizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        android:orientation="horizontal"/>
+        app:layout_constraintStart_toStartOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
