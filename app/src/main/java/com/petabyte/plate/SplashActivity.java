@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.petabyte.plate.ui.activity.LoginActivity;
 import com.petabyte.plate.ui.activity.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
@@ -22,11 +23,10 @@ public class SplashActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-
         if (user != null)
             intent = new Intent(SplashActivity.this, MainActivity.class);
         else
-            intent = new Intent(SplashActivity.this, MainActivity.class); // MainActivity를 LoginActivity로 변경할 것
+            intent = new Intent(SplashActivity.this, LoginActivity.class);
 
         startActivity(intent);
         finish();
