@@ -1,4 +1,4 @@
-package com.petabyte.plate;
+package com.petabyte.plate.ui.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.petabyte.plate.R;
 import com.petabyte.plate.ui.fragment.*;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         loadFragment(fragments[0]);
     }
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

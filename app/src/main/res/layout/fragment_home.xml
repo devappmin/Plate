@@ -7,14 +7,16 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="116dp"
-        android:background="#fafafa">
+        android:background="#fafafa"
+        android:stateListAnimator="@drawable/appbar_always_elevated">
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
+            app:layout_scrollFlags="scroll|snap"
             app:title="PLATE: By everyone" />
 
+        <!--
         <EditText
             android:id="@+id/search_te_fm_home"
             android:layout_width="match_parent"
@@ -28,6 +30,25 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:textSize="13sp" />
+        -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/search_card_fm_home"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="9dp"
+            android:nestedScrollingEnabled="true"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:clickable="true"
+            app:cardCornerRadius="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/what_food"
+                android:layout_gravity="center"/>
+        </androidx.cardview.widget.CardView>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -42,18 +63,26 @@
             android:orientation="vertical">
             <com.petabyte.plate.ui.view.HomeHorizontalList
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:clipToPadding = "false"/>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="500dp"
-                android:layout_margin="40dp"
+                android:layout_margin="20dp"
                 app:cardBackgroundColor="@color/colorPrimary"
-                app:cardCornerRadius="20dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/apply_iv_fm_home"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -70,12 +99,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        android:text="지원하기"
+                        android:text="@string/apply"
                         android:textColor="@android:color/white"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         android:layout_margin="20dp"/>
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
