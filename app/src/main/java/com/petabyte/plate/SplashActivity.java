@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +22,6 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-
 
         if (user != null)
             intent = new Intent(SplashActivity.this, MainActivity.class);
