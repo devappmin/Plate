@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "34790234319",
+    "firebase_url": "https://plate-f5144.firebaseio.com",
+    "project_id": "plate-f5144",
+    "storage_bucket": "plate-f5144.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:34790234319:android:60d8c43ad728fa9ac53fba",
+        "android_client_info": {
+          "package_name": "com.petabyte.plate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "34790234319-r1rq3lqsb0lp84c280udp0r6palsplvo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQPWJGOS0Q0x3_-6avwdYRzw7qBabSTOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "34790234319-r1rq3lqsb0lp84c280udp0r6palsplvo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
