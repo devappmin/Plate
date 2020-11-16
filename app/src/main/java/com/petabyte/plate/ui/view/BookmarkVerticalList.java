@@ -3,6 +3,7 @@ package com.petabyte.plate.ui.view;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -24,6 +25,7 @@ import com.petabyte.plate.data.BookmarkCardViewData;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Calendar;
 
 
 public class BookmarkVerticalList extends ConstraintLayout implements ValueEventListener{
@@ -79,14 +81,15 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     public void onDataChange(@NonNull DataSnapshot snapshots) {
         for (DataSnapshot snapshot : snapshots.getChildren()) {
             String diningName = snapshot.child("Title").getValue().toString();
-            String diningDate = snapshot.child("Schedules").child("RANDOMKEY").child("start").getValue().toString();
+            String diningDate;
+            long diningTimestamp = (long) snapshot.child("Schedules").child("RANDOMKEY").child("start").getValue();
             double diningLatitude = (double) snapshot.child("Location").child("x").getValue();
             double diningLongitude = (double) snapshot.child("Location").child("y").getValue();
             String imageUri = snapshot.child("Image").getValue().toString();
-            String diningLocation;
 
-            diningLocation = BookmarkVerticalList.this.getAddress(diningLatitude, diningLongitude);
-            diningLocation = diningLocation.replace("대한민국 ", "");
+            String diningLocation = getAddress(diningLatitude, diningLongitude);//좌표로 주소 얻기
+            diningLocation = diningLocation.replace("대한민국 ", "");//주소에서 대한민국 제거
+            diningDate = getDate(diningTimestamp);//timstamp로 날짜 얻기
 
             BookmarkCardViewData data = new BookmarkCardViewData(diningName, diningDate, diningLocation, imageUri);
 
@@ -111,11 +114,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
         List<Address> addresses;
 
         try {
-
-            addresses = geocoder.getFromLocation(
-                    latitude,
-                    longitude,
-                    7);
+            addresses = geocoder.getFromLocation(latitude, longitude, 7);
         } catch (IOException ioException) {
             //네트워크 문제
             return "네트워크 오류";
@@ -130,6 +129,13 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
         Address address = addresses.get(0);
         return address.getAddressLine(0).toString();
 
+    }
+
+    private String getDate(long time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(time * 1000);
+        String date = DateFormat.format("yyyy-mm-dd", cal).toString();
+        return date;
     }
 
 }
