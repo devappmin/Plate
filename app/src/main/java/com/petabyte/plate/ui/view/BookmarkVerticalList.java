@@ -72,7 +72,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     }
 
     private void getItemDatas() {
-        mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(this);
+        mDatabase.child("Dining").addListenerForSingleValueEvent(this);
     }
 
     @Override
@@ -86,6 +86,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
             String diningLocation;
 
             diningLocation = BookmarkVerticalList.this.getAddress(diningLatitude, diningLongitude);
+            diningLocation = diningLocation.replace("대한민국 ", "");
 
             BookmarkCardViewData data = new BookmarkCardViewData(diningName, diningDate, diningLocation, imageUri);
 
@@ -127,7 +128,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
         }
 
         Address address = addresses.get(0);
-        return address.getAddressLine(0).toString()+"\n";
+        return address.getAddressLine(0).toString();
 
     }
 
