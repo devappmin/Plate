@@ -1,14 +1,19 @@
 package com.petabyte.plate.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.BookmarkCardViewData;
 import com.squareup.picasso.Picasso;
@@ -46,17 +51,32 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private TextView diningDate;
         private TextView diningLocation;
         private ImageView imageView;
-
+        private CheckBox checkBox;
+        private DatabaseReference databaseReference;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            diningName = (TextView)itemView.findViewById(R.id.dining_name_bookmarkcard);
-            diningDate = (TextView)itemView.findViewById(R.id.dining_date_bookmarkcard);
-            diningLocation = (TextView)itemView.findViewById(R.id.dining_location_bookmarkcard);
-            imageView = (ImageView)itemView.findViewById(R.id.image_view_bookmarkcard);
+            diningName = (TextView) itemView.findViewById(R.id.dining_name_bookmarkcard);
+            diningDate = (TextView) itemView.findViewById(R.id.dining_date_bookmarkcard);
+            diningLocation = (TextView) itemView.findViewById(R.id.dining_location_bookmarkcard);
+            imageView = (ImageView) itemView.findViewById(R.id.image_view_bookmarkcard);
+            checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
 
-            // Add CardView's ClickListener here..
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        Log.d("Checked", "true");
+                    } else {
+                        Log.d("Checked", "false");
+                    }
+                }
+            });
+
+
         }
 
         private void onBind(BookmarkCardViewData data) {

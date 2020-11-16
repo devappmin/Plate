@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import com.petabyte.plate.R;
@@ -25,10 +24,6 @@ public class BookmarkFragment extends Fragment {
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)v.findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
-
-        LottieAnimationView lottie = (LottieAnimationView)v.findViewById(R.id.lottie);
-        lottie.playAnimation();
-
 
         return v;
     }

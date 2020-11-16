@@ -25,9 +25,9 @@
         <TextView
             android:id="@+id/dining_name_bookmarkcard"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/textDarkPrimary"
             android:textSize="25dp"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="25dp"
@@ -37,7 +37,7 @@
         <TextView
             android:id="@+id/dining_date_bookmarkcard"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/textDarkPrimary"
             android:textSize="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,6 +49,7 @@
         <TextView
             android:id="@+id/dining_location_bookmarkcard"
             android:textSize="13dp"
+            android:textColor="@color/textDarkSecondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -59,12 +60,15 @@
             app:layout_constraintRight_toRightOf="parent"/>
 
         <CheckBox
+            android:id="@+id/checkbox_bookmarkcard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
+            android:layout_marginTop="29dp"
             android:layout_marginEnd="15dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintRight_toRightOf="parent"
+            android:checked="true"
+            android:button="@drawable/checkbox_bookmark"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
