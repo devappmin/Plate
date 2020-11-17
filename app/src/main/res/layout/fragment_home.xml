@@ -6,7 +6,7 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="116dp"
+        android:layout_height="130dp"
         android:background="#fafafa"
         android:stateListAnimator="@drawable/appbar_always_elevated">
 
@@ -31,24 +31,34 @@
             android:paddingRight="20dp"
             android:textSize="13sp" />
         -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/search_card_fm_home"
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="9dp"
-            android:nestedScrollingEnabled="true"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:clickable="true"
-            app:cardCornerRadius="20dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/what_food"
-                android:layout_gravity="center"/>
-        </androidx.cardview.widget.CardView>
+            android:layout_height="0dp"
+            android:layout_gravity="bottom"
+            android:layout_weight="30">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/search_card_fm_home"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:clickable="true"
+                android:layout_centerVertical="true"
+                android:nestedScrollingEnabled="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                app:cardCornerRadius="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/what_food" />
+            </androidx.cardview.widget.CardView>
+        </RelativeLayout>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 

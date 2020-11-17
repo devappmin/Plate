@@ -3,12 +3,17 @@
     package="com.petabyte.plate">
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCBM6w_H3TCpctU5Q93-OOfhSLW9Y7pX28" />
+
+        <activity android:name=".ui.activity.SearchLocationActivity"></activity>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.SearchActivity" />
-        <activity android:name=".ui.activity.MainActivity"/>
+        <activity android:name=".ui.activity.MainActivity" />
     </application>
 
 </manifest>

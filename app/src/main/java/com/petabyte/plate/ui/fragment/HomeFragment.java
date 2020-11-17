@@ -39,6 +39,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=2e0e6f43-2523-482e-82ff-f5cd5ad54e19")
+                .fit().centerCrop().into(applyImage);
 
         return v;
     }
