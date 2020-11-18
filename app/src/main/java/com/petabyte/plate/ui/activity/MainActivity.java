@@ -1,15 +1,20 @@
 package com.petabyte.plate.ui.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.petabyte.plate.R;
 import com.petabyte.plate.ui.fragment.*;
+import com.petabyte.plate.utils.ConnectionCodes;
+import com.petabyte.plate.utils.LogTags;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -65,5 +70,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get datum from SearchActivity which was called in HomeFragment
+     * @param requestCode Request codes in ConnectionCodes
+     * @param resultCode Result condition
+     * @param data Intent that has datum
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ConnectionCodes.REQUEST_SEARCH_ACTIVITY && resultCode == RESULT_OK) {
+            Log.d(LogTags.IMPORTANT, data.getIntExtra("people", 0) + " in Activity + " + requestCode + " & " + resultCode);
+            bottomNavigationView.setSelectedItemId(R.id.action_result);
+        }
     }
 }

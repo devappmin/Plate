@@ -14,29 +14,32 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll|snap"
-            app:title="PLATE: By everyone" />
+            android:contentInsetLeft="0dp"
+            android:contentInsetStart="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            android:contentInsetRight="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp">
 
-        <!--
-        <EditText
-            android:id="@+id/search_te_fm_home"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="9dp"
-            android:background="@drawable/textedit_background"
-            android:hint="오늘은 무엇을 먹어볼까요?"
-            android:nestedScrollingEnabled="true"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:textSize="13sp" />
-        -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_icon"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_gravity="bottom"
-            android:layout_weight="30">
+            android:layout_weight="1">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/search_card_fm_home"
@@ -72,16 +75,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <com.petabyte.plate.ui.view.HomeHorizontalList
+                android:id="@+id/special_hh_fm_home"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding = "false"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@color/textDarkDisabled"/>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="500dp"
                 android:layout_margin="20dp"
                 app:cardBackgroundColor="@color/colorPrimary"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="10dp"
                 app:cardElevation="8dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout

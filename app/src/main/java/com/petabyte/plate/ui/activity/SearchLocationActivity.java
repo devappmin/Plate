@@ -2,7 +2,9 @@ package com.petabyte.plate.ui.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -15,6 +17,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.petabyte.plate.R;
 import com.petabyte.plate.utils.LogTags;
 
@@ -25,7 +29,7 @@ import java.util.List;
 public class SearchLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap googleMap;
-
+    private String locationName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +61,7 @@ public class SearchLocationActivity extends AppCompatActivity implements OnMapRe
         List<Address> addresses = null;
 
         try {
-            addresses = geocoder.getFromLocationName("행운1마길 10-4", 5);
+            addresses = geocoder.getFromLocationName("서울특별시 동작구 상도3동", 5);
         } catch (IOException e) {
             e.printStackTrace();
         }

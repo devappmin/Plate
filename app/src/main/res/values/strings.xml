@@ -7,4 +7,5 @@
     <string name="or">-혹은-</string>
     <string name="what_food">🔎 오늘은 무엇을 먹어볼까요?</string>
     <string name="apply">지원하기</string>
+    <string name="search_location">지역 검색</string>
 </resources>

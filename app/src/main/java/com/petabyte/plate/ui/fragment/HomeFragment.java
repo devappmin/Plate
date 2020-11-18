@@ -2,6 +2,7 @@ package com.petabyte.plate.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +14,23 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.ui.activity.*;
+import com.petabyte.plate.ui.view.HomeHorizontalList;
 import com.petabyte.plate.utils.ConnectionCodes;
+import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
+
+import static android.app.Activity.RESULT_OK;
 
 public class HomeFragment extends Fragment {
 
     private CardView searchButton;
     private ImageView applyImage;
+    private HomeHorizontalList specialList;
 
     @Nullable
     @Override
@@ -30,12 +39,13 @@ public class HomeFragment extends Fragment {
 
         searchButton = (CardView) v.findViewById(R.id.search_card_fm_home);
         applyImage = (ImageView)v.findViewById(R.id.apply_iv_fm_home);
+        specialList = (HomeHorizontalList)v.findViewById(R.id.special_hh_fm_home);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
-                startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
+                getActivity().startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
             }
         });
 

@@ -49,7 +49,7 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView titleTextView;
-        private TextView descriptionTextView;
+        private TextView subtitleTextView;
         private ImageView imageView;
 
 
@@ -57,7 +57,7 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
             super(itemView);
 
             titleTextView = (TextView)itemView.findViewById(R.id.title_tv_v_homecard);
-            descriptionTextView = (TextView)itemView.findViewById(R.id.description_tv_v_homecard);
+            subtitleTextView = (TextView)itemView.findViewById(R.id.subtitle_tv_v_homecard);
             imageView = (ImageView)itemView.findViewById(R.id.image_v_homecard);
 
             // Add CardView's ClickListener here..
@@ -66,7 +66,7 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
         private void onBind(HomeCardData data) {
 
             titleTextView.setText(data.getTitle());
-            descriptionTextView.setText(data.getDescription());
+            subtitleTextView.setText(data.getDescription());
             Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/food.png?alt=media&token=99a94b9e-10eb-4eeb-93cb-c79061a8ebc5")).fit().centerCrop().into(imageView);
         }
     }

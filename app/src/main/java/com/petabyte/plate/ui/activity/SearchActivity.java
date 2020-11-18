@@ -1,5 +1,6 @@
 package com.petabyte.plate.ui.activity;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -10,13 +11,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
+import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.ui.fragment.NumberPickerDialog;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.LogTags;
@@ -24,8 +32,10 @@ import com.petabyte.plate.utils.LogTags;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener {
 
@@ -35,6 +45,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private CardView    locationCardView;
     private TextView    peopleTextView;
     private TextView    dateTextView;
+    private Button      submitButton;
 
     private String      date_time;
     private int         mYear;
@@ -42,6 +53,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private int         mDay;
     private int         mHour;
     private int         mMinute;
+    private int         people;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         peopleCardView = (CardView)findViewById(R.id.people_cv_av_search);
         dateCardView = (CardView)findViewById(R.id.date_cv_av_search);
         locationCardView = (CardView)findViewById(R.id.location_cv_av_search);
+        submitButton = (Button)findViewById(R.id.search_btn_av_search);
 
         peopleTextView = (TextView)findViewById(R.id.people_tv_av_search);
         dateTextView = (TextView)findViewById(R.id.date_tv_av_search);
@@ -60,6 +73,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         peopleCardView.setOnClickListener(this);
         dateCardView.setOnClickListener(this);
         locationCardView.setOnClickListener(this);
+        submitButton.setOnClickListener(this);
     }
 
     @Override
@@ -90,11 +104,24 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             Intent intent = new Intent(SearchActivity.this, SearchLocationActivity.class);
             startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_LOCATION);
         }
+        else if (view == submitButton) {
+            Intent intent = new Intent();
+            intent.putExtra("year", mYear);
+            intent.putExtra("month", mMonth);
+            intent.putExtra("day", mDay);
+            intent.putExtra("hour", mHour);
+            intent.putExtra("minute", mMinute);
+            intent.putExtra("people", people);
+
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        peopleTextView.setText((numberPicker.getValue() + 1)+ "명");
+        people = numberPicker.getValue() + 1;
+        peopleTextView.setText(people + "명");
     }
 
     @Override
