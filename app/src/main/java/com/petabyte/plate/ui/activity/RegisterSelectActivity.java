@@ -26,9 +26,9 @@ public class RegisterSelectActivity extends AppCompatActivity {
         btn_guest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO", "guest card view clicked");
+                Log.d("ji1dev", "guest card view clicked");
                 intent = new Intent(RegisterSelectActivity.this, RegisterActivity.class);
-                intent.putExtra("member_type", "guest");
+                intent.putExtra("MEMBER_TYPE", "GUEST");
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
@@ -38,9 +38,9 @@ public class RegisterSelectActivity extends AppCompatActivity {
         btn_host.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO", "host card view clicked");
+                Log.d("ji1dev", "host card view clicked");
                 intent = new Intent(RegisterSelectActivity.this, RegisterActivity.class);
-                intent.putExtra("member_type", "host");
+                intent.putExtra("MEMBER_TYPE", "HOST");
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
