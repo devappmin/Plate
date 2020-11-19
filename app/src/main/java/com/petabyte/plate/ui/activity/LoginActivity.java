@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(input_password.getWindowToken(), 0);
 
                 if(email.getBytes().length <= 0 || pw.getBytes().length <= 0) {
-                    Snackbar.make(view, "빈 칸이 있어요!", 2000).show();
+                    Snackbar.make(view, "빈 칸이 있어요!", 2500).show();
                 }else{
                     firebaseAuth.signInWithEmailAndPassword(email, pw)
                             .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     }else{
-                                        Snackbar.make(view, "이메일이나 비밀번호가 틀렸어요!", 2000).show();
+                                        Snackbar.make(view, "이메일이나 비밀번호가 틀렸어요!", 2500).show();
                                     }
                                 }
                             });
