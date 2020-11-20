@@ -26,6 +26,7 @@ import com.petabyte.plate.utils.LogTags;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class SearchMapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -58,6 +59,7 @@ public class SearchMapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(markerOptions);
 
         this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(soongsil, 17));
+
     }
 
     public static Location addrToPoint(Context context) {
@@ -66,7 +68,7 @@ public class SearchMapFragment extends Fragment implements OnMapReadyCallback {
         List<Address> addresses = null;
 
         try {
-            addresses = geocoder.getFromLocationName("청라자이", 5);
+            addresses = geocoder.getFromLocationName("숭실대학교", 5);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,7 +77,10 @@ public class SearchMapFragment extends Fragment implements OnMapReadyCallback {
                 Address lating = addresses.get(i);
                 location.setLatitude(lating.getLatitude());
                 location.setLongitude(lating.getLongitude());
-                Log.d(LogTags.POINT, addresses.size() + "");
+                Log.d(LogTags.POINT,
+                        lating.getAdminArea()+" "+lating.getSubLocality()+" " + lating.getThoroughfare() + " " +lating);
+
+
             }
         }
         return location;

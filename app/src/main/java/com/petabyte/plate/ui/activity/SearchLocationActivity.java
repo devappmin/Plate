@@ -10,12 +10,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 
-import com.google.android.gms.maps.GoogleMap;
-
 import com.petabyte.plate.R;
 import com.petabyte.plate.ui.fragment.SearchInputFragment;
 import com.petabyte.plate.ui.fragment.SearchMapFragment;
-
 
 public class SearchLocationActivity extends AppCompatActivity {
 
