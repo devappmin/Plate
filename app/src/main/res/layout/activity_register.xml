@@ -90,7 +90,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:background="@drawable/textedit_background"
-        android:hint="Password"
+        android:hint="Password (At least 6 chars)"
         android:inputType="textPassword"
         android:paddingLeft="20dp" />
 
@@ -115,7 +115,7 @@
         android:hint="Enter your password again"
         android:inputType="textPassword"
         android:paddingLeft="20dp" />
-
+    <!--
     <TextView
         android:id="@+id/label_host_intro"
         android:layout_width="wrap_content"
@@ -138,14 +138,14 @@
         android:hint="Introduce yourself shortly"
         android:inputType="textPassword"
         android:paddingLeft="20dp" />
-
+    -->
     <Button
         android:id="@+id/btn_submit"
         android:layout_width="366dp"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:background="@drawable/button_radius"
-        android:text="계속하기"
+        android:text="회원으로 가입하기"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:textSize="17sp"

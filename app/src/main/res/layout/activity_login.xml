@@ -17,7 +17,7 @@
         android:layout_width="320dp"
         android:layout_height="50dp"
         android:hint="E-Mail"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
         android:layout_gravity="center"
         android:background="@drawable/textedit_background"
         android:layout_marginBottom="20dp"
