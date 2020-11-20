@@ -1,5 +1,7 @@
 package com.petabyte.plate.adapter;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.BookmarkCardViewData;
+import com.petabyte.plate.ui.activity.DetailActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -47,7 +50,8 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView diningName;
+        private TextView diningTitle;
+        private TextView diningSubtitle;
         private TextView diningDate;
         private TextView diningLocation;
         private ImageView imageView;
@@ -57,13 +61,33 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            diningName = (TextView) itemView.findViewById(R.id.dining_name_bookmarkcard);
+            diningTitle = (TextView) itemView.findViewById(R.id.dining_title_bookmarkcard);
+            diningSubtitle = (TextView) itemView.findViewById(R.id.dining_subtitle_bookmarkcard);
             diningDate = (TextView) itemView.findViewById(R.id.dining_date_bookmarkcard);
             diningLocation = (TextView) itemView.findViewById(R.id.dining_location_bookmarkcard);
             imageView = (ImageView) itemView.findViewById(R.id.image_view_bookmarkcard);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
 
             databaseReference = FirebaseDatabase.getInstance().getReference();
+
+            diningTitle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), DetailActivity.class);
+                    intent.putExtra("title", diningTitle.getText().toString());
+                    v.getContext().startActivity(intent);
+                }
+            });
+
+            diningLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//주소 textview를 누르면 google maps 어플리케이션으로 연결
+                    String address = diningLocation.getText().toString().replace(' ', '+');
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q="+address));
+                    intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                    v.getContext().startActivity(intent);
+                }
+            });
 
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -76,15 +100,15 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 }
             });
 
-
         }
 
         private void onBind(BookmarkCardViewData data) {
 
-            diningName.setText(data.getDiningName());
+            diningTitle.setText(data.getDiningTitle());
+            diningSubtitle.setText(data.getDiningSubtitle());
             diningDate.setText(data.getDiningDate());
             diningLocation.setText(data.getDiningLocation());
-            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/food.png?alt=media&token=99a94b9e-10eb-4eeb-93cb-c79061a8ebc5")).fit().centerCrop().into(imageView);
+            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(imageView);
         }
     }
 }

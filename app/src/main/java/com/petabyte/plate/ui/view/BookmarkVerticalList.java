@@ -80,24 +80,24 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     @Override
     public void onDataChange(@NonNull DataSnapshot snapshots) {
         for (DataSnapshot snapshot : snapshots.getChildren()) {
-            String diningName = snapshot.child("Title").getValue().toString();
+            String diningTitle = snapshot.child("title").getValue().toString();
+            String diningSubtitle = snapshot.child("subtitle").getValue().toString();
             String diningDate;
-            long diningTimestamp = (long) snapshot.child("Schedules").child("RANDOMKEY").child("start").getValue();
-            double diningLatitude = (double) snapshot.child("Location").child("x").getValue();
-            double diningLongitude = (double) snapshot.child("Location").child("y").getValue();
-            String imageUri = snapshot.child("Image").getValue().toString();
+            long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
+            double diningLatitude = (double) snapshot.child("location").child("x").getValue();
+            double diningLongitude = (double) snapshot.child("location").child("y").getValue();
+            String imageUri = snapshot.child("images").child("2").getValue().toString();
 
-            String diningLocation = getAddress(diningLatitude, diningLongitude);//좌표로 주소 얻기
-            diningLocation = diningLocation.replace("대한민국 ", "");//주소에서 대한민국 제거
+            String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
             diningDate = getDate(diningTimestamp);//timstamp로 날짜 얻기
 
-            BookmarkCardViewData data = new BookmarkCardViewData(diningName, diningDate, diningLocation, imageUri);
+            BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, imageUri);
 
             recyclerAdapter.addItem(data);
             recyclerAdapter.notifyDataSetChanged();
 
             Log.d("[*]", snapshot + "");
-            Log.d("[!]", diningName + ", " + diningDate + "and" + diningLocation);
+            Log.d("[!]", diningTitle + ", " + diningDate + "and" + diningLocation);
         }
     }
 
@@ -131,9 +131,9 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
 
     }
 
-    private String getDate(long time) {
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(time * 1000);
+    private String getDate(long timeStamp) {
+        Calendar cal = Calendar.getInstance(Locale.KOREA);
+        cal.setTimeInMillis(timeStamp * 1000);
         String date = DateFormat.format("yyyy-mm-dd", cal).toString();
         return date;
     }

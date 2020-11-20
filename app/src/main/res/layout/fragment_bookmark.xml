@@ -42,8 +42,8 @@
             <com.petabyte.plate.ui.view.BookmarkVerticalList
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding = "false"/>
-
+                android:clipToPadding="false"/>
+            
             <View
                 android:layout_width="match_parent"
                 android:layout_height="80dp"/>

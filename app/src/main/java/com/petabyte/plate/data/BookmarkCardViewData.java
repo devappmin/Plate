@@ -1,30 +1,27 @@
 package com.petabyte.plate.data;
 
-import android.net.Uri;
-
 public class BookmarkCardViewData {
-    private String diningName;
+    private String diningTitle;
+    private String diningSubtitle;
     private String diningDate;
     private String diningLocation;
     private String imageUri;
 
-    public BookmarkCardViewData() {
-    }
-
-    public BookmarkCardViewData(String diningName, String diningDate, String diningLocation, String imageUri) {
-        this.diningName = diningName;
+    public BookmarkCardViewData(String diningTitle, String diningSubtitle, String diningDate, String diningLocation, String imageUri) {
+        this.diningTitle = diningTitle;
+        this.diningSubtitle = diningSubtitle;
         this.diningDate = diningDate;
         this.diningLocation = diningLocation;
         this.imageUri = imageUri;
     }
 
-    public String getDiningName() {
-        return diningName;
-    }
+    public String getDiningTitle() { return diningTitle; }
 
-    public void setDiningName(String diningName) {
-        this.diningName = diningName;
-    }
+    public void setDiningTitle(String diningTitle) { this.diningTitle = diningTitle; }
+
+    public String getDiningSubtitle() { return diningSubtitle; }
+
+    public void setDiningSubtitle(String diningSubtitle) { this.diningTitle = diningSubtitle; }
 
     public String getDiningDate() {
         return diningDate;
