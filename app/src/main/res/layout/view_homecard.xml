@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:cardCornerRadius="10dp"
-        app:cardElevation="8dp">
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -41,9 +41,9 @@
         android:textColor="@color/textDarkPrimary"
         android:text="타이틀"
         app:layout_constraintTop_toBottomOf="@id/card_v_homecard"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="5dp"/>
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"/>
 
     <TextView
         android:id="@+id/subtitle_tv_v_homecard"
@@ -53,9 +53,29 @@
 
         android:textColor="@color/textDarkSecondary"
         app:layout_constraintTop_toBottomOf="@id/card_v_homecard"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_tv_v_homecard"
         android:layout_margin="10dp"/>
 
+    <TextView
+        android:id="@+id/description_tv_v_homecard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_tv_v_homecard"
+        android:text="가나다라마바사아자차카타파하 가나다라마바사아자차카타파하 123456"
+        android:singleLine="true"/>
+
+    <TextView
+        android:id="@+id/price_tv_v_homecard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/description_tv_v_homecard"
+        android:text="50,000"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

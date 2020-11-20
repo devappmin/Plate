@@ -1,78 +1,58 @@
 package com.petabyte.plate.ui.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
+
 import com.petabyte.plate.R;
-import com.petabyte.plate.utils.LogTags;
-
-import java.io.IOException;
-import java.util.List;
+import com.petabyte.plate.ui.fragment.SearchInputFragment;
+import com.petabyte.plate.ui.fragment.SearchMapFragment;
 
 
-public class SearchLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SearchLocationActivity extends AppCompatActivity {
 
-    private GoogleMap googleMap;
-    private String locationName;
+    private static final int NUM_PAGES = 2;
+
+    private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_location);
 
-        SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map_fr_av_location);
-        mapFragment.getMapAsync(this);
-
+        viewPager = (ViewPager)findViewById(R.id.viewpager_av_location);
+        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), 0);
+        viewPager.setAdapter(pagerAdapter);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        Context context = this;
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        Location soong = addrToPoint(context);
-        final LatLng soongsil = new LatLng(soong.getLatitude(), soong.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(soongsil);
-        markerOptions.title("숭실대");
-        googleMap.addMarker(markerOptions);
-
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(soongsil, 17));
-    }
-
-    public static Location addrToPoint(Context context) {
-        Location location = new Location("");
-        Geocoder geocoder = new Geocoder(context);
-        List<Address> addresses = null;
-
-        try {
-            addresses = geocoder.getFromLocationName("서울특별시 동작구 상도3동", 5);
-        } catch (IOException e) {
-            e.printStackTrace();
+        public ScreenSlidePagerAdapter(@NonNull FragmentManager fm, int behavior) {
+            super(fm, behavior);
         }
-        if (addresses != null) {
-            for (int i = 0; i < addresses.size(); i++) {
-                Address lating = addresses.get(i);
-                location.setLatitude(lating.getLatitude());
-                location.setLongitude(lating.getLongitude());
-                Log.d(LogTags.POINT, addresses.size() + "");
-            }
+
+        @NonNull
+        @Override
+        public Fragment getItem(int position) {
+            Fragment fragment;
+            if(position == 0) fragment = new SearchInputFragment();
+            else fragment = new SearchMapFragment();
+
+            return fragment;
         }
-        return location;
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
+        }
     }
 }

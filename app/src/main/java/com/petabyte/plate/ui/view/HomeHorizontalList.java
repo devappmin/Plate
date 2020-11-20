@@ -93,18 +93,19 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
     public void onDataChange(@NonNull DataSnapshot snapshots) {
         for (DataSnapshot snapshot : snapshots.getChildren()) {
             String title = snapshot.child("title").getValue(String.class);
-            String description = snapshot.child("subtitle").getValue(String.class);
+            String subtitle = snapshot.child("subtitle").getValue(String.class);
+            String description = snapshot.child("description").getValue(String.class);
 
             // Image should be changed
             String imageUri = snapshot.child("image").getValue(String.class);
 
-            HomeCardData data = new HomeCardData(title, description, imageUri);
+            HomeCardData data = new HomeCardData(title, subtitle, description, imageUri);
             recyclerAdapter.addItem(data);
 
             recyclerAdapter.notifyDataSetChanged();
 
             Log.d("[*]", snapshot + "");
-            Log.d("[!]", title + " and " + description);
+            Log.d("[!]", title + " and " + subtitle);
         }
     }
 

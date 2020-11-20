@@ -94,8 +94,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             //class 자신을 Listener로 설정한다
             dialog.setValueChangeListener(this);
             dialog.show(this.getFragmentManager(), "number picker");
-
-            Log.d("[*]", "fuck");
         }
         else if (view == dateCardView) {
             datePicker();
@@ -118,20 +116,19 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    // NumberPicker를 통해서 값을 입력 받았을 때 호출되는 함수
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        // numberPicker에서 선택한 값을 people 변수에 저장하고
+        // peopleTextView에 해당 값을 입력한다.
         people = numberPicker.getValue() + 1;
         peopleTextView.setText(people + "명");
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ConnectionCodes.REQUEST_SEARCH_ACTIVITY) {
-
-        }
-    }
-
+    /**
+     * Datepicker 다이얼로그를 호출하는 함수
+     * 날짜를 정한 뒤에는 시간도 정해야한다,
+     */
     private void datePicker(){
         // 현재 날짜를 기준으로 년 월 일 변수 할당
         final Calendar c = Calendar.getInstance();
@@ -139,24 +136,30 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
 
+        // DatePickerDialog를 통해 다이얼로그 생성
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
 
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        // 입력된 년도, 월, 일을 각 변수에 삽입
                         mYear = year;
                         mMonth = monthOfYear + 1;
                         mDay = dayOfMonth;
 
+                        // date_time 문자열에 월과 일을 삽입
                         date_time = mMonth + "월 " + dayOfMonth + "일";
 
-                        // Time Picker 다이어로그 호출
+                        // Time Picker 다이얼로그를 호출
                         timePicker();
                     }
                 }, mYear, mMonth, mDay);
         datePickerDialog.show();
     }
 
+    /**
+     * Timepicker 다이얼로그를 호출하는 함수
+     */
     private void timePicker(){
         // 현재 시간을 기준으로 시간 및 분 변수 할당
         final Calendar c = Calendar.getInstance();
@@ -174,19 +177,40 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                         mHour = hourOfDay;
                         mMinute = minute;
 
-                        // dateTextView에 텍스트 지정
-                        dateTextView.setText(date_time+" "+hourOfDay + "시 " + minute + "분");
+                        // date_time 문자열에 시간 포함
+                        date_time += " " + mHour + "시";
+
+                        // 0분이 아닐 경우에 date_time 문자열에 분 포함
+                        if (minute != 0)
+                            date_time += " " + mMinute + "분";
+
+                        // dateTextView에 date_time 값을 삽입
+                        dateTextView.setText(date_time);
 
                     }
                 }, mHour, 0, false);
         timePickerDialog.show();
     }
 
+    /**
+     * 년, 월, 일, 시간, 분을 입력하면 Timestamp로 변환해주는 함수
+     * @param year      년
+     * @param month     월
+     * @param day       일
+     * @param hour      시간
+     * @param minute    분
+     * @return Timestamp로 변환한 날짜 값
+     * @throws ParseException
+     */
     private long convertDateToTimestamp(int year, int month, int day, int hour, int minute) throws ParseException {
+        // 년도 ~ 분까지 전부 저장하는 문자열 생성
         String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute;
+
+        // Dateformat을 만들고 dateStr의 값을 삽입
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         Date date = (Date)dateFormat.parse(dateStr);
 
+        // Timestamp 값을 리턴하는데 date 값에 문제가 있으면 0 리턴
         return date != null ? date.getTime() : 0;
     }
 }
