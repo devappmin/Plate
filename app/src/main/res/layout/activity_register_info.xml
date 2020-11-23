@@ -33,7 +33,7 @@
             android:textAlignment="center"
             android:text="Host 회원은 간단한 심사과정이 진행돼요. \n아래 이메일로 포트폴리오를 보내주세요!"
             android:textColor="@color/textDarkPrimary"
-            android:textSize="17sp" />
+            android:textSize="17dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -58,7 +58,7 @@
         android:textAlignment="center"
         android:text="수많은 다이닝이 김숭실님을 기다리고 있어요 "
         android:textColor="@color/textDarkPrimary"
-        android:textSize="16sp" />
+        android:textSize="16dp" />
 
     <Button
         android:id="@+id/btn_start"
@@ -68,7 +68,7 @@
         android:text="시작하기"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:textSize="17sp"
+        android:textSize="17dp"
 
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="20dp"
