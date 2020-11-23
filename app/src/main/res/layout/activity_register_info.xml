@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:textColor="@color/textDarkPrimary"
+        android:lines="2"
+        android:textSize="40dp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_weight="5"
+        android:layout_marginBottom="20dp"
+        android:text="PLATE에 오신것을 \n환영합니다" />
+
+    <LinearLayout
+        android:id="@+id/layout_register_host_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:textAlignment="center"
+            android:text="Host 회원은 간단한 심사과정이 진행돼요. \n아래 이메일로 포트폴리오를 보내주세요!"
+            android:textColor="@color/textDarkPrimary"
+            android:textSize="17sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:textColor="@color/textDarkPrimary"
+            android:background="@drawable/textedit_background"
+            android:textAlignment="center"
+            android:text="welcome@everyplate.com"
+            android:padding="20dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_v_register_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center"
+        android:text="수많은 다이닝이 김숭실님을 기다리고 있어요 "
+        android:textColor="@color/textDarkPrimary"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/button_radius"
+        android:text="시작하기"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
+
+
+</LinearLayout>
+
+
+
