@@ -22,7 +22,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.HomeHorizontalListAdapter;
+import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.HomeCardData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create custom horizontal recycler view
@@ -86,7 +90,7 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
     }
 
     private void getItemDatas() {
-        mDatabase.child("Dining").limitToLast(10).addListenerForSingleValueEvent(this);
+        mDatabase.child("Dining").orderByChild("schedules/RANDOMKEY/start").limitToLast(10).addListenerForSingleValueEvent(this);
     }
 
     @Override

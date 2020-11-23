@@ -16,7 +16,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCBM6w_H3TCpctU5Q93-OOfhSLW9Y7pX28" />
 
-        <activity android:name=".ui.activity.SearchLocationActivity"/>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

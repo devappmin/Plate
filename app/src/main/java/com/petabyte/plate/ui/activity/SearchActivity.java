@@ -4,11 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.SharedElementCallback;
 
 import android.app.ActivityOptions;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +23,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.ui.fragment.NumberPickerDialog;
+import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.LogTags;
 
@@ -39,7 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener {
+public class SearchActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener, LocationPickerBottomSheet.ItemClickListener {
 
     private ImageButton cancelButton;
     private CardView    peopleCardView;
@@ -47,6 +52,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private CardView    locationCardView;
     private TextView    peopleTextView;
     private TextView    dateTextView;
+    private TextView    locationTextView;
     private Button      submitButton;
 
     private String      date_time;
@@ -70,6 +76,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         peopleTextView = (TextView)findViewById(R.id.people_tv_av_search);
         dateTextView = (TextView)findViewById(R.id.date_tv_av_search);
+        locationTextView = (TextView)findViewById(R.id.location_tv_av_search);
 
         cancelButton.setOnClickListener(this);
         peopleCardView.setOnClickListener(this);
@@ -101,8 +108,11 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             datePicker();
         }
         else if (view == locationCardView) {
-            Intent intent = new Intent(SearchActivity.this, SearchLocationActivity.class);
-            startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_LOCATION);
+            //Intent intent = new Intent(SearchActivity.this, SearchLocationActivity.class);
+            //startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_LOCATION);
+            LocationPickerBottomSheet bottomSheet = new LocationPickerBottomSheet();
+            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+
         }
         else if (view == submitButton) {
             Intent intent = new Intent();
@@ -125,6 +135,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         // peopleTextView에 해당 값을 입력한다.
         people = numberPicker.getValue() + 1;
         peopleTextView.setText(people + "명");
+        peopleTextView.setTypeface(null, Typeface.BOLD);
+        peopleTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 
     /**
@@ -165,8 +177,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private void timePicker(){
         // 현재 시간을 기준으로 시간 및 분 변수 할당
         final Calendar c = Calendar.getInstance();
-        mHour = c.get(Calendar.HOUR_OF_DAY);
-        mMinute = c.get(Calendar.MINUTE);
 
         // Time Picker 다이어로그 호출
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
@@ -188,9 +198,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
                         // dateTextView에 date_time 값을 삽입
                         dateTextView.setText(date_time);
-
+                        dateTextView.setTypeface(null, Typeface.BOLD);
+                        dateTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
                     }
-                }, mHour, 0, false);
+                }, 18, 0, false);
         timePickerDialog.show();
     }
 
@@ -214,5 +225,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         // Timestamp 값을 리턴하는데 date 값에 문제가 있으면 0 리턴
         return date != null ? date.getTime() : 0;
+    }
+
+    @Override
+    public void onItemClick(String item) {
+        locationTextView.setText(item);
+        locationTextView.setTypeface(null, Typeface.BOLD);
+        locationTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 }

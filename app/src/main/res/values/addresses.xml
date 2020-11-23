@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="spinner_region">
-        <item></item>
         <item>서울특별시</item>
         <item>부산광역시</item>
         <item>대구광역시</item>
@@ -22,31 +21,31 @@
     </string-array>
 
     <string-array name="spinner_region_seoul">
-        <item>서울특별시 강남구</item>
-        <item>서울특별시 강동구</item>
-        <item>서울특별시 강북구</item>
-        <item>서울특별시 강서구</item>
-        <item>서울특별시 관악구</item>
-        <item>서울특별시 광진구</item>
-        <item>서울특별시 구로구</item>
-        <item>서울특별시 금천구</item>
-        <item>서울특별시 노원구</item>
-        <item>서울특별시 도봉구</item>
-        <item>서울특별시 동대문구</item>
-        <item>서울특별시 동작구</item>
-        <item>서울특별시 마포구</item>
-        <item>서울특별시 서대문구</item>
-        <item>서울특별시 서초구</item>
-        <item>서울특별시 성동구</item>
-        <item>서울특별시 성북구</item>
-        <item>서울특별시 송파구</item>
-        <item>서울특별시 양천구</item>
-        <item>서울특별시 영등포구</item>
-        <item>서울특별시 용산구</item>
-        <item>서울특별시 은평구</item>
-        <item>서울특별시 종로구</item>
-        <item>서울특별시 중구</item>
-        <item>서울특별시 중랑구</item>
+        <item>강남구</item>
+        <item>강동구</item>
+        <item>강북구</item>
+        <item>강서구</item>
+        <item>관악구</item>
+        <item>광진구</item>
+        <item>구로구</item>
+        <item>금천구</item>
+        <item>노원구</item>
+        <item>도봉구</item>
+        <item>동대문구</item>
+        <item>동작구</item>
+        <item>마포구</item>
+        <item>서대문구</item>
+        <item>서초구</item>
+        <item>성동구</item>
+        <item>성북구</item>
+        <item>송파구</item>
+        <item>양천구</item>
+        <item>영등포구</item>
+        <item>용산구</item>
+        <item>은평구</item>
+        <item>종로구</item>
+        <item>중구</item>
+        <item>중랑구</item>
     </string-array>
 
     <string-array name="spinner_region_seoul_gangnam">
