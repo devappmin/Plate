@@ -74,7 +74,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     }
 
     private void getItemDatas() {
-        mDatabase.child("Dining").addListenerForSingleValueEvent(this);
+        mDatabase.child("Dining").orderByChild("schedules/RANDOMKEY/start").addListenerForSingleValueEvent(this);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     private String getDate(long timeStamp) {
         Calendar cal = Calendar.getInstance(Locale.KOREA);
         cal.setTimeInMillis(timeStamp * 1000);
-        String date = DateFormat.format("yyyy-mm-dd", cal).toString();
+        String date = DateFormat.format("yyyy-MM-dd", cal).toString();
         return date;
     }
 

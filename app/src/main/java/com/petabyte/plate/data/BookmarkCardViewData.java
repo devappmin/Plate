@@ -23,25 +23,15 @@ public class BookmarkCardViewData {
 
     public void setDiningSubtitle(String diningSubtitle) { this.diningTitle = diningSubtitle; }
 
-    public String getDiningDate() {
-        return diningDate;
-    }
+    public String getDiningDate() { return diningDate; }
 
-    public void setDiningDate(String diningDate) {
-        this.diningDate = diningDate;
-    }
+    public void setDiningDate(String diningDate) { this.diningDate = diningDate; }
 
     public String getDiningLocation() { return diningLocation; }
 
-    public void setDiningLocation(String diningLocation) {
-        this.diningLocation = diningLocation;
-    }
+    public void setDiningLocation(String diningLocation) { this.diningLocation = diningLocation; }
 
-    public String getImageUri() {
-        return imageUri;
-    }
+    public String getImageUri() { return imageUri; }
 
-    public void setImageUri(String imageUri) {
-        this.imageUri = imageUri;
-    }
+    public void setImageUri(String imageUri) { this.imageUri = imageUri; }
 }
