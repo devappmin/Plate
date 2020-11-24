@@ -5,27 +5,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/title_tv_v_homehorizontal"
+        android:id="@+id/title_tv_v_homeawards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/textDarkPrimary"
         android:text="당신에게 딱 맞는\n럭셔리한 음식을 모아봤어요!"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_v_homehorizontal"
+        android:id="@+id/recycler_view_v_awards"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:paddingStart="15dp"
         android:paddingRight="15dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/title_tv_v_homehorizontal"
+        app:layout_constraintTop_toBottomOf="@id/title_tv_v_homeawards"
         app:layout_constraintStart_toStartOf="parent"/>
 
 

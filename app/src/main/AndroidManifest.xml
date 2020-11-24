@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.petabyte.plate">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -12,6 +15,10 @@
         <activity android:name=".ui.activity.RegisterInfoActivity"></activity>
         <activity android:name=".ui.activity.RegisterActivity" />
         <activity android:name=".ui.activity.RegisterSelectActivity" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCBM6w_H3TCpctU5Q93-OOfhSLW9Y7pX28" />
+
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

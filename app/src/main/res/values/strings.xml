@@ -5,6 +5,10 @@
     <string name="bookmark">북마크</string>
     <string name="mypage">마이페이지</string>
     <string name="or">-혹은-</string>
-    <string name="what_food">오늘은 무엇을 먹어볼까요?</string>
+    <string name="what_food">🔎 오늘은 무엇을 먹어볼까요?</string>
     <string name="apply">지원하기</string>
+    <string name="search_location">지역 검색</string>
+    <string name="choose_location">지역을 선택하세요.</string>
+    <string name="next">다음</string>
+    <string name="submit">확인</string>
 </resources>

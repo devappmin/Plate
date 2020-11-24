@@ -4,12 +4,14 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
@@ -20,7 +22,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.HomeHorizontalListAdapter;
+import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.HomeCardData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create custom horizontal recycler view
@@ -28,10 +34,16 @@ import com.petabyte.plate.data.HomeCardData;
  */
 
 public class HomeHorizontalList extends ConstraintLayout implements ValueEventListener{
+
+    // RecyclerView 관련 변수
     private RecyclerView recyclerView;
     private HomeHorizontalListAdapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
+    // View 변수
+    private TextView titleView;
+
+    // Firebase 관련 변수
     private DatabaseReference mDatabase;
 
     public HomeHorizontalList(@NonNull Context context) {
@@ -67,7 +79,7 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
         recyclerView = (RecyclerView)this.findViewById(R.id.recycler_view_v_homehorizontal);
 
         // 부드러운 스크롤이 아닌 item 단위로 스크롤을 하기 위해 적용
-        SnapHelper helper = new LinearSnapHelper();
+        SnapHelper helper = new PagerSnapHelper();
         helper.attachToRecyclerView(recyclerView);
 
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -78,25 +90,26 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
     }
 
     private void getItemDatas() {
-        mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(this);
+        mDatabase.child("Dining").orderByChild("schedules/RANDOMKEY/start").limitToLast(10).addListenerForSingleValueEvent(this);
     }
 
     @Override
     public void onDataChange(@NonNull DataSnapshot snapshots) {
         for (DataSnapshot snapshot : snapshots.getChildren()) {
-            String title = snapshot.child("Title").getValue(String.class);
-            String description = snapshot.child("Description").getValue(String.class);
+            String title = snapshot.child("title").getValue(String.class);
+            String subtitle = snapshot.child("subtitle").getValue(String.class);
+            String description = snapshot.child("description").getValue(String.class);
 
             // Image should be changed
-            String imageUri = snapshot.child("Image").getValue(String.class);
+            String imageUri = snapshot.child("image").getValue(String.class);
 
-            HomeCardData data = new HomeCardData(title, description, imageUri);
+            HomeCardData data = new HomeCardData(title, subtitle, description, imageUri);
             recyclerAdapter.addItem(data);
 
             recyclerAdapter.notifyDataSetChanged();
 
             Log.d("[*]", snapshot + "");
-            Log.d("[!]", title + " and " + description);
+            Log.d("[!]", title + " and " + subtitle);
         }
     }
 
