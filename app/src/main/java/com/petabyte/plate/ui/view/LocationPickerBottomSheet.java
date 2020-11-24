@@ -67,6 +67,9 @@ public class LocationPickerBottomSheet extends BottomSheetDialogFragment {
                 if (current == PROGRESS.LARGE && !head.equals("init")) {
                     gridLayout.removeAllViews();
 
+                    if(!submitButton.getText().equals("확인"))
+                        submitButton.setText("확인");
+
                     final String temp = head;
 
                     Button location;
@@ -79,9 +82,6 @@ public class LocationPickerBottomSheet extends BottomSheetDialogFragment {
                                 if (head != loc) {
                                     head = temp + " " + loc;
                                     textSwitcher.setText(head);
-
-                                    if(!submitButton.getText().equals("확인"))
-                                        submitButton.setText("확인");
                                 }
                             }
                         });
@@ -92,8 +92,8 @@ public class LocationPickerBottomSheet extends BottomSheetDialogFragment {
                     current = PROGRESS.DETAIL;
                 }
                 else if(current == PROGRESS.DETAIL) {
-                    ItemClickListener listener = (ItemClickListener) getContext();
-                    listener.onItemClick(head);
+                    LocationPickerSelectedListener listener = (LocationPickerSelectedListener) getContext();
+                    listener.onLocationPickerSelected(head);
                     dismiss();
                 }
             }
@@ -133,7 +133,6 @@ public class LocationPickerBottomSheet extends BottomSheetDialogFragment {
         params.setGravity(Gravity.CENTER);
 
         button.setLayoutParams(params);
-
         return button;
     }
 
@@ -158,7 +157,7 @@ public class LocationPickerBottomSheet extends BottomSheetDialogFragment {
         addresses.put("제주특별자치도", R.array.spinner_region_jeju);
     }
 
-    public interface ItemClickListener {
-        void onItemClick(String item);
+    public interface LocationPickerSelectedListener {
+        void onLocationPickerSelected(String address);
     }
 }

@@ -1,50 +1,31 @@
 package com.petabyte.plate.ui.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.SharedElementCallback;
 
-import android.app.ActivityOptions;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
-import com.petabyte.plate.data.DiningMasterData;
-import com.petabyte.plate.ui.fragment.NumberPickerDialog;
 import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
-import com.petabyte.plate.utils.ConnectionCodes;
-import com.petabyte.plate.utils.LogTags;
+import com.petabyte.plate.ui.view.NumberPickerBottomSheet;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements View.OnClickListener, NumberPicker.OnValueChangeListener, LocationPickerBottomSheet.ItemClickListener {
+public class SearchActivity extends AppCompatActivity implements View.OnClickListener, NumberPickerBottomSheet.NumberPickerSelectedListener, LocationPickerBottomSheet.LocationPickerSelectedListener {
 
     private ImageButton cancelButton;
     private CardView    peopleCardView;
@@ -90,29 +71,15 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         if (view == cancelButton)
             finish();
         else if (view == peopleCardView) {
-            NumberPickerDialog dialog = new NumberPickerDialog();
-
-            Bundle bundle = new Bundle(6); // 파라미터는 전달할 데이터 개수
-            bundle.putString("title", "인원 수"); // key , value
-            bundle.putString("subtitle", "예약하려는 인원을 입력해주세요."); // key , value
-            bundle.putInt("maxvalue", 30); // key , value
-            bundle.putInt("minvalue", 1); // key , value
-            bundle.putInt("step", 1); // key , value
-            bundle.putInt("defvalue", 1); // key , value
-            dialog.setArguments(bundle);
-            //class 자신을 Listener로 설정한다
-            dialog.setValueChangeListener(this);
-            dialog.show(this.getFragmentManager(), "number picker");
+            NumberPickerBottomSheet bottomSheet = new NumberPickerBottomSheet(1, 50);
+            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
         }
         else if (view == dateCardView) {
             datePicker();
         }
         else if (view == locationCardView) {
-            //Intent intent = new Intent(SearchActivity.this, SearchLocationActivity.class);
-            //startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_LOCATION);
             LocationPickerBottomSheet bottomSheet = new LocationPickerBottomSheet();
             bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
-
         }
         else if (view == submitButton) {
             Intent intent = new Intent();
@@ -126,17 +93,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             setResult(RESULT_OK, intent);
             finish();
         }
-    }
-
-    // NumberPicker를 통해서 값을 입력 받았을 때 호출되는 함수
-    @Override
-    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        // numberPicker에서 선택한 값을 people 변수에 저장하고
-        // peopleTextView에 해당 값을 입력한다.
-        people = numberPicker.getValue() + 1;
-        peopleTextView.setText(people + "명");
-        peopleTextView.setTypeface(null, Typeface.BOLD);
-        peopleTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 
     /**
@@ -228,9 +184,19 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onItemClick(String item) {
-        locationTextView.setText(item);
+    public void onLocationPickerSelected(String address) {
+        locationTextView.setText(address);
         locationTextView.setTypeface(null, Typeface.BOLD);
         locationTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+    }
+
+    @Override
+    public void onNumberPickerSelected(int selectedValue) {
+        // numberPicker에서 선택한 값을 people 변수에 저장하고
+        // peopleTextView에 해당 값을 입력한다.
+        people = selectedValue;
+        peopleTextView.setText(people + "명");
+        peopleTextView.setTypeface(null, Typeface.BOLD);
+        peopleTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
     }
 }

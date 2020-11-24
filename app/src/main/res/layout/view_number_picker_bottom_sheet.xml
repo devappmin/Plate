@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="32dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="40dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="인원을 선택해주세요."
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:layout_marginBottom="16dp"/>
+
+    <NumberPicker
+        android:id="@+id/picker_v_number_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/button_v_number_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/primary_button_background"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:text="@string/submit"/>
+
+
+</LinearLayout>
