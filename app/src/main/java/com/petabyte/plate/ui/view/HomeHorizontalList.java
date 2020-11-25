@@ -91,6 +91,8 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
 
     private void getItemDatas() {
         mDatabase.child("Dining").orderByChild("schedules/RANDOMKEY/start").limitToLast(10).addListenerForSingleValueEvent(this);
+
+
     }
 
     @Override
@@ -107,9 +109,6 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
             recyclerAdapter.addItem(data);
 
             recyclerAdapter.notifyDataSetChanged();
-
-            Log.d("[*]", snapshot + "");
-            Log.d("[!]", title + " and " + subtitle);
         }
     }
 

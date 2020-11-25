@@ -7,8 +7,9 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="130dp"
-        android:background="#fafafa"
-        android:stateListAnimator="@drawable/appbar_always_elevated">
+        android:background="@android:color/white"
+        app:liftOnScroll="true">
+        <!-- android:stateListAnimator="@drawable/appbar_always_elevated" -->
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
@@ -30,6 +31,7 @@
                     android:layout_width="64dp"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_logo"
+                    android:scaleType="centerCrop"
                     android:layout_gravity="start|bottom"/>
             </FrameLayout>
 
@@ -130,7 +132,7 @@
                 android:id="@+id/awards_ha_fm_home"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+                android:paddingBottom="40dp"
                 android:clipToPadding = "false"/>
 
             <TextView

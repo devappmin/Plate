@@ -10,8 +10,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.HomeAwardsListAdapter;
+import com.petabyte.plate.data.HomeAwardsData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,7 @@ public class HomeAwardsList extends ConstraintLayout {
 
     private TextView titleText;
 
-    private List<String> imageUris;
+    private StorageReference storage;
 
     public HomeAwardsList(@NonNull Context context) {
         super(context);
@@ -49,7 +52,7 @@ public class HomeAwardsList extends ConstraintLayout {
     public void initViews() {
         inflate(getContext(), R.layout.view_homeawardslist, this);
 
-        imageUris = new ArrayList<>();
+        storage = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/").getReference();
 
         titleText = (TextView)this.findViewById(R.id.title_tv_v_homeawards);
         recyclerView = (RecyclerView)this.findViewById(R.id.recycler_view_v_awards);
@@ -58,6 +61,7 @@ public class HomeAwardsList extends ConstraintLayout {
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new HomeAwardsListAdapter();
+        adapter.setReference(storage);
         recyclerView.setAdapter(adapter);
     }
 
@@ -65,9 +69,8 @@ public class HomeAwardsList extends ConstraintLayout {
         titleText.setText(title);
     }
 
-    public void addImages(String uri) {
-        imageUris.add(uri);
-        adapter.addItem(uri);
+    public void addData(HomeAwardsData data) {
+        adapter.addItem(data);
         adapter.notifyDataSetChanged();
     }
 }
