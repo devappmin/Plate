@@ -5,13 +5,15 @@ public class BookmarkCardViewData {
     private String diningSubtitle;
     private String diningDate;
     private String diningLocation;
+    private String diningDetailLocation;
     private String imageUri;
 
-    public BookmarkCardViewData(String diningTitle, String diningSubtitle, String diningDate, String diningLocation, String imageUri) {
+    public BookmarkCardViewData(String diningTitle, String diningSubtitle, String diningDate, String diningLocation, String diningDetailLocation, String imageUri) {
         this.diningTitle = diningTitle;
         this.diningSubtitle = diningSubtitle;
         this.diningDate = diningDate;
         this.diningLocation = diningLocation;
+        this.diningDetailLocation = diningDetailLocation;
         this.imageUri = imageUri;
     }
 
@@ -30,6 +32,10 @@ public class BookmarkCardViewData {
     public String getDiningLocation() { return diningLocation; }
 
     public void setDiningLocation(String diningLocation) { this.diningLocation = diningLocation; }
+
+    public String getDiningDetailLocation() { return diningDetailLocation; }
+
+    public void setDiningDetailLocation(String diningDetailLocation) { this.diningDetailLocation = diningDetailLocation; }
 
     public String getImageUri() { return imageUri; }
 

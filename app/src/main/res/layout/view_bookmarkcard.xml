@@ -70,7 +70,6 @@
 
         <TextView
             android:id="@+id/dining_detail_location_bookmarkcard"
-            android:text="세부세부주소주소"
             android:textSize="13dp"
             android:textColor="@color/textDarkSecondary"
             android:layout_width="0dp"

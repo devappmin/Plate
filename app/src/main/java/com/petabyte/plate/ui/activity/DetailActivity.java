@@ -2,6 +2,8 @@ package com.petabyte.plate.ui.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,11 +29,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.petabyte.plate.R;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -45,6 +48,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView chefImage;
     private TextView chefName;
     private TextView description;
+    private TextView rating;
+    private SimpleRatingBar ratingBar;
+    private CardView bottomCardview;
+    private TextView diningPrice;
 
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
@@ -66,11 +73,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         chefImage = (ImageView)findViewById(R.id.chef_image_DetailActivity);
         chefName = (TextView)findViewById(R.id.chef_name_DetailActivity);
         description = (TextView)findViewById(R.id.description_DetailActivity);
+        rating = (TextView)findViewById(R.id.rating_text_view_DetailActivity);
+        ratingBar = (SimpleRatingBar)findViewById(R.id.rating_bar_DetailActivity);
+        bottomCardview = (CardView)findViewById(R.id.card_view_bottom_DetailActivity);
+        diningPrice = (TextView)findViewById(R.id.price_DetailActivity);
 
         cancelButton.setOnClickListener(this);
 
         diningTitle.setText(diningName);
-
 
         getDiningInformation();
         getChefInformation();
@@ -81,6 +91,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         if(v == cancelButton)
             finish();
+
     }
 
     public void getDiningInformation() {
@@ -101,8 +112,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
                         textView.setTextColor(getResources().getColor(R.color.textDarkPrimary));
                         linearLayout.addView(textView);
-
                     }
+                    diningPrice.setText(String.format(Locale.KOREA, "%,d", dataSnapshot.child("price").getValue()) + "원");
                 }
             }
 
@@ -115,20 +126,31 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     public void getChefInformation() {
 
-
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        readData(new MyCallback() {//get DiningUID
+        storageReference.child("chef.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                chefImage.setBackground(new ShapeDrawable((new OvalShape())));
+                chefImage.setClipToOutline(true);
+                Picasso.get().load(uri).fit().centerCrop().into(chefImage);
+            }
+        });
+
+        readData(new MyCallback() {//get Chef UID
             @Override
             public void onCallback(String uid) {
                 databaseReference = FirebaseDatabase.getInstance().getReference();
-                //get user Information
-                databaseReference.child("User").child("Host").orderByChild("MyDining/DiningUID").equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                //get Host user Information
+                databaseReference.child("User").child("Host").orderByKey().equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshots) {
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
+                            double rate = (double) dataSnapshot.child("Profile").child("Rating").getValue();
                             chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
                             description.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
+                            rating.setText("유저 평점\n" + rate + " / 5.0");
+                            ratingBar.setRating(((float) rate));
                         }
                     }
 
@@ -137,15 +159,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
                     }
                 });
-            }
-        });
-
-        storageReference.child("chef.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                chefImage.setBackground(new ShapeDrawable((new OvalShape())));
-                chefImage.setClipToOutline(true);
-                Picasso.get().load(uri).fit().centerCrop().into(chefImage);
             }
         });
     }
@@ -157,7 +170,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
                     String uid = dataSnapshot.getKey();
-                    myCallback.onCallback(uid);
+                    myCallback.onCallback(uid.substring(0, 28));
                 }
             }
 

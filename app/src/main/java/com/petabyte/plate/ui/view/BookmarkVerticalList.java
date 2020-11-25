@@ -86,12 +86,13 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
             long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
             double diningLatitude = (double) snapshot.child("location").child("x").getValue();
             double diningLongitude = (double) snapshot.child("location").child("y").getValue();
+            String diningDetailLocation = snapshot.child("location").child("detail").getValue().toString();
             String imageUri = snapshot.child("images").child("2").getValue().toString();
 
             String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
             diningDate = getDate(diningTimestamp);//timstamp로 날짜 얻기
 
-            BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, imageUri);
+            BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, diningDetailLocation, imageUri);
 
             recyclerAdapter.addItem(data);
             recyclerAdapter.notifyDataSetChanged();

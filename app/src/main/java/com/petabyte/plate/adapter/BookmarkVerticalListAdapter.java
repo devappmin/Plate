@@ -54,6 +54,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private TextView diningSubtitle;
         private TextView diningDate;
         private TextView diningLocation;
+        private TextView diningDetailLocation;
         private ImageView imageView;
         private CheckBox checkBox;
         private DatabaseReference databaseReference;
@@ -65,6 +66,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningSubtitle = (TextView) itemView.findViewById(R.id.dining_subtitle_bookmarkcard);
             diningDate = (TextView) itemView.findViewById(R.id.dining_date_bookmarkcard);
             diningLocation = (TextView) itemView.findViewById(R.id.dining_location_bookmarkcard);
+            diningDetailLocation = (TextView) itemView.findViewById(R.id.dining_detail_location_bookmarkcard);
             imageView = (ImageView) itemView.findViewById(R.id.image_view_bookmarkcard);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
 
@@ -108,6 +110,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningSubtitle.setText(data.getDiningSubtitle());
             diningDate.setText(data.getDiningDate());
             diningLocation.setText(data.getDiningLocation());
+            diningDetailLocation.setText(data.getDiningDetailLocation());
             Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(imageView);
         }
     }
