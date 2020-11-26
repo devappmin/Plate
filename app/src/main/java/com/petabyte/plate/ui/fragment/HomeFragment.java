@@ -7,11 +7,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
@@ -33,12 +37,16 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private CardView searchButton;
     private ImageView applyImage;
     private HomeHorizontalList specialList;
     private HomeAwardsList awardsList;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private LinearLayout mainLayout;
+    private NestedScrollView scrollView;
 
     private DatabaseReference mDatabase;
 
@@ -55,6 +63,12 @@ public class HomeFragment extends Fragment {
         applyImage = (ImageView)v.findViewById(R.id.apply_iv_fm_home);
         specialList = (HomeHorizontalList)v.findViewById(R.id.special_hh_fm_home);
         awardsList = (HomeAwardsList)v.findViewById(R.id.awards_ha_fm_home);
+        swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.swipe_layout_fm_home);
+        mainLayout = (LinearLayout) v.findViewById(R.id.main_layout_fm_home);
+        scrollView = (NestedScrollView)v.findViewById(R.id.scroll_v_fm_home);
+
+        // 스와이프 시 Listener 설정
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         // 검색으로 이동하기 위한 검색창 클릭 리스너
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -90,5 +104,13 @@ public class HomeFragment extends Fragment {
                 .fit().centerCrop().into(applyImage);
         //endregion
         return v;
+    }
+
+    @Override
+    public void onRefresh() {
+        scrollView.removeView(mainLayout);
+        mainLayout.invalidate();
+        scrollView.addView(mainLayout);
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
