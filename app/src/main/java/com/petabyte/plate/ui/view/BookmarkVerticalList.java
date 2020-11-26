@@ -82,7 +82,7 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
         for (DataSnapshot snapshot : snapshots.getChildren()) {
             String diningTitle = snapshot.child("title").getValue().toString();
             String diningSubtitle = snapshot.child("subtitle").getValue().toString();
-            String diningDate;
+            String diningDate, diningTime;
             long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
             double diningLatitude = (double) snapshot.child("location").child("x").getValue();
             double diningLongitude = (double) snapshot.child("location").child("y").getValue();
@@ -90,9 +90,10 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
             String imageUri = snapshot.child("images").child("2").getValue().toString();
 
             String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
-            diningDate = getDate(diningTimestamp);//timstamp로 날짜 얻기
+            diningDate = getDate(diningTimestamp);//get Date by timestamp
+            diningTime = getTime(diningTimestamp);//get Time by timestamp
 
-            BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, diningDetailLocation, imageUri);
+            BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningTime, diningLocation, diningDetailLocation, imageUri);
 
             recyclerAdapter.addItem(data);
             recyclerAdapter.notifyDataSetChanged();
@@ -135,8 +136,15 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     private String getDate(long timeStamp) {
         Calendar cal = Calendar.getInstance(Locale.KOREA);
         cal.setTimeInMillis(timeStamp * 1000);
-        String date = DateFormat.format("yyyy-MM-dd", cal).toString();
+        String date = DateFormat.format("yyyy-MM-dd EEEE", cal).toString();
         return date;
+    }
+
+    private String getTime(long timeStamp) {
+        Calendar cal = Calendar.getInstance(Locale.KOREA);
+        cal.setTimeInMillis(timeStamp * 1000);
+        String Time = DateFormat.format("aa hh:mm", cal).toString();
+        return Time;
     }
 
 }

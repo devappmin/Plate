@@ -19,7 +19,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp">
 
             <ImageButton
                 android:id="@+id/cancel_button_DetailActivity"
@@ -52,36 +53,48 @@
                 app:layout_constraintLeft_toRightOf="@+id/dining_title_DetailActivity"
                 app:layout_constraintBaseline_toBaselineOf="@+id/dining_title_DetailActivity"/>
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_view_dishes_DetailActivity"
+            <LinearLayout
+                android:id="@+id/linear_layout_dishImage_DetailActivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                app:cardBackgroundColor="#0A000000"
-                app:cardElevation="0dp"
+                android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dining_title_DetailActivity">
+                app:layout_constraintTop_toBottomOf="@+id/dining_title_DetailActivity"/>
 
-                <LinearLayout
-                    android:id="@+id/linear_layout_DetailActivity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="30dp"
-                    android:orientation="vertical"/>
+            <LinearLayout
+                android:id="@+id/linear_layout_dishList_DetailActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linear_layout_dishImage_DetailActivity"/>
 
-            </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/divider1_DetailActivity"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/linear_layout_dishList_DetailActivity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
 
            <ImageView
                android:id="@+id/chef_image_DetailActivity"
                android:layout_width="200dp"
                android:layout_height="200dp"
-               android:layout_marginTop="15dp"
+               android:layout_marginTop="30dp"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintEnd_toEndOf="parent"
-               app:layout_constraintTop_toBottomOf="@+id/card_view_dishes_DetailActivity"/>
+               app:layout_constraintTop_toBottomOf="@id/divider1_DetailActivity"/>
 
             <TextView
                 android:id="@+id/chef_name_DetailActivity"
@@ -126,7 +139,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/description_DetailActivity"/>
 
-
             <com.iarcuschin.simpleratingbar.SimpleRatingBar
                 android:id="@+id/rating_bar_DetailActivity"
                 app:srb_starSize="40dp"
@@ -153,8 +165,9 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_bottom_DetailActivity"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_weight="1"
+        android:layout_height="120dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/white"
         app:layout_constraintTop_toBottomOf="@+id/scroll_view_DetailActivity"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -165,13 +178,13 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/divider_DetailActivity"
+                android:id="@+id/divider2_DetailActivity"
                 android:layout_width="match_parent"
                 android:layout_height="0.8dp"
                 android:layout_marginTop="0dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:background="@android:color/darker_gray"
+                android:background="@color/colorPrimary"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
@@ -183,7 +196,6 @@
                 android:textStyle="bold"
                 android:textSize="40dp"
                 android:textColor="@color/textDarkPrimary"
-                android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
@@ -198,7 +210,7 @@
                 android:background="@drawable/button_radius"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="80dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
 
@@ -206,8 +218,8 @@
                 android:id="@+id/checkbox_DetailActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="40dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="27dp"
                 android:checked="false"
                 android:button="@drawable/checkbox_bookmark"
                 app:layout_constraintBottom_toBottomOf="parent"

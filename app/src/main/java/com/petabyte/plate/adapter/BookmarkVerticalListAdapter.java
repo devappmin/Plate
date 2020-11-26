@@ -1,14 +1,18 @@
 package com.petabyte.plate.adapter;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -53,21 +57,26 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private TextView diningTitle;
         private TextView diningSubtitle;
         private TextView diningDate;
+        private TextView diningTime;
         private TextView diningLocation;
         private TextView diningDetailLocation;
-        private ImageView imageView;
+        private ImageView diningImage;
         private CheckBox checkBox;
         private DatabaseReference databaseReference;
+        private Context context;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            context = itemView.getContext();
+
             diningTitle = (TextView) itemView.findViewById(R.id.dining_title_bookmarkcard);
             diningSubtitle = (TextView) itemView.findViewById(R.id.dining_subtitle_bookmarkcard);
             diningDate = (TextView) itemView.findViewById(R.id.dining_date_bookmarkcard);
+            diningTime = (TextView) itemView.findViewById(R.id.dining_time_bookmarkcard);
             diningLocation = (TextView) itemView.findViewById(R.id.dining_location_bookmarkcard);
             diningDetailLocation = (TextView) itemView.findViewById(R.id.dining_detail_location_bookmarkcard);
-            imageView = (ImageView) itemView.findViewById(R.id.image_view_bookmarkcard);
+            diningImage = (ImageView) itemView.findViewById(R.id.dining_image_bookmarkcard);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
 
             databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -109,9 +118,13 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningTitle.setText(data.getDiningTitle());
             diningSubtitle.setText(data.getDiningSubtitle());
             diningDate.setText(data.getDiningDate());
+            diningTime.setText(data.getDiningTime());
             diningLocation.setText(data.getDiningLocation());
             diningDetailLocation.setText(data.getDiningDetailLocation());
-            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(imageView);
+            GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
+            diningImage.setBackground(drawable);
+            diningImage.setClipToOutline(true);
+            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(diningImage);
         }
     }
 }
