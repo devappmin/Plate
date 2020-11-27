@@ -1,5 +1,6 @@
 package com.petabyte.plate.ui.fragment;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,10 +39,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
 import com.petabyte.plate.ui.activity.LoginActivity;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.GlideApp;
+
+import java.util.List;
 
 public class MyPageFragment extends Fragment {
 
@@ -121,6 +127,32 @@ public class MyPageFragment extends Fragment {
         btn_edit_pw = (TextView)v.findViewById(R.id.text_v_mypage_edit_pw);
         btn_delete_acc = (TextView)v.findViewById(R.id.text_v_mypage_delete_account);
         btn_logout = (TextView)v.findViewById(R.id.text_v_mypage_logout);
+
+        // set user profile image onclick method
+        image_userpics.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Log.d("ji1dev", "profile image clicked");
+                PermissionListener permissionlistener = new PermissionListener(){
+                    @Override
+                    public void onPermissionGranted() {
+                        openGallery();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(List<String> deniedPermissions) {
+                        Toast.makeText(getActivity(), "권한을 거부하였습니다.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                };
+
+                TedPermission.with(getContext())
+                        .setPermissionListener(permissionlistener)
+                        .setRationaleMessage("프로필 사진을 바꾸기 위해 권한이 필요해요!")
+                        .setDeniedMessage("프로필 사진을 바꾸기 위해 이 권한이 필요합니다.\n[설정] > [권한] 에서 권한을 허용할 수 있어요.")
+                        .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        .check();
+            }
+        });
 
         // set using info card
         btn_check_reserve.setOnClickListener(new View.OnClickListener() {
@@ -373,7 +405,4 @@ public class MyPageFragment extends Fragment {
         tmp.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
         return d;
     }
-
-
-
 }
