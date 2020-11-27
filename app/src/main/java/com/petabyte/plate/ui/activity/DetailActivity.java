@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -55,13 +56,17 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private ImageButton cancelButton;
     private TextView diningTitle;
     private TextView diningSubtitle;
+    private TextView diningDescription;
     private ImageView chefImage;
     private TextView chefName;
-    private TextView description;
+    private TextView chefIntroduction;
     private TextView rating;
     private SimpleRatingBar ratingBar;
-    private CardView bottomCardview;
+    private TextView bookmarked;
     private TextView diningPrice;
+    private Button purchaseButton;
+    private CheckBox bookmarkBox;
+    private boolean isChecked;
 
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
@@ -75,6 +80,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         intent = getIntent();
         diningName = intent.getStringExtra("title");
+        isChecked = intent.getBooleanExtra("checked", false);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -83,17 +89,22 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         cancelButton = (ImageButton)findViewById(R.id.cancel_button_DetailActivity);
         diningTitle = (TextView)findViewById(R.id.dining_title_DetailActivity);
         diningSubtitle = (TextView)findViewById(R.id.dining_subtitle_DetailActivity);
+        diningDescription = (TextView)findViewById(R.id.dining_description_DetailActivity);
         chefImage = (ImageView)findViewById(R.id.chef_image_DetailActivity);
         chefName = (TextView)findViewById(R.id.chef_name_DetailActivity);
-        description = (TextView)findViewById(R.id.description_DetailActivity);
+        chefIntroduction = (TextView)findViewById(R.id.chef_introduction_DetailActivity);
         rating = (TextView)findViewById(R.id.rating_text_view_DetailActivity);
         ratingBar = (SimpleRatingBar)findViewById(R.id.rating_bar_DetailActivity);
-        bottomCardview = (CardView)findViewById(R.id.card_view_bottom_DetailActivity);
+        bookmarked = (TextView)findViewById(R.id.number_of_bookmark_DetailActivity);
         diningPrice = (TextView)findViewById(R.id.price_DetailActivity);
-
-        cancelButton.setOnClickListener(this);
+        purchaseButton = (Button)findViewById(R.id.purchase_button_DetailActivity);
+        bookmarkBox = (CheckBox)findViewById(R.id.checkbox_DetailActivity);
 
         diningTitle.setText(diningName);
+        bookmarkBox.setChecked(isChecked);
+
+        cancelButton.setOnClickListener(this);
+        purchaseButton.setOnClickListener(this);
 
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -111,6 +122,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         if(v == cancelButton)
             finish();
+        else if(v == purchaseButton) {
+            Intent purchase = new Intent(this, PurchaseActivity.class);
+            purchase.putExtra("title", diningTitle.getText().toString());
+            startActivity(purchase);
+        }
 
     }
 
@@ -170,6 +186,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         textView.setTextColor(getResources().getColor(R.color.textDarkPrimary));
                         dishList.addView(textView);
                     }
+                    bookmarked.setText(dataSnapshot.child("bookmark").getValue() + "명이 좋아합니다.");
+                    diningDescription.setText("\"" + dataSnapshot.child("description").getValue().toString() + "\"");
                     diningPrice.setText(String.format(Locale.KOREA, "%,d", dataSnapshot.child("price").getValue()) + "원");
                 }
             }
@@ -204,7 +222,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
                             double rate = (double) dataSnapshot.child("Profile").child("Rating").getValue();
                             chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
-                            description.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
+                            chefIntroduction.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
                             rating.setText("유저 평점\n" + rate + " / 5.0");
                             ratingBar.setRating(((float) rate));
                         }

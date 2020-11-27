@@ -86,6 +86,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), DetailActivity.class);
                     intent.putExtra("title", diningTitle.getText().toString());
+                    intent.putExtra("checked", checkBox.isChecked());
                     v.getContext().startActivity(intent);
                 }
             });
