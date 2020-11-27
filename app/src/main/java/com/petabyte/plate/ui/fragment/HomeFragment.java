@@ -2,7 +2,6 @@ package com.petabyte.plate.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,15 +24,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.HomeAwardsData;
+import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.ui.activity.SearchActivity;
 import com.petabyte.plate.ui.view.HomeAwardsList;
 import com.petabyte.plate.ui.view.HomeHorizontalList;
 import com.petabyte.plate.utils.ConnectionCodes;
-import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -78,6 +72,26 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 getActivity().startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
             }
         });
+
+
+        //region PLATE 음식 추천 관련 코드
+        specialList.setTitle("최근에 올라온 음식이에요.");
+        mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshots) {
+                for (DataSnapshot snapshot : snapshots.getChildren()) {
+                    HomeCardData data = snapshot.getValue(HomeCardData.class);
+                    data.setImageUri(snapshot.getKey() + "/" + snapshot.child("dishes/1").getValue(String.class) + ".jpg");
+                    specialList.addData(data);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        //endregion
 
         //region PLATE 포스트 관련 코드
         awardsList.setTitle("PLATE 포스트");

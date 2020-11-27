@@ -2,38 +2,28 @@ package com.petabyte.plate.ui.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.HomeHorizontalListAdapter;
-import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.HomeCardData;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Create custom horizontal recycler view
  * inside of the Nested Scroll View in Home Fragment
  */
 
-public class HomeHorizontalList extends ConstraintLayout implements ValueEventListener{
+public class HomeHorizontalList extends ConstraintLayout {
 
     // RecyclerView 관련 변수
     private RecyclerView recyclerView;
@@ -44,76 +34,56 @@ public class HomeHorizontalList extends ConstraintLayout implements ValueEventLi
     private TextView titleView;
 
     // Firebase 관련 변수
-    private DatabaseReference mDatabase;
+    private StorageReference mStorage;
 
     public HomeHorizontalList(@NonNull Context context) {
         super(context);
-        init();
+        initViews();
     }
 
     public HomeHorizontalList(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        initViews();
     }
 
     public HomeHorizontalList(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        initViews();
     }
 
     public HomeHorizontalList(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        initViews();
     }
 
-    private void init() {
+    private void initViews() {
         inflate(getContext(), R.layout.view_homehorizontallist, this);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/").getReference();
 
-        recyclerInitial();
-        getItemDatas();
-    }
-
-    private void recyclerInitial() {
         recyclerView = (RecyclerView)this.findViewById(R.id.recycler_view_v_homehorizontal);
+        titleView = (TextView)this.findViewById(R.id.title_tv_v_homehorizontal);
 
         // 부드러운 스크롤이 아닌 item 단위로 스크롤을 하기 위해 적용
         SnapHelper helper = new PagerSnapHelper();
         helper.attachToRecyclerView(recyclerView);
 
+        // RecyclerView에 LayoutManager 연결
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
+        // RecyclerView에 Adapter연결
         recyclerAdapter = new HomeHorizontalListAdapter();
+        recyclerAdapter.setReference(mStorage);
         recyclerView.setAdapter(recyclerAdapter);
     }
 
-    private void getItemDatas() {
-        mDatabase.child("Dining").orderByChild("schedules/RANDOMKEY/start").limitToLast(10).addListenerForSingleValueEvent(this);
-
-
+    public void setTitle(String title) {
+        titleView.setText(title);
     }
 
-    @Override
-    public void onDataChange(@NonNull DataSnapshot snapshots) {
-        for (DataSnapshot snapshot : snapshots.getChildren()) {
-            String title = snapshot.child("title").getValue(String.class);
-            String subtitle = snapshot.child("subtitle").getValue(String.class);
-            String description = snapshot.child("description").getValue(String.class);
-
-            // Image should be changed
-            String imageUri = snapshot.child("image").getValue(String.class);
-
-            HomeCardData data = new HomeCardData(title, subtitle, description, imageUri);
-            recyclerAdapter.addItem(data);
-
-            recyclerAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onCancelled(@NonNull DatabaseError error) {
-
+    public void addData(HomeCardData data) {
+        recyclerAdapter.addItem(data);
+        recyclerAdapter.notifyDataSetChanged();
     }
 }

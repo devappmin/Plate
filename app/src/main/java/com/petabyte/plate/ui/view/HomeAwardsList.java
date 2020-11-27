@@ -27,7 +27,7 @@ public class HomeAwardsList extends ConstraintLayout {
 
     private TextView titleText;
 
-    private StorageReference storage;
+    private StorageReference mStorage;
 
     public HomeAwardsList(@NonNull Context context) {
         super(context);
@@ -52,7 +52,7 @@ public class HomeAwardsList extends ConstraintLayout {
     public void initViews() {
         inflate(getContext(), R.layout.view_homeawardslist, this);
 
-        storage = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/").getReference();
+        mStorage = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/").getReference();
 
         titleText = (TextView)this.findViewById(R.id.title_tv_v_homeawards);
         recyclerView = (RecyclerView)this.findViewById(R.id.recycler_view_v_awards);
@@ -61,7 +61,7 @@ public class HomeAwardsList extends ConstraintLayout {
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new HomeAwardsListAdapter();
-        adapter.setReference(storage);
+        adapter.setReference(mStorage);
         recyclerView.setAdapter(adapter);
     }
 
