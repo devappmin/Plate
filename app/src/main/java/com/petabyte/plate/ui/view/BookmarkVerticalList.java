@@ -1,11 +1,15 @@
 package com.petabyte.plate.ui.view;
 
 import android.content.Context;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,26 +17,37 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.BookmarkVerticalListAdapter;
 import com.petabyte.plate.data.BookmarkCardViewData;
+import com.petabyte.plate.ui.activity.DetailActivity;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Calendar;
 
 
-public class BookmarkVerticalList extends ConstraintLayout implements ValueEventListener{
+public class BookmarkVerticalList extends ConstraintLayout {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private BookmarkVerticalListAdapter recyclerAdapter;
-    private DatabaseReference mDatabase;
+    private DatabaseReference databaseReference, ref_g, ref_h;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private String uid;
 
     public BookmarkVerticalList(@NonNull Context context) {
         super(context);
@@ -57,10 +72,11 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
     private void init() {
         inflate(getContext(), R.layout.view_bookmarkverticallist, this);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         recyclerInitial();
-        getItemDatas();
+        getDiningList();
+
     }
 
     private void recyclerInitial() {
@@ -73,42 +89,102 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
         recyclerView.setAdapter(recyclerAdapter);
     }
 
-    private void getItemDatas() {
-        mDatabase.child("Dining").orderByChild("schedules/RANDOMKEY/start").addListenerForSingleValueEvent(this);
+    //get dining list
+    public void getDiningList() {
+        getDiningUid(new MyCallback() {
+            @Override
+            public void onCallback(final ArrayList<String> diningUid) {
+                databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
+                databaseReference.orderByChild("schedules/RANDOMKEY/start").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                            for(int i = 0; i < diningUid.size(); i++) {
+                                if(diningUid.get(i).equals(dataSnapshot.getKey())) {
+                                    getDiningData(dataSnapshot);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+            }
+        });
     }
 
-    @Override
-    public void onDataChange(@NonNull DataSnapshot snapshots) {
-        for (DataSnapshot snapshot : snapshots.getChildren()) {
-            String diningTitle = snapshot.child("title").getValue().toString();
-            String diningSubtitle = snapshot.child("subtitle").getValue().toString();
-            String diningDate, diningTime;
-            long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
-            double diningLatitude = (double) snapshot.child("location").child("x").getValue();
-            double diningLongitude = (double) snapshot.child("location").child("y").getValue();
-            String diningDetailLocation = snapshot.child("location").child("detail").getValue().toString();
-            String imageUri = snapshot.child("images").child("2").getValue().toString();
+    //get Dining UIDs with myCallback
+    private void getDiningUid(final MyCallback myCallback) {
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
+        ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
+        uid = user.getUid();
+        Log.d("uid", uid);
+        ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    String g_uid = dataSnapshot.getKey();
+                    ArrayList<String> diningUid = new ArrayList<String>();
+                    if(g_uid.equals(uid)){
+                        for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
+                            diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
+                            myCallback.onCallback(diningUid);
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
 
-            String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
-            diningDate = getDate(diningTimestamp);//get Date by timestamp
-            diningTime = getTime(diningTimestamp);//get Time by timestamp
-
-            BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningTime, diningLocation, diningDetailLocation, imageUri);
-
-            recyclerAdapter.addItem(data);
-            recyclerAdapter.notifyDataSetChanged();
-
-            Log.d("[*]", snapshot + "");
-            Log.d("[!]", diningTitle + ", " + diningDate + "and" + diningLocation);
-        }
+        ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    String g_uid = dataSnapshot.getKey();
+                    ArrayList<String> diningUid = new ArrayList<String>();
+                    if(g_uid.equals(uid)){
+                        for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
+                            diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
+                        }
+                        myCallback.onCallback(diningUid);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
-    @Override
-    public void onCancelled(@NonNull DatabaseError error) {
+    //get dining Data
+    public void getDiningData (DataSnapshot snapshot) {
+        String diningTitle = snapshot.child("title").getValue().toString();
+        String diningSubtitle = snapshot.child("subtitle").getValue().toString();
+        String diningDate, diningTime;
+        long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
+        double diningLatitude = (double) snapshot.child("location").child("x").getValue();
+        double diningLongitude = (double) snapshot.child("location").child("y").getValue();
+        String diningDetailLocation = snapshot.child("location").child("detail").getValue().toString();
+        String imageUri = snapshot.child("images").child("2").getValue().toString();
 
+        String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
+        diningDate = getDate(diningTimestamp);//get Date by timestamp
+        diningTime = getTime(diningTimestamp);//get Time by timestamp
+
+        BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningTime, diningLocation, diningDetailLocation, imageUri);
+
+        recyclerAdapter.addItem(data);
+        recyclerAdapter.notifyDataSetChanged();
     }
 
-    public String getAddress( double latitude, double longitude) {
+    public String getAddress(double latitude, double longitude) {
 
         //좌표를 주소로 변환
         Geocoder geocoder = new Geocoder(this.getContext(), Locale.KOREA);
@@ -145,6 +221,16 @@ public class BookmarkVerticalList extends ConstraintLayout implements ValueEvent
         cal.setTimeInMillis(timeStamp * 1000);
         String Time = DateFormat.format("aa hh:mm", cal).toString();
         return Time;
+    }
+
+    public interface MyCallback {
+        //diningUIDs
+        void onCallback(ArrayList<String> diningUid);
+    }
+
+    public interface DiningCallback {
+        //diningUIDs
+        void onCallback(ArrayList<BookmarkCardViewData> dinings);
     }
 
 }

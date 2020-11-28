@@ -2,8 +2,6 @@ package com.petabyte.plate.ui.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,7 +15,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
@@ -25,8 +22,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.airbnb.lottie.L;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -82,7 +77,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         diningName = intent.getStringExtra("title");
         isChecked = intent.getBooleanExtra("checked", false);
 
-        mAuth = FirebaseAuth.getInstance();
+
 
         dishImageList = (LinearLayout)findViewById(R.id.linear_layout_dishImage_DetailActivity);
         dishList = (LinearLayout)findViewById(R.id.linear_layout_dishList_DetailActivity);
@@ -106,6 +101,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         cancelButton.setOnClickListener(this);
         purchaseButton.setOnClickListener(this);
 
+        mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             getDiningImage();
@@ -221,9 +217,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     public void onDataChange(@NonNull DataSnapshot snapshots) {
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
                             double rate = (double) dataSnapshot.child("Profile").child("Rating").getValue();
+                            Long ratingCount = (Long) dataSnapshot.child("Profile").child("RatingCount").getValue();
                             chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
                             chefIntroduction.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
-                            rating.setText("유저 평점\n" + rate + " / 5.0");
+                            rating.setText("유저 평점\n" + rate + " / 5.0 (" + ratingCount + "명 참여)");
                             ratingBar.setRating(((float) rate));
                         }
                     }
