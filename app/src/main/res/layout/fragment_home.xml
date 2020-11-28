@@ -80,8 +80,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <com.petabyte.plate.ui.view.HomeHorizontalList
-                    android:id="@+id/special_hh_fm_home"
+
+                <com.petabyte.plate.ui.view.HomeAwardsList
+                    android:id="@+id/image_slide_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="40dp"
@@ -132,12 +133,12 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
-                <com.airbnb.lottie.LottieAnimationView
+                <com.petabyte.plate.ui.view.HomeHorizontalList
+                    android:id="@+id/special_hh_fm_home"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    app:lottie_autoPlay="true"
-                    app:lottie_loop="true"
-                    app:lottie_fileName="icon.json"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:clipToPadding = "false"/>
 
                 <com.petabyte.plate.ui.view.HomeAwardsList
                     android:id="@+id/awards_ha_fm_home"

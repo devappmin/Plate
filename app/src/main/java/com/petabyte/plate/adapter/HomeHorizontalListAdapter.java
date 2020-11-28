@@ -54,6 +54,10 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
         datas.add(data);
     }
 
+    public void removeAllItem() {
+        datas = new ArrayList<>();
+    }
+
     /**
      * Inner class that extends RecyclerView.ViewHolder
      */

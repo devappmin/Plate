@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
@@ -17,6 +16,7 @@ import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.HomeHorizontalListAdapter;
 import com.petabyte.plate.data.HomeCardData;
+import com.petabyte.plate.utils.CustomAlignSnapHelper;
 
 /**
  * Create custom horizontal recycler view
@@ -65,7 +65,7 @@ public class HomeHorizontalList extends ConstraintLayout {
         titleView = (TextView)this.findViewById(R.id.title_tv_v_homehorizontal);
 
         // 부드러운 스크롤이 아닌 item 단위로 스크롤을 하기 위해 적용
-        SnapHelper helper = new PagerSnapHelper();
+        SnapHelper helper = new CustomAlignSnapHelper(2);
         helper.attachToRecyclerView(recyclerView);
 
         // RecyclerView에 LayoutManager 연결
@@ -84,6 +84,11 @@ public class HomeHorizontalList extends ConstraintLayout {
 
     public void addData(HomeCardData data) {
         recyclerAdapter.addItem(data);
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    public void removeAllData() {
+        recyclerAdapter.removeAllItem();
         recyclerAdapter.notifyDataSetChanged();
     }
 }

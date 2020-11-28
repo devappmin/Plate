@@ -10,19 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.HomeAwardsData;
 import com.petabyte.plate.ui.activity.ScrollableImageActivity;
 import com.petabyte.plate.utils.GlideApp;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeAwardsListAdapter extends RecyclerView.Adapter<HomeAwardsListAdapter.ViewHolder> {
+public class HomePostListAdapter extends RecyclerView.Adapter<HomePostListAdapter.ViewHolder> {
 
     private List<HomeAwardsData> datum = new ArrayList<>();
     private StorageReference reference;
@@ -31,7 +28,7 @@ public class HomeAwardsListAdapter extends RecyclerView.Adapter<HomeAwardsListAd
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_homecard_small, parent, false);
-        return new HomeAwardsListAdapter.ViewHolder(view);
+        return new HomePostListAdapter.ViewHolder(view);
     }
 
     @Override
@@ -50,6 +47,10 @@ public class HomeAwardsListAdapter extends RecyclerView.Adapter<HomeAwardsListAd
 
     public void addItem(HomeAwardsData data) {
         datum.add(data);
+    }
+
+    public void removeAllItem() {
+        datum = new ArrayList<>();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
