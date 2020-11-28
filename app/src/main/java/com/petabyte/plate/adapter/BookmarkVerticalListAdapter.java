@@ -90,6 +90,19 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningDetailLocation = (TextView) itemView.findViewById(R.id.dining_detail_location_bookmarkcard);
             diningImage = (ImageView) itemView.findViewById(R.id.dining_image_bookmarkcard);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
+        }
+
+        private void onBind(final BookmarkCardViewData data) {
+            diningTitle.setText(data.getDiningTitle());
+            diningSubtitle.setText(data.getDiningSubtitle());
+            diningDate.setText(data.getDiningDate());
+            diningTime.setText(data.getDiningTime());
+            diningLocation.setText(data.getDiningLocation());
+            diningDetailLocation.setText(data.getDiningDetailLocation());
+            GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
+            diningImage.setBackground(drawable);
+            diningImage.setClipToOutline(true);
+            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(diningImage);
 
             diningTitle.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -111,40 +124,15 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 }
             });
 
-        }
-
-        private void onBind(final BookmarkCardViewData data) {
-            diningTitle.setText(data.getDiningTitle());
-            diningSubtitle.setText(data.getDiningSubtitle());
-            diningDate.setText(data.getDiningDate());
-            diningTime.setText(data.getDiningTime());
-            diningLocation.setText(data.getDiningLocation());
-            diningDetailLocation.setText(data.getDiningDetailLocation());
-            GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
-            diningImage.setBackground(drawable);
-            diningImage.setClipToOutline(true);
-            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(diningImage);
-
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-                    if (isChecked) {
-                        getDiningUid(data.getDiningTitle(), new MyCallback() {
-                            @Override
-                            public void onCallback(String diningUid) {
-                                reviseBookmarkStatus(diningUid, isChecked);
-                            }
-                        });
-                        Log.d("Checked", "true");
-                    } else {
-                        getDiningUid(data.getDiningTitle(), new MyCallback() {
-                            @Override
-                            public void onCallback(String diningUid) {
-                                reviseBookmarkStatus(diningUid, isChecked);
-                            }
-                        });
-                        Log.d("Checked", "false");
-                    }
+                    getDiningUid(data.getDiningTitle(), new MyCallback() {
+                        @Override
+                        public void onCallback(String diningUid) {
+                            reviseBookmarkStatus(diningUid, isChecked);
+                        }
+                    });
                 }
             });
         }
