@@ -1,11 +1,12 @@
 package com.petabyte.plate.ui.fragment;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,12 +20,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.content.CursorLoader;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,6 +42,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
@@ -46,11 +50,11 @@ import com.petabyte.plate.ui.activity.LoginActivity;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.GlideApp;
 
+import java.io.File;
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
 public class MyPageFragment extends Fragment {
-
-    public static final int SELECT_FROM_ALBUM = 1;
 
     private TextView text_username;
     private TextView text_usertype;
@@ -70,43 +74,9 @@ public class MyPageFragment extends Fragment {
     private DatabaseReference ref_g, ref_h;
     private String MEMBER_TYPE = "";
     private String UID = "";
-
-    public StorageReference getStorageRef(String TYPE, String imageURI){
-        storage = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/")
-                .getReference("user").child(TYPE+"/"+imageURI);
-        Log.d("ji1dev", "getStorageRef >> uri = "+storage);
-        return storage;
-    }
-
-    public void setProfileImage(final String UID){
-        if(MEMBER_TYPE.equals("Host")){
-            ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String imageName = snapshot.child(UID).child("Profile/Image").getValue().toString();
-                    if(!imageName.equals("DEFAULT")){
-                        Log.d("ji1dev", "setProfileImage >> host");
-
-                        // set image with GlideApp
-                        GlideApp.with(getContext()).load(getStorageRef("host", imageName))
-                                .circleCrop()
-                                .into(image_userpics);
-
-                    }else{
-                        Log.d("ji1dev", "setProfileImage >> host, NO CUSTOM IMAGE UPLOADED!");
-                        GlideApp.with(getContext())
-                                .load(getResources().getDrawable(R.drawable.ic_character))
-                                .circleCrop()
-                                .into(image_userpics);
-                    }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
-            });
-        }else if(MEMBER_TYPE.equals("Guest")){
-            Log.d("ji1dev", "setProfileImage >> guest member");
-        }
-    }
+    private Uri imageUri;
+    private String pathUri;
+    private ProgressDialog progressDialog;
 
     @Nullable
     @Override
@@ -116,6 +86,8 @@ public class MyPageFragment extends Fragment {
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)v.findViewById(R.id.collapsing_toolbar_mypage);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+
+
 
         text_username = (TextView)v.findViewById(R.id.text_v_mypage_username);
         text_usermail = (TextView)v.findViewById(R.id.text_v_mypage_usermail);
@@ -225,12 +197,12 @@ public class MyPageFragment extends Fragment {
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
                     Object g_uid = dataSnapshot.getKey();
                     if(g_uid.equals(UID)){
-                        //Log.d("ji1dev", "[ref_g]key=" + dataSnapshot.getKey() + ", " + dataSnapshot.child("Profile/Name").getValue().toString());
+                        Log.d("ji1dev", "[ref_g]key=" + dataSnapshot.getKey() + ", " + dataSnapshot.child("Profile/Name").getValue().toString());
                         text_username.setText(dataSnapshot.child("Profile/Name").getValue().toString());
                         text_usertype.setText("Guest 회원");
                         text_usermail.setText(user.getEmail());
                         MEMBER_TYPE = "Guest";
-                        setProfileImage(UID);
+                        setProfileImage();
                     }
                 }
             }
@@ -248,7 +220,7 @@ public class MyPageFragment extends Fragment {
                         text_usertype.setText("Host 회원");
                         text_usermail.setText(user.getEmail());
                         MEMBER_TYPE = "Host";
-                        setProfileImage(UID);
+                        setProfileImage();
                         btn_add_dining.setVisibility(View.VISIBLE);
                         btn_edit_desc.setVisibility(View.VISIBLE);
                         if(dataSnapshot.child("Status").getValue().toString().equals("WAITING")){
@@ -262,6 +234,130 @@ public class MyPageFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if((resultCode == RESULT_OK) && (requestCode == ConnectionCodes.REQUEST_SELECT_IMAGE)){
+            imageUri = data.getData();
+            pathUri = getAbsolutePath(data.getData());
+            Log.d("ji1dev", "pathUri of selected image >> "+pathUri);
+            uploadImage();
+        }
+    }
+
+    // get Storage reference /user/MEMBER_TYPE
+    public StorageReference getStorageRef(){
+        storage = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/")
+                .getReference("user").child(MEMBER_TYPE.toLowerCase());
+        Log.d("ji1dev", "getStorageRef >> uri = "+storage);
+        return storage;
+    }
+
+    // set profile image using GlideApp
+    public void setProfileImage(){
+        if(MEMBER_TYPE.equals("Host")){
+            ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String imageName = snapshot.child(UID).child("Profile/Image").getValue().toString();
+                    if(!imageName.equals("DEFAULT")){
+                        Log.d("ji1dev", "setProfileImage >> host : "+imageName);
+                        // set image with GlideApp
+                        GlideApp.with(getContext()).load(getStorageRef().child(imageName))
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true)
+                                .circleCrop()
+                                .into(image_userpics);
+                    }else{
+                        Log.d("ji1dev", "setProfileImage >> host, NO CUSTOM IMAGE UPLOADED!");
+                        GlideApp.with(getContext())
+                                .load(getResources().getDrawable(R.drawable.ic_character))
+                                .circleCrop()
+                                .into(image_userpics);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
+        }else if(MEMBER_TYPE.equals("Guest")){
+            ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String imageName = snapshot.child(UID).child("Profile/Image").getValue().toString();
+                    if(!imageName.equals("DEFAULT")){
+                        // set image with GlideApp
+                        GlideApp.with(getContext()).load(getStorageRef().child(imageName))
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true)
+                                .circleCrop()
+                                .into(image_userpics);
+                    }else{
+                        GlideApp.with(getContext())
+                                .load(getResources().getDrawable(R.drawable.ic_character))
+                                .circleCrop()
+                                .into(image_userpics);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
+        }
+    }
+
+    // get image from album(gallery app)
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+        startActivityForResult(intent, ConnectionCodes.REQUEST_SELECT_IMAGE);
+    }
+
+    // get file's extension
+    private String getExtension(String fileName){
+        String fileEx = "";
+        if (fileName.contains("."))
+            fileEx = fileName.substring(fileName.lastIndexOf(".")+1);
+        return fileEx;
+    }
+
+    // upload image to Storage
+    private void uploadImage(){
+        final Uri file = Uri.fromFile(new File(pathUri));
+        final String extension = getExtension(file.getLastPathSegment());
+        final String finalFilename = UID+"."+extension;
+
+        if(storage == null) getStorageRef();
+
+        storage = storage.child(finalFilename);
+        Log.d("ji1dev", "final storage path >> "+storage);
+        makeProgressDialog();
+        storage.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                final Task<Uri> imageUrl = task.getResult().getStorage().getDownloadUrl();
+                while (!imageUrl.isComplete());
+                Log.d("ji1dev", "upload completed");
+
+                // set image path on database
+                if(MEMBER_TYPE.equals("Host")) ref_h.child(UID).child("Profile/Image").setValue(finalFilename);
+                else ref_g.child(UID).child("Profile/Image").setValue(finalFilename);
+                Log.d("ji1dev", "database updated");
+                setProfileImage();
+                progressDialog.dismiss();
+            }
+        });
+
+    }
+
+    // get absolute path of image data
+    public String getAbsolutePath(Uri uri){
+        String[] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(getContext(), uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+        int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(index);
     }
 
     // logout function
@@ -278,13 +374,12 @@ public class MyPageFragment extends Fragment {
         return (int) px;
     }
 
-    // get image from album(gallery app)
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-        startActivityForResult(intent, ConnectionCodes.REQUEST_SELECT_IMAGE);
+    public void makeProgressDialog(){
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("바뀐 내용을 반영하고있어요!");
+        progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Horizontal);
+        progressDialog.show();
     }
-
     // function for make dialog with TYPE and other PARAMS
     // TYPE : PROMPT, CONFIRM
     public AlertDialog.Builder makeDialog(String type, final String action, String title, String message, String extra){
@@ -303,11 +398,6 @@ public class MyPageFragment extends Fragment {
         int right_margin = this.dpToPx(20, getActivity().getResources());
         int bottom_margin = this.dpToPx(0, getActivity().getResources());
         lp.setMargins(left_margin, top_margin, right_margin, bottom_margin);
-
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("처리중...");
-        progressDialog.setCancelable(true);
-        progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Horizontal);
 
         // PROMPT BOX TYPE
         if(type.equals("PROMPT")){
@@ -331,7 +421,6 @@ public class MyPageFragment extends Fragment {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
             }
-
             container.addView(input, lp);
             d.setView(container);
             d.setPositiveButton("바꾸기", new DialogInterface.OnClickListener() {
@@ -340,23 +429,24 @@ public class MyPageFragment extends Fragment {
                     // force hide keyboard on fragment
                     InputMethodManager mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     mInputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
-
                     String new_input = input.getText().toString().trim();
                     switch(action){
                         case "EDIT_PW":
                             if(new_input.length() < 6) return;
-                            progressDialog.show();
+                            makeProgressDialog();
                             user.updatePassword(new_input).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()){
+                                    if (task.isSuccessful()) {
                                         progressDialog.dismiss();
                                         logout();
                                     }
                                 }
                             });
+                            break;
                         case "EDIT_DESC":
-                            ref_h.child(user.getUid()).child("Profile/Description").setValue(new_input);
+                            ref_h.child(UID).child("Profile/Description").setValue(new_input);
+                            break;
                     }
                     dialog.dismiss();
                 }
@@ -370,26 +460,25 @@ public class MyPageFragment extends Fragment {
             d.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    progressDialog.show();
-
-                    // remove user info from Realtime DB
-                    switch(MEMBER_TYPE){
-                        case "Host":
-                            ref_h.child(user.getUid()).removeValue();
-                        case "Guest":
-                            ref_g.child(user.getUid()).removeValue();
-                    }
-
+                    makeProgressDialog();
                     // remove user info from Authentication
                     user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
+                                // remove user info from Realtime DB
+                                switch(MEMBER_TYPE){
+                                    case "Host":
+                                        ref_h.child(user.getUid()).removeValue();
+                                    case "Guest":
+                                        ref_g.child(user.getUid()).removeValue();
+                                }
                                 progressDialog.dismiss();
                                 logout();
                             }
                         }
                     });
+
                     dialog.dismiss();
                 }
             });
