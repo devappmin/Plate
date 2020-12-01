@@ -273,10 +273,10 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
-                    android:id="@+id/text_v_mypage_set_push"
+                    android:id="@+id/text_v_mypage_set_noti"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="찜한 다이닝 알림"
+                    android:text="새 PLATE 포스트 알림"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold"
