@@ -149,20 +149,17 @@ public class RegisterActivity extends AppCompatActivity {
                                             if(member_type.equals("HOST")){
                                                 type = "Host";
                                                 bundleData.putString("MEMBER_TYPE", "HOST");
-                                                reference.child(type).child(uid).child("Status").setValue("심사중");
+                                                reference.child(type).child(uid).child("Status").setValue("WAITING");
+                                                map.put("Description", "안녕하세요. " + name +"입니다.");
                                             }else{
                                                 type = "Guest";
                                                 bundleData.putString("MEMBER_TYPE", "GUEST");
                                                 intent.putExtra("MEMBER_TYPE", "GUEST");
                                             }
-
-                                            map.put("Email", email);
                                             map.put("Name", name);
-                                            //map.put("Description", intro);
+                                            map.put("Image", "DEFAULT");
 
                                             reference.child(type).child(uid).child("Profile").setValue(map);
-
-                                            //Snackbar.make(v, "회원가입이 완료되었어요!", 3000).show();
 
                                             intent = new Intent(RegisterActivity.this, RegisterInfoActivity.class);
                                             bundleData.putString("NAME", name);
