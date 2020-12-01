@@ -4,25 +4,20 @@ import android.net.Uri;
 
 public class HomeCardData {
     private String title;
-    private String subTitle;
+    private String subtitle;
     private String description;
     private String imageUri;
+    private long price;
+
     public HomeCardData() {
     }
 
-    public HomeCardData(String title, String subTitle, String description, String imageUri) {
+    public HomeCardData(String title, String subtitle, String description, String imageUri, long price) {
         this.title = title;
+        this.subtitle = subtitle;
         this.description = description;
         this.imageUri = imageUri;
-        this.subTitle = subTitle;
-    }
-
-    public String getSubTitle() {
-        return subTitle;
-    }
-
-    public void setSubTitle(String subTitle) {
-        this.subTitle = subTitle;
+        this.price = price;
     }
 
     public String getTitle() {
@@ -47,5 +42,21 @@ public class HomeCardData {
 
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    public long getPrice() {
+        return price;
+    }
+
+    public void setPrice(long price) {
+        this.price = price;
     }
 }

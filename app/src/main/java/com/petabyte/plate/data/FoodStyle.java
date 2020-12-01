@@ -1,5 +1,10 @@
 package com.petabyte.plate.data;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 public enum FoodStyle {
     WITH_LOVER("연인과 함께"),
     SWEET("달달한"),
@@ -21,9 +26,17 @@ public enum FoodStyle {
     PORK("돼지고기"),
     SHEEP("양고기");
 
-    public final String label;
 
     FoodStyle(String label) {
         this.label = label;
+    }
+
+    private static final List<FoodStyle> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
+    private static final int SIZE = VALUES.size();
+    private static final Random RANDOM = new Random();
+
+    public final String label;
+    public static FoodStyle randomLetter()  {
+        return VALUES.get(RANDOM.nextInt(SIZE));
     }
 }
