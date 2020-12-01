@@ -134,7 +134,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <com.petabyte.plate.ui.view.HomeHorizontalList
-                    android:id="@+id/special_hh_fm_home"
+                    android:id="@+id/recent_hh_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="40dp"
@@ -145,6 +145,27 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="40dp"
+                    android:clipToPadding = "false"/>
+
+                <com.petabyte.plate.ui.view.HomeHorizontalList
+                    android:id="@+id/food_type_hh_fm_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:clipToPadding = "false"/>
+
+                <com.petabyte.plate.ui.view.HomeHorizontalList
+                    android:id="@+id/chip_type_hh_fm_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:clipToPadding = "false"/>
+
+                <com.petabyte.plate.ui.view.HomeHorizontalList
+                    android:id="@+id/chip_type_2_hh_fm_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
                     android:clipToPadding = "false"/>
 
                 <TextView
