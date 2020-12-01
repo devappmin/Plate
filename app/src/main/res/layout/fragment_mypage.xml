@@ -1,19 +1,296 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="116dp"
+    android:background="#fafafa">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:id="@+id/collapsing_toolbar_mypage"
+        app:title="마이페이지"
+        app:expandedTitleMarginStart="18dp"
+        app:collapsedTitleGravity="start"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fafafa"
+        android:fitsSystemWindows="true"
+        app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+</com.google.android.material.appbar.AppBarLayout>
+
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/mypage" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="logout"
-        android:textSize="30sp"/>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="20dp"
+            android:clickable="true"
+            app:cardCornerRadius="10dp">
 
-</LinearLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/text_v_mypage_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/textDarkPrimary"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="28dp"
+                    android:layout_marginStart="22dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_usertype"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginStart="22dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_username"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_usermail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/textDarkDisabled"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginStart="22dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_usertype"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_v_mypage_userimg"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:background="@drawable/imageview_oval_border"
+                    android:padding="1dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginEnd="22dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="20dp"
+            android:clickable="true"
+            app:cardCornerRadius="10dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp">
+
+                <TextView
+                    android:id="@+id/text_v_mypage_title1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="이용 정보"
+                    android:textColor="@color/textDarkPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="22dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_check_reservation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="예약 내역 확인"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_title1"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_add_dining"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="다이닝 일정 추가"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_check_reservation"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="20dp"
+            android:clickable="true"
+            app:cardCornerRadius="10dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp">
+
+                <TextView
+                    android:id="@+id/text_v_mypage_title2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="계정 관리"
+                    android:textColor="@color/textDarkPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="22dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_edit_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="소개문구 변경"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_title2"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_edit_pw"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="비밀번호 변경"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_edit_description"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_delete_account"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="회원 탈퇴 요청"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_edit_pw"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_logout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="로그아웃"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_delete_account"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="20dp"
+            android:clickable="true"
+            app:cardCornerRadius="10dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="25dp"
+                android:paddingBottom="25dp">
+
+                <TextView
+                    android:id="@+id/text_v_mypage_title3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="알림 설정"
+                    android:textColor="@color/textDarkPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="22dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/text_v_mypage_set_noti"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="새 PLATE 포스트 알림"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintTop_toBottomOf="@id/text_v_mypage_title3"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -6,6 +6,7 @@
     <color name="editTextBackground">#ebebeb</color>
     <color name="colorSuccess">#28a754</color>
     <color name="colorDanger">#e2454b</color>
+    <color name="colorLight">#f8f9fa</color>
 
     <!-- Dark Text Color for Light Background -->
     <color name="textDarkPrimary">#DE000000</color> <!--DE for %87 opacity-->

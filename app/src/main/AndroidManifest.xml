@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.PurchaseActivity"></activity>
+        <activity android:name=".ui.activity.ScrollableImageActivity"/>
         <activity android:name=".ui.activity.RegisterInfoActivity" />
         <activity android:name=".ui.activity.RegisterActivity" />
         <activity android:name=".ui.activity.RegisterSelectActivity" />
@@ -32,6 +32,11 @@
         <activity android:name=".ui.activity.LoginActivity" />
         <activity android:name=".ui.activity.SearchActivity" />
         <activity android:name=".ui.activity.MainActivity" />
+        <activity
+            android:name="com.soundcloud.android.crop.CropImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!--uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/-->
 </manifest>
