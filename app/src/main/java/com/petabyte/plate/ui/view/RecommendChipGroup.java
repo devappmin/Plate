@@ -14,6 +14,9 @@ import com.petabyte.plate.R;
 import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.utils.LogTags;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RecommendChipGroup extends ConstraintLayout {
 
     private ChipGroup chipGroup;
@@ -55,7 +58,21 @@ public class RecommendChipGroup extends ConstraintLayout {
         for(FoodStyle style : FoodStyle.values()) {
             Chip chip = new Chip(chipGroup.getContext());
             chip.setText("#" + style.label);
+            chip.setCheckable(true);
             chipGroup.addView(chip);
         }
+    }
+
+    public List<FoodStyle> getSelectedChips() {
+        List<Integer> selectedList = chipGroup.getCheckedChipIds();
+        List<FoodStyle> foodStyles = new ArrayList<>();
+
+        for(int id : selectedList) {
+            Chip chip = chipGroup.findViewById(id);
+            if (chip.isChecked())
+                foodStyles.add(FoodStyle.getFoodStyle(chip.getText().toString().substring(1)));
+        }
+
+        return foodStyles;
     }
 }

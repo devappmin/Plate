@@ -125,6 +125,7 @@
                 android:textColor="@android:color/white"/>
 
             <com.petabyte.plate.ui.view.RecommendChipGroup
+                android:id="@+id/recommend_chip_av_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/search_btn_av_search"
