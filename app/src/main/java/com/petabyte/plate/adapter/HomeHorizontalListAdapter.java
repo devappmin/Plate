@@ -1,5 +1,6 @@
 package com.petabyte.plate.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -95,12 +96,13 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
             });
         }
 
+        @SuppressLint("SetTextI18n")
         private void onBind(HomeCardData data, StorageReference reference) {
 
             titleTextView.setText(data.getTitle());
             subtitleTextView.setText(data.getSubtitle());
             descriptionTextView.setText(data.getDescription());
-            priceTextView.setText(String.format(Locale.KOREA, "%,d", data.getPrice()));
+            priceTextView.setText(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
 
             Log.d(LogTags.IMPORTANT, data.getImageUri());
             GlideApp.with(itemView.getContext()).load(reference.child("dining/" + data.getImageUri())).fitCenter().centerCrop().into(imageView);
