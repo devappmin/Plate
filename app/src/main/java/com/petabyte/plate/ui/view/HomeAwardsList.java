@@ -1,13 +1,16 @@
 package com.petabyte.plate.ui.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Constraints;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,15 +36,16 @@ public class HomeAwardsList extends ConstraintLayout {
     private RecyclerView.LayoutManager layoutManager;
 
     private TextView titleText;
+    private ConstraintLayout mainLayout;
 
     private StorageReference mStorage;
 
     private TYPE_MODE type;
 
-    public static enum TYPE_MODE {
+    public enum TYPE_MODE {
         POST_MODE,
-        IMAGE_SLIDE_MODE;
-    };
+        IMAGE_SLIDE_MODE
+    }
 
     public HomeAwardsList(@NonNull Context context) {
         super(context);
@@ -70,6 +74,7 @@ public class HomeAwardsList extends ConstraintLayout {
 
         titleText = (TextView)this.findViewById(R.id.title_tv_v_homeawards);
         recyclerView = (RecyclerView)this.findViewById(R.id.recycler_view_v_awards);
+        mainLayout = (ConstraintLayout)this.findViewById(R.id.layout_v_awards);
 
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
@@ -112,6 +117,19 @@ public class HomeAwardsList extends ConstraintLayout {
         titleText.setVisibility(GONE);
     }
 
+    public void setBackgroundColor(final int backgroundColor, final int textColor) {
+        mainLayout.setBackgroundColor(backgroundColor);
+        titleText.setTextColor(textColor);
+    }
+
+    public void setMarginTop(final int top) {
+        titleText.setPadding(0, top, 0, 5);
+    }
+
+    public void setMarginBottom(final int bottom) {
+        recyclerView.setPadding(15, 0, 15, bottom);
+    }
+
     public void addData(HomeAwardsData data) {
         awardAdapter.addItem(data);
         awardAdapter.notifyDataSetChanged();
@@ -131,4 +149,6 @@ public class HomeAwardsList extends ConstraintLayout {
             slideAdapter.notifyDataSetChanged();
         }
     }
+
+
 }

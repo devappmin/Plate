@@ -1,8 +1,10 @@
 package com.petabyte.plate.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +21,7 @@ import java.util.List;
 
 public class RecommendChipGroup extends ConstraintLayout {
 
+    private TextView titleTextView;
     private ChipGroup chipGroup;
 
     public RecommendChipGroup(@NonNull Context context) {
@@ -49,18 +52,32 @@ public class RecommendChipGroup extends ConstraintLayout {
         inflate(context, R.layout.view_recommend_chip_group, this);
 
         chipGroup = (ChipGroup)this.findViewById(R.id.chip_group_v_recommend_chip);
+        titleTextView = (TextView)this.findViewById(R.id.title_tv_v_recommend_chip);
 
         addAllChip();
     }
 
+    public void setTitle(String title) {
+        titleTextView.setText(title);
+    }
 
+
+    @SuppressLint("SetTextI18n")
     public void addAllChip() {
         for(FoodStyle style : FoodStyle.values()) {
-            Chip chip = new Chip(chipGroup.getContext());
-            chip.setText("#" + style.label);
-            chip.setCheckable(true);
-            chipGroup.addView(chip);
+            addChip(style);
         }
+    }
+
+    @SuppressLint({"ResourceType", "UseCompatLoadingForColorStateLists", "SetTextI18n"})
+    public void addChip(FoodStyle style) {
+        Chip chip = new Chip(chipGroup.getContext());
+        chip.setText("#" + style.label);
+        chip.setCheckable(true);
+        chip.setCheckedIconVisible(false);
+        chip.setChipBackgroundColor(getResources().getColorStateList(R.drawable.chip_state_list_background));
+        chip.setTextColor(getResources().getColorStateList(R.drawable.chip_state_list_text_color));
+        chipGroup.addView(chip);
     }
 
     public List<FoodStyle> getSelectedChips() {
@@ -74,5 +91,18 @@ public class RecommendChipGroup extends ConstraintLayout {
         }
 
         return foodStyles;
+    }
+
+    public List<String> getSelectedChipsLabel() {
+        List<Integer> selectedList = chipGroup.getCheckedChipIds();
+        List<String> labels = new ArrayList<>();
+
+        for(int id : selectedList) {
+            Chip chip = chipGroup.findViewById(id);
+            if (chip.isChecked())
+                labels.add(chip.getText().toString().substring(1));
+        }
+
+        return labels;
     }
 }

@@ -1,6 +1,7 @@
 package com.petabyte.plate.ui.fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -106,6 +107,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
 
         postList.setTitle("PLATE 포스트");
+        postList.setBackgroundColor(Color.BLACK, Color.WHITE);
+        postList.setMarginTop(80);
+        postList.setMarginBottom(80);
         postList.setType(HomeAwardsList.TYPE_MODE.POST_MODE);
 
         imageSlider.hideTitle();
@@ -241,7 +245,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         if (completeLoaded[LIST_COUNT - 1]) {
             // 로딩화면을 감춘 뒤 루프 종료
             loadingSkeletonView.setVisibility(View.GONE);
-            loadingSkeletonView.loop(false);
+            loadingSkeletonView.setSpeed(0);
 
             // 데이터 화면 보여줌.
             scrollView.setVisibility(View.VISIBLE);
@@ -260,7 +264,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onRefresh() {
         // 로딩화면 표시
         loadingSkeletonView.setVisibility(View.VISIBLE);
-        loadingSkeletonView.loop(true);
+        loadingSkeletonView.setSpeed(1f);
         scrollView.setVisibility(View.GONE);
         searchButton.setVisibility(View.GONE);
 
