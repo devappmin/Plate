@@ -15,6 +15,7 @@ import com.petabyte.plate.R;
 import com.petabyte.plate.ui.fragment.*;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.LogTags;
+import com.petabyte.plate.service.NewpostService;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         fragments[3] = new MyPageFragment();
 
         loadFragment(fragments[0]);
+
+        Intent serviceIntent = new Intent(MainActivity.this, NewpostService.class);
+        startService(serviceIntent);
     }
 
 
