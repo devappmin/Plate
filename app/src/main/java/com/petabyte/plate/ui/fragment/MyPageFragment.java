@@ -42,6 +42,7 @@ import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
+import com.petabyte.plate.ui.activity.AddDiningPlanActivity;
 import com.petabyte.plate.ui.activity.LoginActivity;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.GlideApp;
@@ -117,7 +118,7 @@ public class MyPageFragment extends Fragment {
         btn_add_dining.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(getActivity(), AddDiningActivity.class));
+                startActivity(new Intent(getActivity(), AddDiningPlanActivity.class));
             }
         });
 

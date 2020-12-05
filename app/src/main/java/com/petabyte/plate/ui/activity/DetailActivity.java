@@ -1,8 +1,5 @@
 package com.petabyte.plate.ui.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -11,16 +8,19 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -29,10 +29,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.petabyte.plate.R;
 import com.squareup.picasso.Picasso;
@@ -44,7 +44,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private Context context;
     private Intent intent;
-    private String diningName;
+    private String diningName, uid;
 
     private LinearLayout dishImageList;
     private LinearLayout dishList;
@@ -63,9 +63,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private CheckBox bookmarkBox;
     private boolean isChecked;
 
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReference, ref_g, ref_h;
     private StorageReference storageReference;
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +77,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         intent = getIntent();
         diningName = intent.getStringExtra("title");
         isChecked = intent.getBooleanExtra("checked", false);
-
-
 
         dishImageList = (LinearLayout)findViewById(R.id.linear_layout_dishImage_DetailActivity);
         dishList = (LinearLayout)findViewById(R.id.linear_layout_dishList_DetailActivity);
@@ -98,11 +97,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         diningTitle.setText(diningName);
         bookmarkBox.setChecked(isChecked);
 
-        cancelButton.setOnClickListener(this);
-        purchaseButton.setOnClickListener(this);
-
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+        user = mAuth.getCurrentUser();
+
         if (user != null) {
             getDiningImage();
             getDiningInformation();
@@ -111,13 +108,28 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             signInAnonymously();
         }
 
+        cancelButton.setOnClickListener(this);
+        purchaseButton.setOnClickListener(this);
+        bookmarkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                getDishImageUri(new MyCallback() {//for getting dining UID
+                    @Override
+                    public void onCallback(ArrayList<String> keyList) {
+                        reviseBookmarkStatus(keyList.get(0), isChecked);//index 0 is dining UID
+                    }
+                });
+            }
+        });
 
     }
 
     @Override
     public void onClick(View v) {
-        if(v == cancelButton)
-            finish();
+        if(v == cancelButton) {
+            Intent intent = new Intent(this, AddDiningPlanActivity.class);
+            startActivity(intent);
+        }
         else if(v == purchaseButton) {
             Intent purchase = new Intent(this, PurchaseActivity.class);
             purchase.putExtra("title", diningTitle.getText().toString());
@@ -141,25 +153,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         getDishImageUri(new MyCallback() {
             @Override
             public void onCallback(ArrayList<String> keyList) {
-                String diningUID = keyList.get(0);
-                String dish = keyList.get(1);
-                Log.d("음식", dish);
-                storageReference = FirebaseStorage.getInstance().getReference();
-                storageReference.child("dining").child(diningUID).child(dish + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        ImageView dishImage = new ImageView(context);
-                        GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, toDp(250));
-                        layoutParams.gravity = Gravity.CENTER;
-                        layoutParams.bottomMargin = toDp(15);
-                        dishImage.setBackground(drawable);
-                        dishImage.setClipToOutline(true);
-                        dishImage.setLayoutParams(layoutParams);
-                        Picasso.get().load(uri).fit().centerCrop().into(dishImage);
-                        dishImageList.addView(dishImage);
-                    }
-                });
+                String diningUid = keyList.get(0);
+                for(int i = 1; i < keyList.size(); i++) {
+                    final String dish = keyList.get(i);
+                    storageReference = FirebaseStorage.getInstance().getReference();
+                    storageReference.child("dining").child(diningUid).child(dish + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            ImageView dishImage = new ImageView(context);
+                            GradientDrawable drawable = (GradientDrawable) context.getDrawable(R.drawable.image_radius);
+                            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, toDp(250));
+                            layoutParams.gravity = Gravity.CENTER;
+                            layoutParams.bottomMargin = toDp(15);
+                            dishImage.setBackground(drawable);
+                            dishImage.setClipToOutline(true);
+                            dishImage.setLayoutParams(layoutParams);
+                            Picasso.get().load(uri).fit().centerCrop().into(dishImage);
+                            dishImageList.addView(dishImage);
+                        }
+                    });
+                }
             }
         });
     }
@@ -216,11 +229,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshots) {
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
-                            double rate = (double) dataSnapshot.child("Profile").child("Rating").getValue();
+                            String rateString = dataSnapshot.child("Profile").child("Rating").getValue().toString();
+                            double rate = Double.parseDouble(rateString);
                             Long ratingCount = (Long) dataSnapshot.child("Profile").child("RatingCount").getValue();
                             chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
                             chefIntroduction.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
-                            rating.setText("유저 평점\n" + rate + " / 5.0 (" + ratingCount + "명 참여)");
+                            rating.setText(String.format("유저 평점\n" + "%.1f" + " / 5.0 (" + ratingCount + "명 참여)", rate));
                             ratingBar.setRating(((float) rate));
                         }
                     }
@@ -261,12 +275,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
+                    ArrayList<String> keyList = new ArrayList<String>();
+                    keyList.add(dataSnapshot.getKey());
                     for(int i = 1; i <= dataSnapshot.child("dishes").getChildrenCount(); i++) {//get dishes from database
-                        ArrayList<String> keyList = new ArrayList<String>();
-                        keyList.add(dataSnapshot.getKey());
                         keyList.add(dataSnapshot.child("dishes").child(Integer.toString(i)).getValue().toString());
-                        myCallback.onCallback(keyList);
                     }
+                    myCallback.onCallback(keyList);
                 }
             }
 
@@ -276,6 +290,107 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
+
+    public void reviseBookmarkStatus(final String diningUid, final boolean isChecked) {
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
+        ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
+        uid = user.getUid();
+        ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    String userUid = dataSnapshot.getKey();
+                    boolean isRemoved = false;
+                    if(userUid.equals(uid)){
+                        if(isChecked) {//if not checked before listener runs, add to bookmark
+                            Long size = dataSnapshot.child("Bookmark").getChildrenCount();
+                            ref_g.child(userUid).child("Bookmark").child(Long.toString(size + 1)).setValue(diningUid);
+                        } else {//if checked before listener runs, remove from bookmark
+                            for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++) {
+                                try {
+                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString().equals(diningUid)) {
+                                        dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
+                                        isRemoved = true;
+                                    }
+                                } catch (NullPointerException e) {
+                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString().equals(diningUid)) {
+                                        dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
+                                        isRemoved = true;
+                                    }
+                                }
+                                if(isRemoved) {
+                                    //update afterward value's index
+                                    if(i != dataSnapshot.child("Bookmark").getChildrenCount()){
+                                        String newDiningUid;
+                                        newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
+                                        ref_g.child(userUid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
+                                    } else {//remove last value
+                                        try {
+                                            dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
+                                        } catch (NullPointerException e) {
+                                            dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
+        ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    String userUid = dataSnapshot.getKey();
+                    boolean isRemoved = false;
+                    if(userUid.equals(uid)){
+                        if(isChecked) {//if not checked before listener runs, add to bookmark
+                            Long size = dataSnapshot.child("Bookmark").getChildrenCount();
+                            ref_h.child(userUid).child("Bookmark").child(Long.toString(size + 1)).setValue(diningUid);
+                        } else {//if checked before listener runs, remove from bookmark
+                            for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++) {
+                                try {
+                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString().equals(diningUid)) {
+                                        dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
+                                        isRemoved = true;
+                                    }
+                                } catch (NullPointerException e) {
+                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString().equals(diningUid)) {
+                                        dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
+                                        isRemoved = true;
+                                    }
+                                }
+                                if(isRemoved) {
+                                    //update afterward value's index
+                                    if(i != dataSnapshot.child("Bookmark").getChildrenCount()){
+                                        String newDiningUid;
+                                        newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
+                                        ref_h.child(userUid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
+                                    } else {//remove last value
+                                        try {
+                                            dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
+                                        } catch (NullPointerException e) {
+                                            dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
 
     public int toDp(int size) {
         float scale = getResources().getDisplayMetrics().density;

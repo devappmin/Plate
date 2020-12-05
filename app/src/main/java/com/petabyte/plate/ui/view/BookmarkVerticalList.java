@@ -1,15 +1,11 @@
 package com.petabyte.plate.ui.view;
 
 import android.content.Context;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -25,19 +20,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.BookmarkVerticalListAdapter;
 import com.petabyte.plate.data.BookmarkCardViewData;
-import com.petabyte.plate.ui.activity.DetailActivity;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Calendar;
 
 
 public class BookmarkVerticalList extends ConstraintLayout {
@@ -121,7 +112,7 @@ public class BookmarkVerticalList extends ConstraintLayout {
     //get Dining UIDs with myCallback
     private void getDiningUid(final MyCallback myCallback) {
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+        user = mAuth.getCurrentUser();
         ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
         ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
         uid = user.getUid();
@@ -135,8 +126,8 @@ public class BookmarkVerticalList extends ConstraintLayout {
                     if(g_uid.equals(uid)){
                         for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
                             diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
-                            myCallback.onCallback(diningUid);
                         }
+                        myCallback.onCallback(diningUid);
                     }
                 }
             }
@@ -148,11 +139,19 @@ public class BookmarkVerticalList extends ConstraintLayout {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
-                    String g_uid = dataSnapshot.getKey();
+                    String h_uid = dataSnapshot.getKey();
                     ArrayList<String> diningUid = new ArrayList<String>();
-                    if(g_uid.equals(uid)){
+                    if(h_uid.equals(uid)){
                         for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
-                            diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
+                            try {
+                                diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
+                            } catch (NullPointerException e) {
+                                String newDiningUid;
+                                newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
+                                ref_h.child(h_uid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
+                                diningUid.add(newDiningUid);
+                                dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
+                            }
                         }
                         myCallback.onCallback(diningUid);
                     }
@@ -226,11 +225,6 @@ public class BookmarkVerticalList extends ConstraintLayout {
     public interface MyCallback {
         //diningUIDs
         void onCallback(ArrayList<String> diningUid);
-    }
-
-    public interface DiningCallback {
-        //diningUIDs
-        void onCallback(ArrayList<BookmarkCardViewData> dinings);
     }
 
 }

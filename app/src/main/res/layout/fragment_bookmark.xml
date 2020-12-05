@@ -10,7 +10,7 @@
         android:background="#fafafa">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
+            android:id="@+id/collapsing_toolbar_BookmarkFragment"
             app:title="찜한 다이닝"
             app:expandedTitleMarginStart="18dp"
             app:collapsedTitleGravity="start"

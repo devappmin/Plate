@@ -3,6 +3,7 @@
     package="com.petabyte.plate">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,11 +13,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.ScrollableImageActivity"/>
+        <activity android:name=".ui.activity.SearchAddressActivity"></activity>
+        <activity android:name=".ui.activity.ScrollableImageActivity" />
         <activity android:name=".ui.activity.RegisterInfoActivity" />
         <activity android:name=".ui.activity.RegisterActivity" />
         <activity android:name=".ui.activity.RegisterSelectActivity" />
+        <activity android:name=".ui.activity.PurchaseActivity" />
+        <activity android:name=".ui.activity.AddDiningPlanActivity" />
 
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="r4niv0jjpe" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCBM6w_H3TCpctU5Q93-OOfhSLW9Y7pX28" />
@@ -37,6 +44,5 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!--uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/-->
+
 </manifest>
