@@ -14,11 +14,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ui.activity.ReservationCheckActivity"></activity>
+
         <service
             android:name=".service.NewpostService"
             android:enabled="true"
-            android:exported="true"></service>
-        <activity android:name=".ui.activity.ScrollableImageActivity"/>
+            android:exported="true" />
+
+        <activity android:name=".ui.activity.ScrollableImageActivity" />
         <activity android:name=".ui.activity.RegisterInfoActivity" />
         <activity android:name=".ui.activity.RegisterActivity" />
         <activity android:name=".ui.activity.RegisterSelectActivity" />
