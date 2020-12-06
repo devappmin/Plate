@@ -199,8 +199,6 @@ public class MyPageFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
 
-        //getMemberType()
-
         ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
         ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
         UID = user.getUid();
