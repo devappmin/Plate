@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -25,7 +26,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -43,14 +48,13 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
 import com.petabyte.plate.ui.activity.LoginActivity;
-import com.petabyte.plate.utils.ConnectionCodes;
+import com.petabyte.plate.ui.activity.ReservationCheckActivity;
 import com.petabyte.plate.utils.GlideApp;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 public class MyPageFragment extends Fragment {
 
     private TextView text_username;
@@ -74,6 +78,8 @@ public class MyPageFragment extends Fragment {
     private String UID = "";
     private Uri imageUri;
     private ProgressDialog progressDialog;
+    private RequestManager mGlideRequestManager;
+
 
     @Nullable
     @Override
@@ -82,6 +88,7 @@ public class MyPageFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_mypage, container, false);
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)v.findViewById(R.id.collapsing_toolbar_mypage);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+        mGlideRequestManager = GlideApp.with(this);
 
         text_username = (TextView)v.findViewById(R.id.text_v_mypage_username);
         text_usermail = (TextView)v.findViewById(R.id.text_v_mypage_usermail);
@@ -110,7 +117,10 @@ public class MyPageFragment extends Fragment {
         btn_check_reserve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(getActivity(), ReservationCheckActivity.class));
+                startActivity(new Intent(
+                        getActivity(), ReservationCheckActivity.class)
+                        .putExtra("UID", UID)
+                        .putExtra("MEMBER_TYPE", MEMBER_TYPE));
             }
         });
 
@@ -188,6 +198,9 @@ public class MyPageFragment extends Fragment {
         // set user info card
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
+
+        //getMemberType()
+
         ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
         ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
         UID = user.getUid();
@@ -222,8 +235,9 @@ public class MyPageFragment extends Fragment {
                         setProfileImage();
                         btn_add_dining.setVisibility(View.VISIBLE);
                         btn_edit_desc.setVisibility(View.VISIBLE);
+
                         if(dataSnapshot.child("Status").getValue().toString().equals("WAITING")){
-                            btn_add_dining.setTextColor(getResources().getColor(R.color.textDarkDisabled));
+                            btn_add_dining.setTextColor(Color.GRAY);
                             btn_add_dining.setText("다이닝 일정 추가 [심사 진행중]");
                             btn_add_dining.setEnabled(false);
                         }
@@ -245,14 +259,16 @@ public class MyPageFragment extends Fragment {
                     if(!imageName.equals("DEFAULT")){
                         //Log.d("result", "setProfileImage >> host : "+imageName);
                         // set image with GlideApp
-                        GlideApp.with(getContext()).load(getStorageRef().child(imageName))
+                        mGlideRequestManager
+                                .load(getStorageRef().child(imageName))
+                                .override(200)
                                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                                 .skipMemoryCache(true)
                                 .circleCrop()
                                 .into(image_userpics);
                     }else{
                         //Log.d("result", "setProfileImage >> host, NO CUSTOM IMAGE UPLOADED!");
-                        GlideApp.with(getContext())
+                        mGlideRequestManager
                                 .load(getResources().getDrawable(R.drawable.ic_character))
                                 .circleCrop()
                                 .into(image_userpics);
@@ -268,7 +284,9 @@ public class MyPageFragment extends Fragment {
                     String imageName = snapshot.child(UID).child("Profile/Image").getValue().toString();
                     if(!imageName.equals("DEFAULT")){
                         // set image with GlideApp
-                        GlideApp.with(getContext()).load(getStorageRef().child(imageName))
+                        GlideApp.with(getContext())
+                                 .load(getStorageRef().child(imageName))
+                                .override(200)
                                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                                 .skipMemoryCache(true)
                                 .circleCrop()
@@ -469,9 +487,8 @@ public class MyPageFragment extends Fragment {
     // upload image to Storage
     private void uploadImage(){
         final Uri file = Uri.fromFile(new File(imageUri.getPath()));
-        final String extension = getExtension(file.getLastPathSegment());
-        final String finalFilename = UID+"."+extension;
-
+        //final String extension = getExtension(file.getLastPathSegment());
+        final String finalFilename = UID;
         if(storage == null) getStorageRef();
 
         storage = storage.child(finalFilename);
