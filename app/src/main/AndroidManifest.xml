@@ -18,12 +18,20 @@
             android:name=".service.NewpostService"
             android:enabled="true"
             android:exported="true"></service>
-        <activity android:name=".ui.activity.ScrollableImageActivity"/>
-        <activity android:name=".ui.activity.RegisterInfoActivity" />
-        <activity android:name=".ui.activity.RegisterActivity" />
-        <activity android:name=".ui.activity.RegisterSelectActivity" />
-        <activity android:name=".ui.activity.PurchaseActivity" />
-        <activity android:name=".ui.activity.AddDiningPlanActivity" />
+        <activity android:name=".ui.activity.ScrollableImageActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.RegisterInfoActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.RegisterSelectActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.PurchaseActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.AddDiningPlanActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.SearchAddressActivity"
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -36,10 +44,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.DetailActivity" />
-        <activity android:name=".ui.activity.LoginActivity" />
-        <activity android:name=".ui.activity.SearchActivity" />
-        <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.DetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.SearchActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="com.soundcloud.android.crop.CropImageActivity"
             android:screenOrientation="portrait"

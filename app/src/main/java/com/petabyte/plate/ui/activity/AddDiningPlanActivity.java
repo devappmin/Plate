@@ -1,5 +1,6 @@
 package com.petabyte.plate.ui.activity;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,15 +39,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.ui.view.AddDishImageHorizontalList;
 import com.petabyte.plate.utils.ConnectionCodes;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AddDiningPlanActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -362,7 +369,22 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                 }
             }
         } else if (v == addDishImage) {
-            startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI), ConnectionCodes.GET_FROM_GALLERY);
+            PermissionListener permissionlistener = new PermissionListener(){
+                @Override
+                public void onPermissionGranted() {
+                    startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI).setType("image/*"), ConnectionCodes.GET_FROM_GALLERY);
+                }
+                @Override
+                public void onPermissionDenied(List<String> deniedPermissions) {
+                    Toast.makeText(context, "권한을 거부하였습니다.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+                }
+            };
+            TedPermission.with(context)
+                    .setPermissionListener(permissionlistener)
+                    .setRationaleMessage("사진을 업로드하기 위해 권한이 필요합니다.")
+                    .setDeniedMessage("사진을 업로드하기 위해 이 권한이 필요합니다.\n[설정] > [권한] 에서 권한을 허용할 수 있어요.")
+                    .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    .check();
         } else if (v == submitButton) {
             //upload to realtime database
             //항목들이 모두 입력되었는지 검사, 공백이 입력되어도 입력되지 않은 것으로 판단
@@ -379,7 +401,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                     || (dishImageBitmaps.size() == 0)) {
                 Snackbar.make(v, "모든 항목들을 채워 주세요.", 3000).show();
             } else {
-                //uploadDiningInformation();
+                uploadDiningInformation();
                 finish();
             }
         }
@@ -487,22 +509,28 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                     String picturePath = cursor.getString(columnIndex);
                     final String filename = picturePath.substring(picturePath.lastIndexOf("/") + 1);
-                    imageNames.add(filename);
+
                     cursor.close();
 
-                    final AddDishImageHorizontalList addDishImageHorizontalList = new AddDishImageHorizontalList(context);
-                    final Bitmap dishImage = BitmapFactory.decodeFile(picturePath);
-                    addDishImageHorizontalList.setImage(dishImage);
-                    dishImageBitmaps.add(dishImage);
-                    addDishImageHorizontalList.removeButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dishImageList.removeView(addDishImageHorizontalList);
-                            dishImageBitmaps.remove(dishImage);
-                            imageNames.remove(filename);
-                        }
-                    });
-                    dishImageList.addView(addDishImageHorizontalList);
+                    try {
+                        final InputStream imageStream = getContentResolver().openInputStream(selectedImage);
+                        final Bitmap selectedImageBitmap = BitmapFactory.decodeStream(imageStream);
+                        final AddDishImageHorizontalList addDishImageHorizontalList = new AddDishImageHorizontalList(context);
+                        addDishImageHorizontalList.setImage(selectedImageBitmap);
+                        dishImageBitmaps.add(selectedImageBitmap);
+                        imageNames.add(filename);
+                        addDishImageHorizontalList.removeButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dishImageList.removeView(addDishImageHorizontalList);
+                                dishImageBitmaps.remove(selectedImageBitmap);
+                                imageNames.remove(filename);
+                            }
+                        });
+                        dishImageList.addView(addDishImageHorizontalList);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
