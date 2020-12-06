@@ -45,4 +45,14 @@
         <item name="android:textColor">#000</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="EditTextStyle">
+        <item name="colorControlNormal">@color/colorPrimary</item>
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="CustomDatePicker" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">@color/colorPrimary</item>
+    </style>
+
 </resources>

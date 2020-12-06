@@ -22,6 +22,8 @@
         <activity android:name=".ui.activity.RegisterInfoActivity" />
         <activity android:name=".ui.activity.RegisterActivity" />
         <activity android:name=".ui.activity.RegisterSelectActivity" />
+        <activity android:name=".ui.activity.PurchaseActivity" />
+        <activity android:name=".ui.activity.AddDiningPlanActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

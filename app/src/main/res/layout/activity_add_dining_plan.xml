@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view_DetailActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:overScrollMode="never"
+    tools:context=".ui.activity.AddDiningPlanActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_layout_addPlan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/cancel_button_addPlan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_cancel_24"
+            android:background="@android:color/transparent"
+            android:layout_margin="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/title_addPlan"
+            android:text="다이닝 일정 추가"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/textDarkPrimary"
+            android:textSize="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view_addPlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title_addPlan">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="20dp">
+
+                <TextView
+                    android:id="@+id/text_title_addPlan"
+                    android:text="제공하실 다이닝의 이름을 알려주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <EditText
+                    android:id="@+id/editText_title_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="다이닝 이름"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_title_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_subtitle_addPlan"
+                    android:text="제공하실 다이닝의 부제목을 적어주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_title_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_subtitle_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="부제목"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_subtitle_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_description_addPlan"
+                    android:text="다이닝을 대표할 한 줄 소개를 적어주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_subtitle_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_description_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="한 줄 소개"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_description_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_style_addPlan"
+                    android:text="제공하실 다이닝의 스타일을 알려주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_description_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_style_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:hint="스타일을 선택해 주세요."
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_style_addPlan"/>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_styles_addPlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="30dp"
+                    android:animateLayoutChanges="true"
+                    android:theme="@style/AppTheme.Material"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_style_addPlan"/>
+
+
+                <TextView
+                    android:id="@+id/text_location_addPlan"
+                    android:text="다이닝이 진행 될 장소는 어디인가요?"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/chip_group_styles_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_location_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:hint="주소 입력"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_location_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_detail_location_addPlan"
+                    android:text="세부 주소를 알려 주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_location_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_detail_location_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:hint="ex) 동호빌딩 5층 104호"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_detail_location_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_time_addPlan"
+                    android:text="다이닝을 진행할 시간을 알려주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_detail_location_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_date_addPlan"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:gravity="center"
+                    android:hint="날짜 입력"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="20dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/editText_start_time_addPlan"
+                    app:layout_constraintTop_toBottomOf="@id/text_time_addPlan" />
+
+                <EditText
+                    android:id="@+id/editText_start_time_addPlan"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:gravity="center"
+                    android:hint="시작 시간"
+                    android:layout_marginEnd="15dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toEndOf="@id/editText_date_addPlan"
+                    app:layout_constraintEnd_toStartOf="@id/editText_end_time_addPlan"
+                    app:layout_constraintTop_toBottomOf="@+id/text_time_addPlan"/>
+
+                <TextView
+                    android:text="~"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="3dp"
+                    app:layout_constraintStart_toEndOf="@id/editText_start_time_addPlan"
+                    app:layout_constraintEnd_toStartOf="@id/editText_end_time_addPlan"
+                    app:layout_constraintTop_toBottomOf="@id/text_time_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_end_time_addPlan"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:gravity="center"
+                    android:hint="종료 시간"
+                    android:layout_marginEnd="50dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toEndOf="@+id/editText_start_time_addPlan"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/text_time_addPlan"/>
+
+                <ImageView
+                    android:id="@+id/add_time_addPlan"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_baseline_add_24"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toEndOf="@id/editText_end_time_addPlan"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_time_addPlan"/>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_times_addPlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="30dp"
+                    android:animateLayoutChanges="true"
+                    android:theme="@style/AppTheme.Material"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_date_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_person_addPlan"
+                    android:text="최대 인원 수를 설정해 주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="25dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_times_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_max_person_addPlan"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:maxLines="1"
+                    android:inputType="number"
+                    android:hint="최대 인원 수"
+                    android:gravity="center"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_person_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_price_addPlan"
+                    android:text="제공하실 다이닝의 가격을 알려주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="25dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_max_person_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_price_addPlan"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:maxLines="1"
+                    android:inputType="number"
+                    android:hint="가격"
+                    android:gravity="center"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_price_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_dish_addPlan"
+                    android:text="제공하실 코스/메뉴를 추가해 주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_price_addPlan"/>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_dishes_addPlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="30dp"
+                    android:animateLayoutChanges="true"
+                    android:theme="@style/AppTheme.Material"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_dish_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_dish_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:hint="코스/메뉴"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chip_group_dishes_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_image_addPlan"
+                    android:text="다이닝 이미지를 업로드 해 주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_dish_addPlan"/>
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_image_addPlan">
+
+                    <LinearLayout
+                        android:id="@+id/linear_layout_dishImage_addPlan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/add_dish_image_view_addPlan"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:paddingStart="15dp"
+                            android:paddingTop="20dp"
+                            android:src="@drawable/ic_baseline_add_24"
+                            android:background="@drawable/image_radius_with_border"/>
+
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/submit_button_addPlan"
+            android:text="일정 추가"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/detail_activity_round_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/card_view_addPlan"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/submit_button_addPlan"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
