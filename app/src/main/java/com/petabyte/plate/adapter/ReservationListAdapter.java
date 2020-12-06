@@ -1,34 +1,30 @@
 package com.petabyte.plate.adapter;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.ReservationCardData;
-import com.petabyte.plate.ui.activity.ReservationCheckActivity;
-import com.petabyte.plate.utils.LogTags;
-
-import org.w3c.dom.Text;
-
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ReservationListAdapter extends RecyclerView.Adapter<ReservationListAdapter.ViewHolder> {
 
     private List<ReservationCardData> datas = new ArrayList<>();
-    private StorageReference reference;
+    private static Context mContext;
+
+    public ReservationListAdapter(Context context) {
+        mContext = context;
+    }
 
     // item view를 관리하는 ViewHolder 객체를 생성한다.
     @NonNull
@@ -86,6 +82,21 @@ public class ReservationListAdapter extends RecyclerView.Adapter<ReservationList
 
         private void onBind(ReservationCardData data) {
             statusTextView.setText(data.getStatus());
+
+            Drawable bg = mContext.getResources().getDrawable(R.drawable.textview_status_background);
+
+            switch(data.getStatus()){
+                case "결제완료":
+                    bg.setColorFilter(mContext.getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
+                    statusTextView.setBackground(bg);
+                    statusTextView.setTextColor(Color.WHITE);
+                    break;
+                case "예약취소":
+                    bg.setColorFilter(mContext.getResources().getColor(R.color.colorDanger), PorterDuff.Mode.SRC_ATOP);
+                    statusTextView.setBackground(bg);
+                    statusTextView.setTextColor(Color.WHITE);
+                    break;
+            }
             titleTextView.setText(data.getTitle());
             timeTextView.setText(data.getTimestamp());
             locationTextView.setText(data.getLocation());
