@@ -2,85 +2,93 @@ package com.petabyte.plate.data;
 
 import com.google.firebase.database.Exclude;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DiningMasterData {
-    private int Bookmark;
-    private int Price;
-    private String Title;
-    private String Subtitle;
-    private String Description;
-    private String Location;
-    private String DetailLocation;
-    private Map<String, Integer> Count;
-    private Map<String, String> Dishes;
-    private Map<String, String> Images;
-    private Map<String, Double> Coordinate;
-    private Map<String, Map<String, Double>> Schedules;
-    private int dishCount = 0;
-    private int imageCount = 0;
+    private int bookmark;
+    private int price;
+    private String title;
+    private String subtitle;
+    private String description;
+    private List<String> dishes;
+    private List<String> images;
+    private List<String> style;
+    private HashMap<String, Integer> count;
+    private HashMap<String, Object> location;
+    private HashMap<String, Map<String, Double>> schedules;
+
+    @Exclude private int dishCount = 0;
+    @Exclude private int imageCount = 0;
 
     public DiningMasterData() {
     }
 
     public DiningMasterData(int bookmark, int price, String title, String subtitle, String description) {
-        Bookmark = bookmark;
-        Price = price;
-        Title = title;
-        Subtitle = subtitle;
-        Description = description;
+        this.bookmark = bookmark;
+        this.price = price;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.description = description;
 
-        Location = "";
-        DetailLocation = "";
-        Dishes = new HashMap<>();
-        Images = new HashMap<>();
-        Count = new HashMap<>();
-        Coordinate = new HashMap<>();
-        Schedules = new HashMap<>();
+        count = new HashMap<>();
+        dishes =  new ArrayList<>();
+        images = new ArrayList<>();
+        style = new ArrayList<>();
+        location = new HashMap<>();
+        schedules = new HashMap<>();
     }
 
-    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description, Map<String, Integer> count, Map<String, String> dishes, Map<String, String> images, Map<String, Double> coordinate, Map<String, Map<String, Double>> schedules) {
-        Bookmark = bookmark;
-        Price = price;
-        Title = title;
-        Subtitle = subtitle;
-        Description = description;
-        Count = count;
-        Dishes = dishes;
-        Images = images;
-        Coordinate = coordinate;
-        Schedules = schedules;
+    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description,
+                            List<String> dishes, List<String> images, List<String> style, HashMap<String, Integer> count,
+                            HashMap<String, Object> location, HashMap<String, Map<String, Double>> schedules, int dishCount, int imageCount) {
+        this.bookmark = bookmark;
+        this.price = price;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.description = description;
+        this.dishes = dishes;
+        this.images = images;
+        this.style = style;
+        this.count = count;
+        this.location = location;
+        this.schedules = schedules;
+        this.dishCount = dishCount;
+        this.imageCount = imageCount;
+    }
 
-        Location = "";
-        DetailLocation = "";
+    @Exclude
+    public List<FoodStyle> getFoodStyle() {
+        List<FoodStyle> styleList = new ArrayList<>();
+        for (String style : style) {
+            styleList.add(FoodStyle.getFoodStyle(style));
+        }
+        return styleList;
     }
 
     @Exclude
     public void addDishes(String[] dishList) {
-
-        for(String dish : dishList)
-            Dishes.put(++dishCount + "", dish);
-
+        dishes.addAll(Arrays.asList(dishList));
     }
 
     @Exclude
     public void addCount(int current, int max) {
-        Count.put("Current", current);
-        Count.put("Max", max);
+        count.put("Current", current);
+        count.put("Max", max);
     }
 
     @Exclude
     public void addImages(String[] imageList) {
-        for (String image : imageList)
-            Images.put(++imageCount + "", image);
+        images.addAll(Arrays.asList(imageList));
     }
 
     @Exclude
-    public void addCoordinate(double x, double y) {
-        Coordinate.put("x", x);
-        Coordinate.put("y", y);
+    public void addLocation(double x, double y) {
+        location.put("x", String.valueOf(x));
+        location.put("y", String.valueOf(y));
     }
 
     @Exclude
@@ -93,103 +101,111 @@ public class DiningMasterData {
         }
 
         for (int i = 0; i < singleSchedules.size(); i++) {
-            Schedules.put(i + "+", singleSchedules);
+            schedules.put(String.valueOf(i), singleSchedules);
         }
     }
 
     public int getBookmark() {
-        return Bookmark;
+        return bookmark;
     }
 
     public void setBookmark(int bookmark) {
-        Bookmark = bookmark;
+        this.bookmark = bookmark;
     }
 
     public int getPrice() {
-        return Price;
+        return price;
     }
 
     public void setPrice(int price) {
-        Price = price;
+        this.price = price;
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
     public String getSubtitle() {
-        return Subtitle;
+        return subtitle;
     }
 
     public void setSubtitle(String subtitle) {
-        Subtitle = subtitle;
+        this.subtitle = subtitle;
     }
 
     public String getDescription() {
-        return Description;
-    }
-
-    public String getLocation() {
-        return Location;
-    }
-
-    public void setLocation(String location) {
-        Location = location;
-    }
-
-    public String getDetailLocation() {
-        return DetailLocation;
-    }
-
-    public void setDetailLocation(String detailLocation) {
-        DetailLocation = detailLocation;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 
-    public Map<String, Integer> getCount() {
-        return Count;
+    public List<String> getDishes() {
+        return dishes;
     }
 
-    public void setCount(Map<String, Integer> count) {
-        Count = count;
+    public void setDishes(List<String> dishes) {
+        this.dishes = dishes;
     }
 
-    public Map<String, String> getDishes() {
-        return Dishes;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setDishes(Map<String, String> dishes) {
-        Dishes = dishes;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
-    public Map<String, String> getImages() {
-        return Images;
+    public HashMap<String, Integer> getCount() {
+        return count;
     }
 
-    public void setImages(Map<String, String> images) {
-        Images = images;
+    public void setCount(HashMap<String, Integer> count) {
+        this.count = count;
     }
 
-    public Map<String, Double> getCoordinate() {
-        return Coordinate;
+    public HashMap<String, Object> getLocation() {
+        return location;
     }
 
-    public void setCoordinate(Map<String, Double> coordinate) {
-        Coordinate = coordinate;
+    public void setLocation(HashMap<String, Object> location) {
+        this.location = location;
     }
 
-    public Map<String, Map<String, Double>> getSchedules() {
-        return Schedules;
+    public HashMap<String, Map<String, Double>> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedules(Map<String, Map<String, Double>> schedules) {
-        Schedules = schedules;
+    public void setSchedules(HashMap<String, Map<String, Double>> schedules) {
+        this.schedules = schedules;
+    }
+
+    public List<String> getStyle() {
+        return style;
+    }
+
+    public void setStyle(List<String> style) {
+        this.style = style;
+    }
+
+    public int getDishCount() {
+        return dishCount;
+    }
+
+    public void setDishCount(int dishCount) {
+        this.dishCount = dishCount;
+    }
+
+    public int getImageCount() {
+        return imageCount;
+    }
+
+    public void setImageCount(int imageCount) {
+        this.imageCount = imageCount;
     }
 }

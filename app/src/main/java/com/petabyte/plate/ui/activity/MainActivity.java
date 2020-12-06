@@ -33,11 +33,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         fragments = new Fragment[4];
         fragments[0] = new HomeFragment();
-        fragments[1] = new ResultFragment();
-        fragments[2] = new BookmarkFragment();
-        fragments[3] = new MyPageFragment();
 
-        loadFragment(fragments[0]);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_main, fragments[0]).commit();
 
         Intent serviceIntent = new Intent(MainActivity.this, NewpostService.class);
         startService(serviceIntent);
@@ -54,14 +51,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 break;
 
             case R.id.action_result:
+                if (fragments[1] == null) {
+                    fragments[1] = new ResultFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_main, fragments[1]).commit();
+                }
                 fragment = fragments[1];
                 break;
 
             case R.id.action_bookmark:
+                if (fragments[2] == null) {
+                    fragments[2] = new BookmarkFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_main, fragments[2]).commit();
+                }
                 fragment = fragments[2];
                 break;
 
             case R.id.action_mypage:
+                if (fragments[3] == null) {
+                    fragments[3] = new MyPageFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_main, fragments[3]).commit();
+                }
                 fragment = fragments[3];
                 break;
         }
@@ -70,7 +79,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_main, fragment).commit();
+            for (int i = 0; i < fragments.length; i++) {
+                if (fragments[i] == fragment)
+                    getSupportFragmentManager().beginTransaction().show(fragment).commit();
+                else if (fragments[i] != null)
+                    getSupportFragmentManager().beginTransaction().hide(fragments[i]).commit();
+
+            }
+            //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_main, fragment).commit();
             return true;
         }
         return false;

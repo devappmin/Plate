@@ -27,6 +27,12 @@ public enum FoodStyle {
     SHEEP("양고기");
 
 
+    public final String label;
+
+    FoodStyle(String label) {
+        this.label = label;
+    }
+
     public static FoodStyle getFoodStyle(String name) {
         for (FoodStyle style : FoodStyle.values()) {
             if (style.label.equals(name))
@@ -36,15 +42,10 @@ public enum FoodStyle {
         return null;
     }
 
-    FoodStyle(String label) {
-        this.label = label;
-    }
-
     private static final List<FoodStyle> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
     private static final int SIZE = VALUES.size();
     private static final Random RANDOM = new Random();
 
-    public final String label;
     public static FoodStyle randomLetter()  {
         return VALUES.get(RANDOM.nextInt(SIZE));
     }

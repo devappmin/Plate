@@ -1,5 +1,7 @@
 package com.petabyte.plate.adapter;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.HomeCardData;
+import com.petabyte.plate.ui.activity.DetailActivity;
 import com.petabyte.plate.utils.GlideApp;
 import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
@@ -71,7 +74,7 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
 
         private View itemView;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull final View itemView) {
             super(itemView);
 
             this.itemView = itemView;
@@ -83,14 +86,23 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
             priceTextView = (TextView)itemView.findViewById(R.id.price_tv_v_homecard);
 
             // Add CardView's ClickListener here..
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(itemView.getContext(), DetailActivity.class);
+                    intent.putExtra("title", titleTextView.getText().toString());
+                    itemView.getContext().startActivity(intent);
+                }
+            });
         }
 
+        @SuppressLint("SetTextI18n")
         private void onBind(HomeCardData data, StorageReference reference) {
 
             titleTextView.setText(data.getTitle());
             subtitleTextView.setText(data.getSubtitle());
             descriptionTextView.setText(data.getDescription());
-            priceTextView.setText(String.format(Locale.KOREA, "%,d", data.getPrice()));
+            priceTextView.setText(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
 
             Log.d(LogTags.IMPORTANT, data.getImageUri());
             GlideApp.with(itemView.getContext()).load(reference.child("dining/" + data.getImageUri())).fitCenter().centerCrop().into(imageView);

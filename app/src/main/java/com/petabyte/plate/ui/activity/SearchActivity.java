@@ -8,6 +8,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -16,8 +17,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.petabyte.plate.R;
+import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
 import com.petabyte.plate.ui.view.NumberPickerBottomSheet;
+import com.petabyte.plate.ui.view.RecommendChipGroup;
+import com.petabyte.plate.utils.LogTags;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,6 +30,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener, NumberPickerBottomSheet.NumberPickerSelectedListener, LocationPickerBottomSheet.LocationPickerSelectedListener {
+
+    private RecommendChipGroup chipGroup;
 
     private ImageButton cancelButton;
     private CardView    peopleCardView;
@@ -59,6 +65,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         dateTextView = (TextView)findViewById(R.id.date_tv_av_search);
         locationTextView = (TextView)findViewById(R.id.location_tv_av_search);
 
+        chipGroup = (RecommendChipGroup)findViewById(R.id.recommend_chip_av_search);
+
         cancelButton.setOnClickListener(this);
         peopleCardView.setOnClickListener(this);
         dateCardView.setOnClickListener(this);
@@ -89,6 +97,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             intent.putExtra("hour", mHour);
             intent.putExtra("minute", mMinute);
             intent.putExtra("people", people);
+
+            for (FoodStyle foodStyle : chipGroup.getSelectedChips()) {
+                Log.d(LogTags.IMPORTANT, foodStyle.label);
+            }
 
             setResult(RESULT_OK, intent);
             finish();

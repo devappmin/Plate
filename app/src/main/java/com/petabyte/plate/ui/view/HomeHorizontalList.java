@@ -1,6 +1,7 @@
 package com.petabyte.plate.ui.view;
 
 import android.content.Context;
+import android.text.Spanned;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -68,6 +69,9 @@ public class HomeHorizontalList extends ConstraintLayout {
         SnapHelper helper = new CustomAlignSnapHelper(2);
         helper.attachToRecyclerView(recyclerView);
 
+        // 해당 RecyclerView를 터치한 뒤 위/아래로 스크롤하면 Collapsing Toolbar가 제대로 닫히지 않는 문제 해결
+        recyclerView.setNestedScrollingEnabled(false);
+
         // RecyclerView에 LayoutManager 연결
         layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
@@ -80,6 +84,10 @@ public class HomeHorizontalList extends ConstraintLayout {
 
     public void setTitle(String title) {
         titleView.setText(title);
+    }
+
+    public void setTitle(Spanned fromHtml) {
+        titleView.setText(fromHtml);
     }
 
     public void addData(HomeCardData data) {
