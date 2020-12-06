@@ -12,12 +12,13 @@ public class DiningMasterData {
     private String Title;
     private String Subtitle;
     private String Description;
+    private String Location;
+    private String DetailLocation;
     private Map<String, Integer> Count;
     private Map<String, String> Dishes;
     private Map<String, String> Images;
-    private Map<String, Double> Location;
+    private Map<String, Double> Coordinate;
     private Map<String, Map<String, Double>> Schedules;
-
     private int dishCount = 0;
     private int imageCount = 0;
 
@@ -31,14 +32,16 @@ public class DiningMasterData {
         Subtitle = subtitle;
         Description = description;
 
+        Location = "";
+        DetailLocation = "";
         Dishes = new HashMap<>();
         Images = new HashMap<>();
         Count = new HashMap<>();
-        Location = new HashMap<>();
+        Coordinate = new HashMap<>();
         Schedules = new HashMap<>();
     }
 
-    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description, Map<String, Integer> count, Map<String, String> dishes, Map<String, String> images, Map<String, Double> location, Map<String, Map<String, Double>> schedules) {
+    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description, Map<String, Integer> count, Map<String, String> dishes, Map<String, String> images, Map<String, Double> coordinate, Map<String, Map<String, Double>> schedules) {
         Bookmark = bookmark;
         Price = price;
         Title = title;
@@ -47,8 +50,11 @@ public class DiningMasterData {
         Count = count;
         Dishes = dishes;
         Images = images;
-        Location = location;
+        Coordinate = coordinate;
         Schedules = schedules;
+
+        Location = "";
+        DetailLocation = "";
     }
 
     @Exclude
@@ -72,9 +78,9 @@ public class DiningMasterData {
     }
 
     @Exclude
-    public void addLocation(double x, double y) {
-        Location.put("x", x);
-        Location.put("y", y);
+    public void addCoordinate(double x, double y) {
+        Coordinate.put("x", x);
+        Coordinate.put("y", y);
     }
 
     @Exclude
@@ -127,6 +133,22 @@ public class DiningMasterData {
         return Description;
     }
 
+    public String getLocation() {
+        return Location;
+    }
+
+    public void setLocation(String location) {
+        Location = location;
+    }
+
+    public String getDetailLocation() {
+        return DetailLocation;
+    }
+
+    public void setDetailLocation(String detailLocation) {
+        DetailLocation = detailLocation;
+    }
+
     public void setDescription(String description) {
         Description = description;
     }
@@ -155,12 +177,12 @@ public class DiningMasterData {
         Images = images;
     }
 
-    public Map<String, Double> getLocation() {
-        return Location;
+    public Map<String, Double> getCoordinate() {
+        return Coordinate;
     }
 
-    public void setLocation(Map<String, Double> location) {
-        Location = location;
+    public void setCoordinate(Map<String, Double> coordinate) {
+        Coordinate = coordinate;
     }
 
     public Map<String, Map<String, Double>> getSchedules() {

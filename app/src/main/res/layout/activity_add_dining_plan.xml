@@ -53,8 +53,8 @@
                 android:paddingBottom="20dp">
 
                 <TextView
-                    android:id="@+id/text_style_addPlan"
-                    android:text="제공하실 다이닝의 스타일을 알려주세요."
+                    android:id="@+id/text_title_addPlan"
+                    android:text="제공하실 다이닝의 이름을 알려주세요."
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/textDarkPrimary"
@@ -64,7 +64,82 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <EditText
-                    android:id="@+id/editText_style_addplan"
+                    android:id="@+id/editText_title_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="다이닝 이름"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_title_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_subtitle_addPlan"
+                    android:text="제공하실 다이닝의 부제목을 적어주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_title_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_subtitle_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="부제목"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_subtitle_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_description_addPlan"
+                    android:text="다이닝을 대표할 한 줄 소개를 적어주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_subtitle_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_description_addPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="한 줄 소개"
+                    android:paddingStart="5dp"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_description_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_style_addPlan"
+                    android:text="제공하실 다이닝의 스타일을 알려주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_description_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_style_addPlan"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginStart="15dp"
@@ -86,7 +161,7 @@
                     android:animateLayoutChanges="true"
                     android:theme="@style/AppTheme.Material"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/editText_style_addplan"/>
+                    app:layout_constraintTop_toBottomOf="@id/editText_style_addPlan"/>
 
 
                 <TextView
@@ -101,13 +176,14 @@
                     app:layout_constraintTop_toBottomOf="@+id/chip_group_styles_addPlan"/>
 
                 <EditText
-                    android:id="@+id/editText_location_addplan"
+                    android:id="@+id/editText_location_addPlan"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
                     android:cursorVisible="false"
                     android:focusable="false"
+                    android:hint="주소 입력"
                     android:paddingStart="5dp"
                     android:theme="@style/EditTextStyle"
                     app:layout_constraintStart_toStartOf="parent"
@@ -123,10 +199,10 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/editText_location_addplan"/>
+                    app:layout_constraintTop_toBottomOf="@id/editText_location_addPlan"/>
 
                 <EditText
-                    android:id="@+id/editText_detail_location_addplan"
+                    android:id="@+id/editText_detail_location_addPlan"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginStart="15dp"
@@ -149,7 +225,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/editText_detail_location_addplan"/>
+                    app:layout_constraintTop_toBottomOf="@id/editText_detail_location_addPlan"/>
 
                 <EditText
                     android:id="@+id/editText_date_addPlan"
@@ -245,20 +321,43 @@
                     app:layout_constraintTop_toBottomOf="@id/chip_group_times_addPlan"/>
 
                 <EditText
-                    android:id="@+id/editText_max_person_addplan"
-                    android:layout_width="0dp"
-                    android:layout_height="45dp"
+                    android:id="@+id/editText_max_person_addPlan"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
-                    android:layout_marginTop="10dp"
                     android:maxLines="1"
                     android:inputType="number"
                     android:hint="최대 인원 수"
                     android:gravity="center"
                     android:theme="@style/EditTextStyle"
-                    app:layout_constraintStart_toEndOf="@id/text_person_addPlan"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/chip_group_times_addPlan"/>
+                    app:layout_constraintTop_toBottomOf="@id/text_person_addPlan"/>
+
+                <TextView
+                    android:id="@+id/text_price_addPlan"
+                    android:text="제공하실 다이닝의 가격을 알려주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="25dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_max_person_addPlan"/>
+
+                <EditText
+                    android:id="@+id/editText_price_addPlan"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:maxLines="1"
+                    android:inputType="number"
+                    android:hint="가격"
+                    android:gravity="center"
+                    android:theme="@style/EditTextStyle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_price_addPlan"/>
 
                 <TextView
                     android:id="@+id/text_dish_addPlan"
@@ -269,7 +368,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/editText_max_person_addplan"/>
+                    app:layout_constraintTop_toBottomOf="@id/editText_price_addPlan"/>
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chip_group_dishes_addPlan"
@@ -297,6 +396,46 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/chip_group_dishes_addPlan"/>
 
+                <TextView
+                    android:id="@+id/text_image_addPlan"
+                    android:text="다이닝 이미지를 업로드 해 주세요."
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textDarkPrimary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/editText_dish_addPlan"/>
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text_image_addPlan">
+
+                    <LinearLayout
+                        android:id="@+id/linear_layout_dishImage_addPlan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/add_dish_image_view_addPlan"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:paddingStart="15dp"
+                            android:paddingTop="20dp"
+                            android:src="@drawable/ic_baseline_add_24"
+                            android:background="@drawable/image_radius_with_border"/>
+
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

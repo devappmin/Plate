@@ -27,6 +27,15 @@ public enum FoodStyle {
     SHEEP("양고기");
 
 
+    public static FoodStyle getFoodStyle(String name) {
+        for (FoodStyle style : FoodStyle.values()) {
+            if (style.label.equals(name))
+                return style;
+        }
+
+        return null;
+    }
+
     FoodStyle(String label) {
         this.label = label;
     }

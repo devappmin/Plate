@@ -3,6 +3,8 @@ package com.petabyte.plate.ui.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -21,9 +23,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthResult;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +40,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.petabyte.plate.R;
+import com.petabyte.plate.data.FoodStyle;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -46,11 +52,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private Intent intent;
     private String diningName, uid;
 
+    private LinearLayout parentLayout;
     private LinearLayout dishImageList;
     private LinearLayout dishList;
     private ImageButton cancelButton;
     private TextView diningTitle;
     private TextView diningSubtitle;
+    private ChipGroup styleChipGroup;
     private TextView diningDescription;
     private ImageView chefImage;
     private TextView chefName;
@@ -78,11 +86,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         diningName = intent.getStringExtra("title");
         isChecked = intent.getBooleanExtra("checked", false);
 
+        parentLayout = (LinearLayout)findViewById(R.id.parent_layout_DetailActivity);
         dishImageList = (LinearLayout)findViewById(R.id.linear_layout_dishImage_DetailActivity);
         dishList = (LinearLayout)findViewById(R.id.linear_layout_dishList_DetailActivity);
         cancelButton = (ImageButton)findViewById(R.id.cancel_button_DetailActivity);
         diningTitle = (TextView)findViewById(R.id.dining_title_DetailActivity);
         diningSubtitle = (TextView)findViewById(R.id.dining_subtitle_DetailActivity);
+        styleChipGroup = (ChipGroup)findViewById(R.id.chip_group_DetailActivity);
         diningDescription = (TextView)findViewById(R.id.dining_description_DetailActivity);
         chefImage = (ImageView)findViewById(R.id.chef_image_DetailActivity);
         chefName = (TextView)findViewById(R.id.chef_name_DetailActivity);
@@ -100,28 +110,27 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-        if (user != null) {
-            getDiningImage();
-            getDiningInformation();
-            getChefInformation();
-        } else {
-            signInAnonymously();
-        }
+        getDiningImage();
+        getDiningInformation();
+        getChefInformation();
 
         cancelButton.setOnClickListener(this);
         purchaseButton.setOnClickListener(this);
         bookmarkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
                 getDishImageUri(new MyCallback() {//for getting dining UID
                     @Override
                     public void onCallback(ArrayList<String> keyList) {
+                        if(isChecked)
+                            Snackbar.make(buttonView, "찜 목록에 추가하였습니다.", 3000).show();
+                        else
+                            Snackbar.make(buttonView, "찜 목록에서 삭제하였습니다.", 3000).show();
                         reviseBookmarkStatus(keyList.get(0), isChecked);//index 0 is dining UID
                     }
                 });
             }
         });
-
     }
 
     @Override
@@ -138,26 +147,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private void signInAnonymously() {
-        mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                getDiningImage();
-                getDiningInformation();
-                getChefInformation();
-            }
-        });
-    }
-
     public void getDiningImage() {
         getDishImageUri(new MyCallback() {
             @Override
             public void onCallback(ArrayList<String> keyList) {
                 String diningUid = keyList.get(0);
                 for(int i = 1; i < keyList.size(); i++) {
-                    final String dish = keyList.get(i);
+                    final String imageName = keyList.get(i);
                     storageReference = FirebaseStorage.getInstance().getReference();
-                    storageReference.child("dining").child(diningUid).child(dish + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    storageReference.child("dining").child(diningUid).child(imageName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
                             ImageView dishImage = new ImageView(context);
@@ -185,6 +183,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
                     diningSubtitle.setText(dataSnapshot.child("subtitle").getValue().toString());//set subtitle from database
+                    for(int i = 0; i < dataSnapshot.child("style").getChildrenCount(); i++) {
+                        FoodStyle style = FoodStyle.valueOf((dataSnapshot.child("style").child(Integer.toString(i + 1)).getValue().toString()));
+                        String styleLabel = "#" + style.label;
+                        Chip chip = new Chip(styleChipGroup.getContext());
+                        chip.setText(styleLabel);
+                        chip.setTextColor(Color.parseColor("#FFFFFF"));
+                        chip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPrimary)));
+                        styleChipGroup.addView(chip);
+                    }
                     for(int i = 1; i <= dataSnapshot.child("dishes").getChildrenCount(); i++) {//get dishes from database
                         String dish = dataSnapshot.child("dishes").child(Integer.toString(i)).getValue().toString();
                         TextView textView = new TextView(context);
@@ -277,8 +284,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
                     ArrayList<String> keyList = new ArrayList<String>();
                     keyList.add(dataSnapshot.getKey());
-                    for(int i = 1; i <= dataSnapshot.child("dishes").getChildrenCount(); i++) {//get dishes from database
-                        keyList.add(dataSnapshot.child("dishes").child(Integer.toString(i)).getValue().toString());
+                    for(int i = 1; i <= dataSnapshot.child("images").getChildrenCount(); i++) {//get dishes from database
+                        keyList.add(dataSnapshot.child("images").child(Integer.toString(i)).getValue().toString());
                     }
                     myCallback.onCallback(keyList);
                 }

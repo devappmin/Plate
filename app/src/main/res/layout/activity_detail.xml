@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.activity.DetailActivity">
+    tools:context=".ui.activity.DetailActivity"
+    android:id="@+id/parent_layout_DetailActivity">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view_DetailActivity"
@@ -53,16 +54,27 @@
                 app:layout_constraintLeft_toRightOf="@+id/dining_title_DetailActivity"
                 app:layout_constraintBaseline_toBaselineOf="@+id/dining_title_DetailActivity"/>
 
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_DetailActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="30dp"
+                android:animateLayoutChanges="true"
+                android:theme="@style/AppTheme.Material"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dining_title_DetailActivity"/>
+
             <LinearLayout
                 android:id="@+id/linear_layout_dishImage_DetailActivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:orientation="vertical"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dining_title_DetailActivity"/>
+                app:layout_constraintTop_toBottomOf="@+id/chip_group_DetailActivity"/>
 
             <LinearLayout
                 android:id="@+id/linear_layout_dishList_DetailActivity"

@@ -125,7 +125,15 @@ public class BookmarkVerticalList extends ConstraintLayout {
                     ArrayList<String> diningUid = new ArrayList<String>();
                     if(g_uid.equals(uid)){
                         for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
-                            diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
+                            try {
+                                diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
+                            } catch (NullPointerException e) {
+                                String newDiningUid;
+                                newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
+                                ref_g.child(g_uid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
+                                diningUid.add(newDiningUid);
+                                dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
+                            }
                         }
                         myCallback.onCallback(diningUid);
                     }
@@ -175,9 +183,8 @@ public class BookmarkVerticalList extends ConstraintLayout {
 
         String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
         diningDate = getDate(diningTimestamp);//get Date by timestamp
-        diningTime = getTime(diningTimestamp);//get Time by timestamp
 
-        BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningTime, diningLocation, diningDetailLocation, imageUri);
+        BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, diningDetailLocation, imageUri);
 
         recyclerAdapter.addItem(data);
         recyclerAdapter.notifyDataSetChanged();
@@ -210,16 +217,9 @@ public class BookmarkVerticalList extends ConstraintLayout {
 
     private String getDate(long timeStamp) {
         Calendar cal = Calendar.getInstance(Locale.KOREA);
-        cal.setTimeInMillis(timeStamp * 1000);
+        cal.setTimeInMillis(timeStamp);
         String date = DateFormat.format("yyyy-MM-dd EEEE", cal).toString();
         return date;
-    }
-
-    private String getTime(long timeStamp) {
-        Calendar cal = Calendar.getInstance(Locale.KOREA);
-        cal.setTimeInMillis(timeStamp * 1000);
-        String Time = DateFormat.format("aa hh:mm", cal).toString();
-        return Time;
     }
 
     public interface MyCallback {

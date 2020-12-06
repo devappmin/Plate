@@ -11,13 +11,6 @@
     android:clickable="true"
     app:cardCornerRadius="8dp">
 
-    <ProgressBar
-        android:id="@+id/progress_bar_bookmarkcard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -62,17 +55,6 @@
             android:paddingTop="15dp"
             app:layout_constraintLeft_toRightOf="@+id/dining_image_bookmarkcard"
             app:layout_constraintTop_toBottomOf="@+id/dining_subtitle_bookmarkcard"/>
-
-        <TextView
-            android:id="@+id/dining_time_bookmarkcard"
-            android:textStyle="bold"
-            android:textColor="@color/textDarkPrimary"
-            android:textSize="15dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            app:layout_constraintLeft_toRightOf="@id/dining_date_bookmarkcard"
-            app:layout_constraintBaseline_toBaselineOf="@id/dining_date_bookmarkcard"/>
 
         <TextView
             android:id="@+id/dining_location_bookmarkcard"

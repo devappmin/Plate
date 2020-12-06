@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -57,11 +56,9 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ProgressBar progressBar;
         private TextView diningTitle;
         private TextView diningSubtitle;
         private TextView diningDate;
-        private TextView diningTime;
         private TextView diningLocation;
         private TextView diningDetailLocation;
         private ImageView diningImage;
@@ -81,12 +78,9 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             databaseReference = FirebaseDatabase.getInstance().getReference();
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
-
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar_bookmarkcard);
             diningTitle = (TextView) itemView.findViewById(R.id.dining_title_bookmarkcard);
             diningSubtitle = (TextView) itemView.findViewById(R.id.dining_subtitle_bookmarkcard);
             diningDate = (TextView) itemView.findViewById(R.id.dining_date_bookmarkcard);
-            diningTime = (TextView) itemView.findViewById(R.id.dining_time_bookmarkcard);
             diningLocation = (TextView) itemView.findViewById(R.id.dining_location_bookmarkcard);
             diningDetailLocation = (TextView) itemView.findViewById(R.id.dining_detail_location_bookmarkcard);
             diningImage = (ImageView) itemView.findViewById(R.id.dining_image_bookmarkcard);
@@ -97,7 +91,6 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningTitle.setText(data.getDiningTitle());
             diningSubtitle.setText(data.getDiningSubtitle());
             diningDate.setText(data.getDiningDate());
-            diningTime.setText(data.getDiningTime());
             diningLocation.setText(data.getDiningLocation());
             diningDetailLocation.setText(data.getDiningDetailLocation());
             GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
@@ -126,16 +119,11 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
                     getDiningUid(data.getDiningTitle(), new MyCallback() {
                         @Override
                         public void onCallback(String diningUid) {
-
-                            checkBox.setClickable(false);
-                            progressBar.setVisibility(View.VISIBLE);
                             reviseBookmarkStatus(diningUid, isChecked);
-                            progressBar.setVisibility(View.GONE);
-                            checkBox.setClickable(true);
                         }
                     });
                 }
