@@ -366,7 +366,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         } else if (v == submitButton) {
             //upload to realtime database
             //항목들이 모두 입력되었는지 검사, 공백이 입력되어도 입력되지 않은 것으로 판단
-
             if (title_editText.getText().toString().replace(" ", "").equals("")
                     || subtitle_editText.getText().toString().replace(" ", "").equals("")
                     || description_editText.getText().toString().replace(" ", "").equals("")
@@ -380,7 +379,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                     || (dishImageBitmaps.size() == 0)) {
                 Snackbar.make(v, "모든 항목들을 채워 주세요.", 3000).show();
             } else {
-                uploadDiningInformation();
+                //uploadDiningInformation();
                 finish();
             }
         }
@@ -422,7 +421,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
 
         diningReference.child("location").child("location").setValue(location_editText.getText().toString());
         diningReference.child("location").child("detail").setValue(detailLocation_editText.getText().toString());
-        diningReference.child("price").setValue(price_editText.getText().toString());
+        diningReference.child("price").setValue(Long.parseLong(price_editText.getText().toString()));
         ArrayList<String> plans = timeNumberToDateFormatString(times);
         DatabaseReference scheduleReference = diningReference.child("schedules").push();
         for (int i = 0; i < plans.size(); i++) {
@@ -439,7 +438,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         }
         diningReference.child("subtitle").setValue(subtitle_editText.getText().toString());
         diningReference.child("title").setValue(title_editText.getText().toString());
-
     }
 
     //16자리 숫자의 시간 정보를 yyyy-MM-dd HH:mm:ss 형식으로 변환, 순서대로 두 개씩 짝지어 시작 시간, 종료 시간을 나타냄

@@ -136,8 +136,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         if(v == cancelButton) {
-            Intent intent = new Intent(this, AddDiningPlanActivity.class);
-            startActivity(intent);
+            finish();
         }
         else if(v == purchaseButton) {
             Intent purchase = new Intent(this, PurchaseActivity.class);
