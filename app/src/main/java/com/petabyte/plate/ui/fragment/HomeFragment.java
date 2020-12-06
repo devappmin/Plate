@@ -1,7 +1,9 @@
 package com.petabyte.plate.ui.fragment;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -120,7 +122,14 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
-                Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
+
+                // 지금 돌리는 프로그램이 안드로이드 롤리팝(5.0)인지 확인
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), searchButton, "Search");
+                    startActivity(intent, options.toBundle());
+                } else
+                    // 롤리팝 이하면 애니메이션 없이 액티비티 호출
+                    Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
             }
         });
 
@@ -164,6 +173,18 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 모든 값이 불러왔는지 확인하는 배열 초기화
+        completeLoaded = new boolean[LIST_COUNT];
+        for (int i = 0; i < LIST_COUNT; i++)
+            completeLoaded[i] = false;
+
+        // 뷰가 생성되면 불러온 리스트의 수를 0으로 초기화
+        current = 0;
+    }
+
     private void loadRecentList(final HomeHorizontalList mList) {
         mList.setTitle("최근에 올라온 음식이에요.");
         mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -187,7 +208,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
-                    data.setImageUri(snapshot.getKey() + "/" + snapshot.child("dishes/1").getValue(String.class) + ".jpg");
+                    data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                     mList.addData(data);
                 }
 
@@ -251,9 +272,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
-                    if (snapshot.child("style").hasChild(foodStyle.toString())) {
+                    if (((List<String>)snapshot.child("style").getValue()).contains(foodStyle.toString())) {
                         HomeCardData data = snapshot.getValue(HomeCardData.class);
-                        data.setImageUri(snapshot.getKey() + "/" + snapshot.child("dishes/1").getValue(String.class) + ".jpg");
+                        data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                         mList.addData(data);
                     }
                 }
@@ -277,7 +298,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (snapshot.child("subtitle").getValue(String.class).equals(type)) {
                         HomeCardData data = snapshot.getValue(HomeCardData.class);
-                        data.setImageUri(snapshot.getKey() + "/" + snapshot.child("dishes/1").getValue(String.class) + ".jpg");
+                        data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                         mList.addData(data);
                     }
                 }
@@ -300,7 +321,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String path = snapshot.child("Home").child("Todays Food").getValue(String.class);
                 String title = snapshot.child("Dining").child(path).child("title").getValue(String.class);
-                String image = path + "/" + snapshot.child("Dining").child(path).child("dishes/1").getValue(String.class) + ".jpg";
+                String image = path + "/" + snapshot.child("Dining").child(path).child("images/1").getValue(String.class);
                 view.launch(title, image);
 
                 completeLoaded[current++] = true;

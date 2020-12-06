@@ -16,10 +16,10 @@ public class DiningMasterData {
     private String description;
     private List<String> dishes;
     private List<String> images;
+    private List<String> style;
     private HashMap<String, Integer> count;
     private HashMap<String, Object> location;
     private HashMap<String, Map<String, Double>> schedules;
-    private HashMap<String, String> style;
 
     @Exclude private int dishCount = 0;
     @Exclude private int imageCount = 0;
@@ -37,25 +37,36 @@ public class DiningMasterData {
         count = new HashMap<>();
         dishes =  new ArrayList<>();
         images = new ArrayList<>();
+        style = new ArrayList<>();
         location = new HashMap<>();
         schedules = new HashMap<>();
-        style = new HashMap<>();
     }
 
-    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description, HashMap<String, Integer> count,
-                            List<String> dishes, List<String> images, HashMap<String, Object> location,
-                            HashMap<String, Map<String, Double>> schedules, HashMap<String, String> style) {
+    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description,
+                            List<String> dishes, List<String> images, List<String> style, HashMap<String, Integer> count,
+                            HashMap<String, Object> location, HashMap<String, Map<String, Double>> schedules, int dishCount, int imageCount) {
         this.bookmark = bookmark;
         this.price = price;
         this.title = title;
         this.subtitle = subtitle;
         this.description = description;
-        this.count = count;
         this.dishes = dishes;
         this.images = images;
+        this.style = style;
+        this.count = count;
         this.location = location;
         this.schedules = schedules;
-        this.style = style;
+        this.dishCount = dishCount;
+        this.imageCount = imageCount;
+    }
+
+    @Exclude
+    public List<FoodStyle> getFoodStyle() {
+        List<FoodStyle> styleList = new ArrayList<>();
+        for (String style : style) {
+            styleList.add(FoodStyle.getFoodStyle(style));
+        }
+        return styleList;
     }
 
     @Exclude
@@ -174,11 +185,11 @@ public class DiningMasterData {
         this.schedules = schedules;
     }
 
-    public HashMap<String, String> getStyle() {
+    public List<String> getStyle() {
         return style;
     }
 
-    public void setStyle(HashMap<String, String> style) {
+    public void setStyle(List<String> style) {
         this.style = style;
     }
 

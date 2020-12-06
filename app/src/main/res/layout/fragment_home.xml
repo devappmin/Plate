@@ -66,6 +66,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:background="@android:color/white">
@@ -81,25 +82,25 @@
                 android:id="@+id/image_slide_fm_home"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
+                android:clipToPadding="false"
+                android:background="@drawable/image_slider_background"
                 android:fitsSystemWindows="true"
-                android:clipToPadding = "false"
-                app:layout_collapseMode="parallax"/>
+                app:layout_collapseMode="parallax" />
 
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="60dp"
                 android:layout_gravity="bottom"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
                 <androidx.cardview.widget.CardView
                     android:id="@+id/search_card_fm_home"
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:clickable="true"
-                    android:layout_centerVertical="true"
                     android:nestedScrollingEnabled="true"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
@@ -109,7 +110,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="@string/what_food" />
+                        android:background="@android:color/transparent"
+                        android:hint="@string/what_food"
+                        android:textSize="18sp" />
                 </androidx.cardview.widget.CardView>
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
