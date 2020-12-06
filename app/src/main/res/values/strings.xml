@@ -13,4 +13,5 @@
     <string name="submit">확인</string>
     <string name="special_food_for_you">당신에게 딱 맞는\n럭셔리한 음식을 모아봤어요!</string>
     <string name="today_popup_dining">오늘의 팝업 다이닝</string>
+    <string name="add_dining">다이닝 추가하기</string>
 </resources>

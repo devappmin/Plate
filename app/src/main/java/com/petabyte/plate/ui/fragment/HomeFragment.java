@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
+import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.data.HomeAwardsData;
 import com.petabyte.plate.data.HomeCardData;
@@ -41,6 +42,9 @@ import com.petabyte.plate.utils.KoreanUtil;
 import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -51,6 +55,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private CardView searchButton;
     private CardView applyCardView;
+    private CardView addDiningPlanCardView;
     private ImageView applyImage;
     private HomeHorizontalList recentList;
     private HomeHorizontalList foodTypeList;
@@ -88,6 +93,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         // 뷰를 불러온다.
         searchButton = (CardView)v.findViewById(R.id.search_card_fm_home);
         applyCardView = (CardView)v.findViewById(R.id.apply_cv_fm_home);
+        addDiningPlanCardView = (CardView)v.findViewById(R.id.add_dining_cv_fm_home);
         applyImage = (ImageView)v.findViewById(R.id.apply_iv_fm_home);
         recentList = (HomeHorizontalList)v.findViewById(R.id.recent_hh_fm_home);
         postList = (HomeAwardsList)v.findViewById(R.id.awards_ha_fm_home);
@@ -115,6 +121,14 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
                 Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
+            }
+        });
+
+        // 다이닝 추가와 관련된 클릭 리스너
+        addDiningPlanCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start AddDiningPlanActivity here..
             }
         });
 
@@ -156,6 +170,22 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
+
+                    DiningMasterData masterData = snapshot.getValue(DiningMasterData.class);
+                    Log.d(LogTags.IMPORTANT, masterData.getSchedules() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getPrice() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getLocation() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getImages() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getDishes() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getCount() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getBookmark() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getTitle() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getSubtitle() + "");
+                    Log.d(LogTags.IMPORTANT, masterData.getDescription() + "");
+
+
+
+
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
                     data.setImageUri(snapshot.getKey() + "/" + snapshot.child("dishes/1").getValue(String.class) + ".jpg");
                     mList.addData(data);
@@ -303,6 +333,11 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
     }
 
+    /**
+     * 유저가 Guest인지 Host인지를 구분하여
+     * 유저가 Guest인 경우 지원하기 CardView를 보여주고
+     * 유저가 Host인 경우 다이닝 추가하기 CardView를 보여준다.
+     */
     private void getUserType() {
         final String userUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -314,6 +349,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 if (userType.equals("Host"))
                     applyCardView.setVisibility(View.GONE);
 
+                if (userType.equals("Guest"))
+                    addDiningPlanCardView.setVisibility(View.GONE);
             }
 
             @Override
