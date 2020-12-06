@@ -509,7 +509,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                     String picturePath = cursor.getString(columnIndex);
                     final String filename = picturePath.substring(picturePath.lastIndexOf("/") + 1);
-
                     cursor.close();
 
                     try {

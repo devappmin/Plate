@@ -422,7 +422,8 @@
                         android:id="@+id/linear_layout_dishImage_addPlan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:animateLayoutChanges="true">
 
                         <ImageView
                             android:id="@+id/add_dish_image_view_addPlan"
