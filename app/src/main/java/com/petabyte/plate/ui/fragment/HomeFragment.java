@@ -126,7 +126,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 // 지금 돌리는 프로그램이 안드로이드 롤리팝(5.0)인지 확인
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), searchButton, "Search");
-                    startActivity(intent, options.toBundle());
+                    Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY, options.toBundle());
                 } else
                     // 롤리팝 이하면 애니메이션 없이 액티비티 호출
                     Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
@@ -174,8 +174,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onDestroyView() {
+        super.onDestroyView();
         // 모든 값이 불러왔는지 확인하는 배열 초기화
         completeLoaded = new boolean[LIST_COUNT];
         for (int i = 0; i < LIST_COUNT; i++)
@@ -203,9 +203,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     Log.d(LogTags.IMPORTANT, masterData.getTitle() + "");
                     Log.d(LogTags.IMPORTANT, masterData.getSubtitle() + "");
                     Log.d(LogTags.IMPORTANT, masterData.getDescription() + "");
-
-
-
 
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
                     data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
@@ -302,7 +299,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         mList.addData(data);
                     }
                 }
-
+                Log.d(LogTags.POINT, current + "");
                 completeLoaded[current++] = true;
                 checkAllLoaded();
             }
