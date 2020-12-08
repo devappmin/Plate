@@ -158,6 +158,8 @@ public class RegisterActivity extends AppCompatActivity {
                                             }
                                             map.put("Name", name);
                                             map.put("Image", "DEFAULT");
+                                            map.put("Rating", "0");
+                                            map.put("RatingCount", "0");
 
                                             reference.child(type).child(uid).child("Profile").setValue(map);
 

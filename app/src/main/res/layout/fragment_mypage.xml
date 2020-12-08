@@ -7,7 +7,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 <com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="116dp"
-    android:background="#fafafa">
+    android:background="@android:color/white">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
         android:id="@+id/collapsing_toolbar_mypage"
@@ -16,7 +16,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
         app:collapsedTitleGravity="start"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#fafafa"
+        android:background="@android:color/white"
         android:fitsSystemWindows="true"
         app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
