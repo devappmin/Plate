@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/image_cv_v_more_list_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/image_v_v_more_list_card"
+            android:layout_width="120dp"
+            android:layout_height="120dp"/>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/title_tv_v_more_list_card"
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@color/textDarkPrimary"
+        android:textStyle="bold"
+        android:text="타이틀"
+        app:layout_constraintStart_toEndOf="@id/image_cv_v_more_list_card"
+        app:layout_constraintTop_toTopOf="@id/image_cv_v_more_list_card"/>
+
+    <TextView
+        android:id="@+id/subtitle_tv_v_more_list_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/textDarkDisabled"
+        android:text="한식 다이닝"
+        app:layout_constraintTop_toBottomOf="@id/title_tv_v_more_list_card"
+        app:layout_constraintStart_toEndOf="@id/image_cv_v_more_list_card"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/description_tv_v_more_list_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:text="가나다라마바사아자차"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/image_cv_v_more_list_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subtitle_tv_v_more_list_card"/>
+
+    <TextView
+        android:id="@+id/price_tv_v_more_list_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/image_cv_v_more_list_card"
+        app:layout_constraintStart_toEndOf="@id/image_cv_v_more_list_card"
+        android:layout_marginStart="20dp"
+        android:textSize="15sp"
+        android:text="50,000원"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

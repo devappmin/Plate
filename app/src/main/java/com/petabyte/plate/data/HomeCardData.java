@@ -1,8 +1,10 @@
 package com.petabyte.plate.data;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class HomeCardData {
+public class HomeCardData implements Parcelable {
     private String title;
     private String subtitle;
     private String description;
@@ -59,4 +61,42 @@ public class HomeCardData {
     public void setPrice(long price) {
         this.price = price;
     }
+
+    // region PARCELABLE
+
+    public HomeCardData(Parcel in) {
+        title = in.readString();
+        subtitle = in.readString();
+        description = in.readString();
+        imageUri = in.readString();
+        price = in.readLong();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(subtitle);
+        dest.writeString(description);
+        dest.writeString(imageUri);
+        dest.writeLong(price);
+    }
+
+    public static final Creator<HomeCardData> CREATOR = new Creator<HomeCardData>() {
+        @Override
+        public HomeCardData createFromParcel(Parcel source) {
+            return new HomeCardData(source);
+        }
+
+        @Override
+        public HomeCardData[] newArray(int size) {
+            return new HomeCardData[size];
+        }
+    };
+
+    // endregion
 }

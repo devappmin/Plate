@@ -44,6 +44,7 @@ import com.petabyte.plate.utils.KoreanUtil;
 import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,12 +180,58 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         current = 0;
     }
 
+    /**
+     * 다이닝 Key 값에서 Timestamp의 값을 추출하는 함수
+     * @param dataSnapshot 추출하고자하는 다이닝의 Datasnapshot
+     * @return 다이닝 Key 값에 적혀있는 Timestamp 값
+     */
+    private Long getTimestamp(DataSnapshot dataSnapshot) {
+        String key = dataSnapshot.getKey();
+        return Long.parseLong(key.substring(key.lastIndexOf("-") + 1));
+    }
+
+    /**
+     * DataSnapshot의 루트를 불러와 자식 노드를 TimeStamp에 맞춰 최신 순으로 정렬하는 메소드
+     * 다이닝 Key 값이 HostUID-Timestamp로 이루어진 것을 이용하여 정렬하는 것이다.
+     * @param root 다이닝 루트 노드
+     * @return 루트 노드의 자식을 최신순으로 정렬한 배열
+     */
+    private DataSnapshot[] sortSnapshot(DataSnapshot root) {
+        // root의 자식을 불러와 ArrayList에 저장
+        List<DataSnapshot> temp = new ArrayList<>();
+        for (DataSnapshot snapshot : root.getChildren()) {
+            temp.add(snapshot);
+        }
+
+        // ArrayList를 배열로 변환
+        DataSnapshot[] array = temp.toArray(new DataSnapshot[temp.size()]);
+
+        // Sorting을 하기 위한 임시 데이터 변수
+        int max;
+        DataSnapshot tmp;
+
+        // Selection Sort를 이용하여 DataSnapshot을 정렬
+        for (int i = 0; i < array.length - 1; i++) {
+            max = i;
+            for (int j = i + 1; j < array.length; j++) {
+                if (getTimestamp(array[i]) > getTimestamp(array[j]))
+                    max = j;
+                tmp = array[i];
+                array[i] = array[j];
+                array[j] = tmp;
+            }
+        }
+
+        return array;
+    }
+
     private void loadRecentList(final HomeHorizontalList mList) {
         mList.setTitle("최근에 올라온 음식이에요.");
         mDatabase.child("Dining").limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for (DataSnapshot snapshot : snapshots.getChildren()) {
+
+                for (DataSnapshot snapshot : sortSnapshot(snapshots)) {
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
                     data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                     mList.addData(data);
@@ -202,7 +249,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void loadPlatePost(final HomeAwardsList mList) {
-        mDatabase.child("Home").addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("Home").child("Plate Post").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for (DataSnapshot snapshot : snapshots.getChildren()) {

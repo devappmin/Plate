@@ -3,6 +3,7 @@
     package="com.petabyte.plate">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.ScrollableImageActivity"/>
+        <activity android:name=".ui.activity.MoreListActivity"></activity>
+        <activity android:name=".ui.activity.ScrollableImageActivity" />
         <activity android:name=".ui.activity.RegisterInfoActivity" />
         <activity android:name=".ui.activity.RegisterActivity" />
         <activity android:name=".ui.activity.RegisterSelectActivity" />
@@ -37,6 +39,5 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!--uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/-->
+
 </manifest>
