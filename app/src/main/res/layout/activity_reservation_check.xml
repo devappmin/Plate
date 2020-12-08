@@ -30,6 +30,16 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <TextView
+        android:id="@+id/text_v_reservation_hint_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="300dp"
+        android:textSize="20sp"
+        android:text="아직 예약된 내용이 없어요.\nPLATE의 다이닝을 즐겨주세요!"/>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +61,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+                android:layout_height="100dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

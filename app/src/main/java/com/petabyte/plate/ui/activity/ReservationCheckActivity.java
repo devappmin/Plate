@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,35 +33,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReservationCheckActivity extends AppCompatActivity implements ValueEventListener {
+public class ReservationCheckActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private String UID;
     private String MEMBER_TYPE;
     private Intent intent;
 
+    private TextView hintTextView;
     private RecyclerView recyclerView;
     private ReservationListAdapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private DatabaseReference mDatabase;
-    HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<String, DiningMasterData>();
+    HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
 
     private String diningUID;
     private String reservationTime;
     private String reservationStatus;
     private String diningTitle;
     private String diningLocation;
+    private List<String> dishes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reservation_check);
 
+        hintTextView = findViewById(R.id.text_v_reservation_hint_msg);
+
         // mypage에서 회원정보 인텐트로 수신
         intent = getIntent();
         UID = intent.getStringExtra("UID");
         MEMBER_TYPE = intent.getStringExtra("MEMBER_TYPE");
-        Log.d("ji1dev", UID+" / "+MEMBER_TYPE);
 
         // appbar 구현
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar_reservation_check);
@@ -69,23 +74,47 @@ public class ReservationCheckActivity extends AppCompatActivity implements Value
         toolbar = (Toolbar)findViewById(R.id.toolbar_reservation_check);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         // recycler view에 adapter과 layout manager 등록
         initRecycler();
 
         // data를 가져와서 세팅
         initData();
+    }
 
+    // 마스터 데이터 가져오는 함수
+    private void getDiningMasterData(){
+        diningMasterDataMap.clear();
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Dining");
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot datasnapshot: snapshot.getChildren()){
+                    // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
+                    diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
+
+                    Log.d("ji1dev", datasnapshot.getKey());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     // recycler view 초기 설정
     private void initRecycler(){
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view_reservation);
-        recyclerAdapter = new ReservationListAdapter(this); // adapter 생성
+        recyclerAdapter = new ReservationListAdapter(this.getSupportFragmentManager(), this); // adapter 생성
+        recyclerAdapter.removeAllItem(); // 기존 내용 제거
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,true);
         recyclerView.setAdapter(recyclerAdapter); // layout manager 세팅
         recyclerView.setLayoutManager(layoutManager); // adapter 세팅
     }
+
     // firebase db 에서 data를 가져와서 item을 세팅
     private void initData() {
         String currentTime = String.valueOf(System.currentTimeMillis());
@@ -94,10 +123,32 @@ public class ReservationCheckActivity extends AppCompatActivity implements Value
 
         // 마스터 데이터 세팅
         getDiningMasterData();
-        // make dummy data on DB
-        //ReservationCardData data = new ReservationCardData("입금대기중", "맥도날드", currentTime, "숭실대학교 정보과학관 201호");
-        //mDatabase.child(currentTime).setValue(data);
-        mDatabase.orderByKey().addListenerForSingleValueEvent(this);
+
+        mDatabase.orderByKey().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                recyclerAdapter.removeAllItem(); // 기존 내용 제거
+                for(DataSnapshot datasnapshot: snapshot.getChildren()){
+                    String timeKey = datasnapshot.getKey();
+                    diningUID = datasnapshot.child("DiningUID").getValue().toString();
+                    reservationTime = convertTimestamp((long) datasnapshot.child("Reservation").getValue());
+                    reservationStatus = datasnapshot.child("Status").getValue().toString();
+                    diningTitle = diningMasterDataMap.get(diningUID).getTitle();
+                    diningLocation = (String) diningMasterDataMap.get(diningUID).getLocation().get("detail");
+                    dishes = diningMasterDataMap.get(diningUID).getDishes();
+
+                    // recycler adapter에 item 추가
+                    ReservationCardData data = new ReservationCardData(MEMBER_TYPE,
+                            timeKey, reservationStatus, diningTitle, reservationTime, diningLocation, dishes);
+                    recyclerAdapter.addItem(data);
+                    recyclerAdapter.notifyDataSetChanged();
+                }
+                if(recyclerAdapter.getItemCount()==0) hintTextView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     @Override
@@ -110,46 +161,6 @@ public class ReservationCheckActivity extends AppCompatActivity implements Value
         }
         return super.onOptionsItemSelected(item);
     }
-
-    // 마스터 데이터 가져오는 함수
-    private void getDiningMasterData(){
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Dining");
-        database.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot datasnapshot: snapshot.getChildren()){
-
-                    // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
-                    diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
-                    Log.d("ji1dev", datasnapshot.getKey());
-                    Log.d("ji1dev", diningMasterDataMap.get(datasnapshot.getKey()).getTitle());
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
-    }
-
-    @Override
-    public void onDataChange(@NonNull DataSnapshot snapshot) {
-        for(DataSnapshot datasnapshot: snapshot.getChildren()){
-            diningUID = datasnapshot.child("DiningUID").getValue().toString();
-            reservationTime = convertTimestamp((long) datasnapshot.child("Reservation").getValue());
-            reservationStatus = datasnapshot.child("Status").getValue().toString();
-            diningTitle = diningMasterDataMap.get(diningUID).getTitle();
-            diningLocation = (String) diningMasterDataMap.get(diningUID).getLocation().get("detail");
-
-            Log.d("ji1dev", diningUID+" / "+diningTitle+" / "+reservationTime+" / "+reservationStatus+" / "+diningLocation);
-
-            // recycler adapter에 item 추가
-            ReservationCardData data = new ReservationCardData(reservationStatus, diningTitle, reservationTime, diningLocation);
-            recyclerAdapter.addItem(data);
-            recyclerAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onCancelled(@NonNull DatabaseError error) {}
 
     public String convertTimestamp(long time) {
         String pattern = "yyyy-MM-dd HH:mm";
