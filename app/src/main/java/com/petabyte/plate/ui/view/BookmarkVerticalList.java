@@ -86,7 +86,7 @@ public class BookmarkVerticalList extends ConstraintLayout {
             @Override
             public void onCallback(final ArrayList<String> diningUid) {
                 databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-                databaseReference.orderByChild("schedules/RANDOMKEY/start").addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.orderByChild("start").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
@@ -174,45 +174,16 @@ public class BookmarkVerticalList extends ConstraintLayout {
     public void getDiningData (DataSnapshot snapshot) {
         String diningTitle = snapshot.child("title").getValue().toString();
         String diningSubtitle = snapshot.child("subtitle").getValue().toString();
-        String diningDate, diningTime;
         long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
-        double diningLatitude = (double) snapshot.child("location").child("x").getValue();
-        double diningLongitude = (double) snapshot.child("location").child("y").getValue();
+        String  diningDate = getDate(diningTimestamp);//get Date by timestamp
+        String diningLocation = snapshot.child("location").child("location").getValue().toString();
         String diningDetailLocation = snapshot.child("location").child("detail").getValue().toString();
         String imageUri = snapshot.child("images").child("2").getValue().toString();
-
-        String diningLocation = getAddress(diningLatitude, diningLongitude).replace("대한민국 ", "");//좌표로 주소 얻기, String에서 대한민국 제거
-        diningDate = getDate(diningTimestamp);//get Date by timestamp
 
         BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, diningDetailLocation, imageUri);
 
         recyclerAdapter.addItem(data);
         recyclerAdapter.notifyDataSetChanged();
-    }
-
-    public String getAddress(double latitude, double longitude) {
-
-        //좌표를 주소로 변환
-        Geocoder geocoder = new Geocoder(this.getContext(), Locale.KOREA);
-
-        List<Address> addresses;
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 7);
-        } catch (IOException ioException) {
-            //네트워크 문제
-            return "네트워크 오류";
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return "잘못된 주소";
-        }
-
-        if (addresses == null || addresses.size() == 0) {
-            return "주소 미발견";
-        }
-
-        Address address = addresses.get(0);
-        return address.getAddressLine(0).toString();
-
     }
 
     private String getDate(long timeStamp) {
