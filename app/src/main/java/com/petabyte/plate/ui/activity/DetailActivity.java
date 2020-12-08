@@ -10,6 +10,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -40,10 +41,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.petabyte.plate.R;
+import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.FoodStyle;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
@@ -51,6 +54,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private Context context;
     private Intent intent;
     private String diningName, uid;
+    HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
 
     private LinearLayout parentLayout;
     private LinearLayout dishImageList;
@@ -174,7 +178,29 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    private void getDiningMasterData(){
+        diningMasterDataMap.clear();
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Dining");
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot datasnapshot: snapshot.getChildren()){
+                    // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
+                    diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    public void getDiningInformationTest() {
+        getDiningMasterData();
+
+    }
+
     public void getDiningInformation() {
+        //여기다 추가
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
         databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")

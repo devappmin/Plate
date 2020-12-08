@@ -422,7 +422,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         userReference = FirebaseDatabase.getInstance().getReference("User").child("Host").child(uid);
         storageReference = FirebaseStorage.getInstance().getReference();
 
-
         userReference.child("MyDining").push().setValue(diningUid);//add MyDining
 
         //add Dining information
@@ -466,6 +465,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         }
         diningReference.child("subtitle").setValue(subtitle_editText.getText().toString());
         diningReference.child("title").setValue(title_editText.getText().toString());
+        diningReference.child("date").setValue(plans.get(0).substring(0, 10));
     }
 
     //16자리 숫자의 시간 정보를 yyyy-MM-dd HH:mm:ss 형식으로 변환, 순서대로 두 개씩 짝지어 시작 시간, 종료 시간을 나타냄

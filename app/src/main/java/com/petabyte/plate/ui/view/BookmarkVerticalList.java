@@ -20,15 +20,27 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.BookmarkVerticalListAdapter;
 import com.petabyte.plate.data.BookmarkCardViewData;
+import com.petabyte.plate.data.DiningMasterData;
+import com.petabyte.plate.data.UserData;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 
 public class BookmarkVerticalList extends ConstraintLayout {
@@ -39,6 +51,10 @@ public class BookmarkVerticalList extends ConstraintLayout {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private String uid;
+    private HashMap<String, UserData> userDataMap =  new HashMap<>();
+    private HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
+    private ArrayList<BookmarkCardViewData> dataList = new ArrayList<>();
+    private ArrayList<String> bookmarkDiningUidList = new ArrayList<>();
 
     public BookmarkVerticalList(@NonNull Context context) {
         super(context);
@@ -66,8 +82,7 @@ public class BookmarkVerticalList extends ConstraintLayout {
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
         recyclerInitial();
-        getDiningList();
-
+        getDiningData();
     }
 
     private void recyclerInitial() {
@@ -80,89 +95,48 @@ public class BookmarkVerticalList extends ConstraintLayout {
         recyclerView.setAdapter(recyclerAdapter);
     }
 
-    //get dining list
-    public void getDiningList() {
-        getDiningUid(new MyCallback() {
-            @Override
-            public void onCallback(final ArrayList<String> diningUid) {
-                databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-                databaseReference.orderByChild("start").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
-                            for(int i = 0; i < diningUid.size(); i++) {
-                                if(diningUid.get(i).equals(dataSnapshot.getKey())) {
-                                    getDiningData(dataSnapshot);
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-
-            }
-        });
-    }
-
-    //get Dining UIDs with myCallback
-    private void getDiningUid(final MyCallback myCallback) {
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
+    private void getUserData(){
         ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
         ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
-        uid = user.getUid();
-        Log.d("uid", uid);
+
         ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
-                    String g_uid = dataSnapshot.getKey();
-                    ArrayList<String> diningUid = new ArrayList<String>();
-                    if(g_uid.equals(uid)){
-                        for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
-                            try {
-                                diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
-                            } catch (NullPointerException e) {
-                                String newDiningUid;
-                                newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
-                                ref_g.child(g_uid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
-                                diningUid.add(newDiningUid);
-                                dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                            }
-                        }
-                        myCallback.onCallback(diningUid);
-                    }
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    userDataMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserData.class));
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
 
         ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
-                    String h_uid = dataSnapshot.getKey();
-                    ArrayList<String> diningUid = new ArrayList<String>();
-                    if(h_uid.equals(uid)){
-                        for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++){
-                            try {
-                                diningUid.add(dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString());
-                            } catch (NullPointerException e) {
-                                String newDiningUid;
-                                newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
-                                ref_h.child(h_uid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
-                                diningUid.add(newDiningUid);
-                                dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                            }
-                        }
-                        myCallback.onCallback(diningUid);
-                    }
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    userDataMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserData.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getDiningMasterData(){
+        diningMasterDataMap.clear();
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Dining");
+        database.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot datasnapshot: snapshot.getChildren()){
+                    // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
+                    diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
                 }
             }
             @Override
@@ -171,31 +145,71 @@ public class BookmarkVerticalList extends ConstraintLayout {
     }
 
     //get dining Data
-    public void getDiningData (DataSnapshot snapshot) {
-        String diningTitle = snapshot.child("title").getValue().toString();
-        String diningSubtitle = snapshot.child("subtitle").getValue().toString();
-        long diningTimestamp = (long) snapshot.child("schedules").child("RANDOMKEY").child("start").getValue();
-        String  diningDate = getDate(diningTimestamp);//get Date by timestamp
-        String diningLocation = snapshot.child("location").child("location").getValue().toString();
-        String diningDetailLocation = snapshot.child("location").child("detail").getValue().toString();
-        String imageUri = snapshot.child("images").child("2").getValue().toString();
+    public void getDiningData() {
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        uid = user.getUid();
+        getUserData();
+        getDiningMasterData();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (String uid : userDataMap.get(uid).getBookmark()) {
+                    if(uid != null) {
+                        String diningTitle = diningMasterDataMap.get(uid).getTitle();
+                        String diningSubTitle = diningMasterDataMap.get(uid).getSubtitle();
+                        String diningDate = diningMasterDataMap.get(uid).getDate();
+                        String diningLocation = diningMasterDataMap.get(uid).getLocation().get("location");
+                        String diningDetailLocation = diningMasterDataMap.get(uid).getLocation().get("detail");
+                        String imageName = diningMasterDataMap.get(uid).getImages().get(1);
+                        BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubTitle, diningDate, diningLocation, diningDetailLocation, imageName, uid);
+                        dataList.add(data);
+                    }
+                }
+                Collections.sort(dataList);
+                for (BookmarkCardViewData bookmarkCardViewData : dataList) {
+                    String dayOfWeek = "";
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = new Date();
+                    try {
+                        date = dateFormat.parse(bookmarkCardViewData.getDiningDate());
+                    } catch (ParseException e) {
+                    }
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+                        case 1:
+                            dayOfWeek = " 일요일";
+                            break;
+                        case 2:
+                            dayOfWeek = " 월요일";
+                            break;
+                        case 3:
+                            dayOfWeek = " 화요일";
+                            break;
+                        case 4:
+                            dayOfWeek = " 수요일";
+                            break;
+                        case 5:
+                            dayOfWeek = " 목요일";
+                            break;
+                        case 6:
+                            dayOfWeek = " 금요일";
+                            break;
+                        case 7:
+                            dayOfWeek = " 토요일";
+                            break;
+                    }
+                    bookmarkCardViewData.setDiningDate(bookmarkCardViewData.getDiningDate() + dayOfWeek);
+                    recyclerAdapter.addItem(bookmarkCardViewData);
+                    recyclerAdapter.notifyDataSetChanged();
+                }
+            }
 
-        BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubtitle, diningDate, diningLocation, diningDetailLocation, imageUri);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-        recyclerAdapter.addItem(data);
-        recyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
-
-    private String getDate(long timeStamp) {
-        Calendar cal = Calendar.getInstance(Locale.KOREA);
-        cal.setTimeInMillis(timeStamp);
-        String date = DateFormat.format("yyyy-MM-dd EEEE", cal).toString();
-        return date;
-    }
-
-    public interface MyCallback {
-        //diningUIDs
-        void onCallback(ArrayList<String> diningUid);
-    }
-
 }

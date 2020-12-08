@@ -14,24 +14,34 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ui.activity.Test"></activity>
+
         <service
             android:name=".service.NewpostService"
             android:enabled="true"
-            android:exported="true"></service>
-        <activity android:name=".ui.activity.ScrollableImageActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.RegisterInfoActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.RegisterActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.RegisterSelectActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.PurchaseActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.AddDiningPlanActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.SearchAddressActivity"
-            android:screenOrientation="portrait"/>
+            android:exported="true" />
+
+        <activity
+            android:name=".ui.activity.ScrollableImageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.RegisterInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.RegisterSelectActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.PurchaseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.AddDiningPlanActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.SearchAddressActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -44,14 +54,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.DetailActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.LoginActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.SearchActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.activity.MainActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.activity.DetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.SearchActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.soundcloud.android.crop.CropImageActivity"
             android:screenOrientation="portrait"
