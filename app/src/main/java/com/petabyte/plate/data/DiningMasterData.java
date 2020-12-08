@@ -18,7 +18,8 @@ public class DiningMasterData {
     private List<String> images;
     private List<String> style;
     private HashMap<String, Integer> count;
-    private HashMap<String, Object> location;
+    private HashMap<String, String> location;
+    private HashMap<String, Double> coordinator;
     private HashMap<String, Map<String, Double>> schedules;
 
     @Exclude private int dishCount = 0;
@@ -38,13 +39,14 @@ public class DiningMasterData {
         dishes =  new ArrayList<>();
         images = new ArrayList<>();
         style = new ArrayList<>();
+        coordinator = new HashMap<>();
         location = new HashMap<>();
         schedules = new HashMap<>();
     }
 
-    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description,
-                            List<String> dishes, List<String> images, List<String> style, HashMap<String, Integer> count,
-                            HashMap<String, Object> location, HashMap<String, Map<String, Double>> schedules, int dishCount, int imageCount) {
+    public DiningMasterData(int bookmark, int price, String title, String subtitle, String description, List<String> dishes,
+                            List<String> images, List<String> style, HashMap<String, Integer> count, HashMap<String, String> location,
+                            HashMap<String, Double> coordinator, HashMap<String, Map<String, Double>> schedules, int dishCount, int imageCount) {
         this.bookmark = bookmark;
         this.price = price;
         this.title = title;
@@ -55,6 +57,7 @@ public class DiningMasterData {
         this.style = style;
         this.count = count;
         this.location = location;
+        this.coordinator = coordinator;
         this.schedules = schedules;
         this.dishCount = dishCount;
         this.imageCount = imageCount;
@@ -169,12 +172,20 @@ public class DiningMasterData {
         this.count = count;
     }
 
-    public HashMap<String, Object> getLocation() {
+    public HashMap<String, String> getLocation() {
         return location;
     }
 
-    public void setLocation(HashMap<String, Object> location) {
+    public void setLocation(HashMap<String, String> location) {
         this.location = location;
+    }
+
+    public HashMap<String, Double> getCoordinator() {
+        return coordinator;
+    }
+
+    public void setCoordinator(HashMap<String, Double> coordinator) {
+        this.coordinator = coordinator;
     }
 
     public HashMap<String, Map<String, Double>> getSchedules() {
