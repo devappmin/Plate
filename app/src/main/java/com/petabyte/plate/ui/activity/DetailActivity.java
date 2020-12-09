@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -287,21 +288,20 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
                             String rateString = dataSnapshot.child("Profile").child("Rating").getValue().toString();
                             String profileImageName = dataSnapshot.child("Profile").child("Image").getValue().toString();
-                            if(!profileImageName.equals("DEFAULT")){
-                                // set image with GlideApp
-                                mGlideRequestManager
-                                        .load(storageReference.child(profileImageName))
-                                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                        .skipMemoryCache(true)
-                                        .circleCrop()
-                                        .into(chefImage);
-                            }else{
-                                //Log.d("result", "setProfileImage >> host, NO CUSTOM IMAGE UPLOADED!");
-                                mGlideRequestManager
-                                        .load(getResources().getDrawable(R.drawable.ic_character))
-                                        .circleCrop()
-                                        .into(chefImage);
-                            }
+                            storageReference.child(profileImageName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    chefImage.setBackground(new ShapeDrawable(new OvalShape()));
+                                    chefImage.setClipToOutline(true);
+                                    Picasso.get().load(uri).fit().centerCrop().into(chefImage);
+                                }
+                            });
+                            storageReference.child(profileImageName).getDownloadUrl().addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Picasso.get().load(R.drawable.ic_character).fit().centerCrop().into(chefImage);
+                                }
+                            });
                             double rate = Double.parseDouble(rateString);
                             Long ratingCount = (Long) dataSnapshot.child("Profile").child("RatingCount").getValue();
                             chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
