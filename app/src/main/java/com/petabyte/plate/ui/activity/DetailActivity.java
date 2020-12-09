@@ -61,7 +61,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private Context context;
     private Intent intent;
-    private String diningName, uid, diningUid, diningDate;
+    private String uid, diningUid, diningDate;
     private DiningMasterData diningMasterData;
     private HashMap<String, UserData> userDataMap =  new HashMap<>();
 
@@ -97,7 +97,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         mGlideRequestManager = GlideApp.with(this);
 
         intent = getIntent();
-        diningName = intent.getStringExtra("title");
         diningUid = intent.getStringExtra("diningUid");
         isChecked = intent.getBooleanExtra("checked", false);
 
@@ -118,7 +117,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         purchaseButton = (Button)findViewById(R.id.purchase_button_DetailActivity);
         bookmarkBox = (CheckBox)findViewById(R.id.checkbox_DetailActivity);
 
-        diningTitle.setText(diningName);
         bookmarkBox.setChecked(isChecked);
 
         mAuth = FirebaseAuth.getInstance();
@@ -149,7 +147,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
         else if(v == purchaseButton) {
             Bundle bundle = new Bundle();
-            bundle.putString("title", diningName);
             bundle.putString("diningUid", diningUid);
             bundle.putString("date", diningDate);
             DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
@@ -195,11 +192,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     public void getDiningInformation() {
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.orderByKey().equalTo(diningUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
+                    diningTitle.setText(dataSnapshot.child("title").getValue().toString());
                     diningSubtitle.setText(dataSnapshot.child("subtitle").getValue().toString());//set subtitle from database
                     for(int i = 0; i < dataSnapshot.child("style").getChildrenCount(); i++) {
                         FoodStyle style = FoodStyle.valueOf((dataSnapshot.child("style").child(Integer.toString(i + 1)).getValue().toString()));
@@ -236,7 +234,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     //get chef UID
     public void getChefUid(final MyCallback myCallback) {
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.orderByKey().equalTo(diningUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
