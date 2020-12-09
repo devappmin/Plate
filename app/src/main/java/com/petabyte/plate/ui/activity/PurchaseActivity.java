@@ -17,6 +17,6 @@ public class PurchaseActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         TextView textView = (TextView)findViewById(R.id.price_purchase);
-        textView.setText(intent.getStringExtra("title"));
+        textView.setText(Long.toString(intent.getLongExtra("start", 0)));
     }
 }

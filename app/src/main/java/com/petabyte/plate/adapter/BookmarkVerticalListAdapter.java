@@ -69,7 +69,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private TextView diningDetailLocation;
         private ImageView diningImage;
         private CheckBox checkBox;
-        private DatabaseReference databaseReference, ref_g, ref_h;
+        private DatabaseReference ref_g, ref_h;
         private StorageReference storageReference;
         private FirebaseAuth mAuth;
         private FirebaseUser user;
@@ -85,7 +85,6 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
             context = itemView.getContext();
 
-            databaseReference = FirebaseDatabase.getInstance().getReference();
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
             diningTitle = (TextView) itemView.findViewById(R.id.dining_title_bookmarkcard);

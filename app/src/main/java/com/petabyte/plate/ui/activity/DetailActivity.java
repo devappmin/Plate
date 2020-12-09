@@ -41,8 +41,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.petabyte.plate.R;
+import com.petabyte.plate.data.BookmarkCardViewData;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.FoodStyle;
+import com.petabyte.plate.data.UserData;
+import com.petabyte.plate.ui.view.DetailTimeListBottomSheet;
+import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -53,10 +57,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private Context context;
     private Intent intent;
-    private String diningName, uid;
-    HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
+    private String diningName, uid, diningUid, diningDate;
+    private DiningMasterData diningMasterData;
+    private HashMap<String, UserData> userDataMap =  new HashMap<>();
 
-    private LinearLayout parentLayout;
     private LinearLayout dishImageList;
     private LinearLayout dishList;
     private ImageButton cancelButton;
@@ -90,7 +94,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         diningName = intent.getStringExtra("title");
         isChecked = intent.getBooleanExtra("checked", false);
 
-        parentLayout = (LinearLayout)findViewById(R.id.parent_layout_DetailActivity);
         dishImageList = (LinearLayout)findViewById(R.id.linear_layout_dishImage_DetailActivity);
         dishList = (LinearLayout)findViewById(R.id.linear_layout_dishList_DetailActivity);
         cancelButton = (ImageButton)findViewById(R.id.cancel_button_DetailActivity);
@@ -123,16 +126,23 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         bookmarkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
-                getDishImageUri(new MyCallback() {//for getting dining UID
+                if(isChecked)
+                    Snackbar.make(buttonView, "찜 목록에 추가하였습니다.", 3000).show();
+                else
+                    Snackbar.make(buttonView, "찜 목록에서 삭제하였습니다.", 3000).show();
+                getDiningMasterData();
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onCallback(ArrayList<String> keyList) {
-                        if(isChecked)
-                            Snackbar.make(buttonView, "찜 목록에 추가하였습니다.", 3000).show();
-                        else
-                            Snackbar.make(buttonView, "찜 목록에서 삭제하였습니다.", 3000).show();
-                        reviseBookmarkStatus(keyList.get(0), isChecked);//index 0 is dining UID
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        reviseBookmarkStatus(diningUid, isChecked);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
+
             }
         });
     }
@@ -143,21 +153,38 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             finish();
         }
         else if(v == purchaseButton) {
-            Intent purchase = new Intent(this, PurchaseActivity.class);
-            purchase.putExtra("title", diningTitle.getText().toString());
-            startActivity(purchase);
-        }
+            //start, dininguid, title
+            getDiningMasterData();
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title", diningName);
+                    bundle.putString("diningUid", diningUid);
+                    bundle.putString("date", diningDate);
+                    DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
+                    bottomSheet.setArguments(bundle);
+                    bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+                }
 
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
     }
 
+
     public void getDiningImage() {
-        getDishImageUri(new MyCallback() {
+        getDiningMasterData();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onCallback(ArrayList<String> keyList) {
-                String diningUid = keyList.get(0);
-                for(int i = 1; i < keyList.size(); i++) {
-                    final String imageName = keyList.get(i);
-                    storageReference = FirebaseStorage.getInstance().getReference();
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                storageReference = FirebaseStorage.getInstance().getReference();
+                for(int i = 0; i < diningMasterData.getImages().size() - 1; i++) {
+                    String imageName = diningMasterData.getImages().get(i + 1);
                     storageReference.child("dining").child(diningUid).child(imageName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
@@ -175,32 +202,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     });
                 }
             }
-        });
-    }
 
-    private void getDiningMasterData(){
-        diningMasterDataMap.clear();
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Dining");
-        database.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot datasnapshot: snapshot.getChildren()){
-                    // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
-                    diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
-                }
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
         });
-    }
-
-    public void getDiningInformationTest() {
-        getDiningMasterData();
-
     }
 
     public void getDiningInformation() {
-        //여기다 추가
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
         databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -240,13 +250,31 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    public void getChefInformation() {
-        readChefData(new MyCallback() {//get Chef UID
+    //get chef UID
+    public void getChefUid(final MyCallback myCallback) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
+        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onCallback(ArrayList<String> keyList) {
-                String uid = keyList.get(0).substring(0, 28);
+            public void onDataChange(@NonNull DataSnapshot snapshots) {
+                for(DataSnapshot dataSnapshot : snapshots.getChildren()){
+                    String chefUid = dataSnapshot.getKey().substring(0, 28);
+                    myCallback.onCallback(chefUid);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void getChefInformation() {
+        getChefUid(new MyCallback() {//get Chef UID
+            @Override
+            public void onCallback(String chefUid) {
                 storageReference = FirebaseStorage.getInstance().getReference();
-                storageReference.child("user").child("host").child(uid + ".png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                storageReference.child("user").child("host").child(chefUid + ".png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
                         chefImage.setBackground(new ShapeDrawable((new OvalShape())));
@@ -257,7 +285,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
                 databaseReference = FirebaseDatabase.getInstance().getReference();
                 //get Host user Information
-                databaseReference.child("User").child("Host").orderByKey().equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                databaseReference.child("User").child("Host").orderByKey().equalTo(chefUid).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshots) {
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
@@ -280,50 +308,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    //get chef UID
-    public void readChefData(final MyCallback myCallback) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for(DataSnapshot dataSnapshot : snapshots.getChildren()){
-                    ArrayList<String> keyList = new ArrayList<String>();
-                    keyList.add(dataSnapshot.getKey());
-                    myCallback.onCallback(keyList);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    //get Dish Uri
-    public void getDishImageUri(final MyCallback myCallback) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for(DataSnapshot dataSnapshot : snapshots.getChildren()){
-                    ArrayList<String> keyList = new ArrayList<String>();
-                    keyList.add(dataSnapshot.getKey());
-                    for(int i = 1; i <= dataSnapshot.child("images").getChildrenCount(); i++) {//get dishes from database
-                        keyList.add(dataSnapshot.child("images").child(Integer.toString(i)).getValue().toString());
-                    }
-                    myCallback.onCallback(keyList);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    public void reviseBookmarkStatus(final String diningUid, final boolean isChecked) {
+    public void reviseBookmarkStatus (final String diningUid, final boolean isChecked) {
+        getUserData();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
@@ -332,86 +318,43 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String userUid = dataSnapshot.getKey();
-                    boolean isRemoved = false;
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
-                            Long size = dataSnapshot.child("Bookmark").getChildrenCount();
-                            ref_g.child(userUid).child("Bookmark").child(Long.toString(size + 1)).setValue(diningUid);
+                            if(!(userDataMap.get(uid).getBookmark().contains(diningUid)))
+                                ref_g.child(userUid).child("Bookmark").push().setValue(diningUid);
                         } else {//if checked before listener runs, remove from bookmark
-                            for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++) {
-                                try {
-                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString().equals(diningUid)) {
-                                        dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                        isRemoved = true;
-                                    }
-                                } catch (NullPointerException e) {
-                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString().equals(diningUid)) {
-                                        dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                        isRemoved = true;
-                                    }
-                                }
-                                if(isRemoved) {
-                                    //update afterward value's index
-                                    if(i != dataSnapshot.child("Bookmark").getChildrenCount()){
-                                        String newDiningUid;
-                                        newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
-                                        ref_g.child(userUid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
-                                    } else {//remove last value
-                                        try {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                        } catch (NullPointerException e) {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                        }
-                                    }
-                                }
+                            if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                userDataMap.get(uid).getBookmark().remove(diningUid);
+                                ref_g.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                             }
                         }
                     }
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
 
         ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String userUid = dataSnapshot.getKey();
-                    boolean isRemoved = false;
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
-                            Long size = dataSnapshot.child("Bookmark").getChildrenCount();
-                            ref_h.child(userUid).child("Bookmark").child(Long.toString(size + 1)).setValue(diningUid);
+                            if(!(userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                userDataMap.get(uid).getBookmark().add(diningUid);
+                                ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
+                            }
                         } else {//if checked before listener runs, remove from bookmark
-                            for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++) {
-                                try {
-                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString().equals(diningUid)) {
-                                        dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                        isRemoved = true;
-                                    }
-                                } catch (NullPointerException e) {
-                                    if (dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString().equals(diningUid)) {
-                                        dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                        isRemoved = true;
-                                    }
-                                }
-                                if(isRemoved) {
-                                    //update afterward value's index
-                                    if(i != dataSnapshot.child("Bookmark").getChildrenCount()){
-                                        String newDiningUid;
-                                        newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
-                                        ref_h.child(userUid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
-                                    } else {//remove last value
-                                        try {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                        } catch (NullPointerException e) {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                        }
-                                    }
-                                }
+                            if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                userDataMap.get(uid).getBookmark().remove(diningUid);
+                                ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                             }
                         }
                     }
@@ -419,10 +362,60 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
     }
 
+    private void getUserData(){
+        ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
+        ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
+
+        ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    userDataMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserData.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    userDataMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserData.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getDiningMasterData(){
+        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
+        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot datasnapshot: snapshot.getChildren()){
+                    diningMasterData = datasnapshot.getValue(DiningMasterData.class);
+                    diningUid = datasnapshot.getKey();
+                    diningDate = datasnapshot.child("date").getValue().toString();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
 
     public int toDp(int size) {
         float scale = getResources().getDisplayMetrics().density;
@@ -430,8 +423,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public interface MyCallback {
-        //keyList[0] = uid
-        //keyList[1] = dish
-        void onCallback(ArrayList<String> keyList);
+        void onCallback(String chefUid);
     }
 }

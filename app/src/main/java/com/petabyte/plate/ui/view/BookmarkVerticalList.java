@@ -26,6 +26,7 @@ import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.BookmarkVerticalListAdapter;
 import com.petabyte.plate.data.BookmarkCardViewData;
 import com.petabyte.plate.data.DiningMasterData;
+import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.data.UserData;
 
 import java.io.IOException;
@@ -54,7 +55,6 @@ public class BookmarkVerticalList extends ConstraintLayout {
     private HashMap<String, UserData> userDataMap =  new HashMap<>();
     private HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
     private ArrayList<BookmarkCardViewData> dataList = new ArrayList<>();
-    private ArrayList<String> bookmarkDiningUidList = new ArrayList<>();
 
     public BookmarkVerticalList(@NonNull Context context) {
         super(context);

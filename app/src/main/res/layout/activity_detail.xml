@@ -123,14 +123,14 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
 
-           <ImageView
-               android:id="@+id/chef_image_DetailActivity"
-               android:layout_width="200dp"
-               android:layout_height="200dp"
-               android:layout_marginTop="30dp"
-               app:layout_constraintStart_toStartOf="parent"
-               app:layout_constraintEnd_toEndOf="parent"
-               app:layout_constraintTop_toBottomOf="@id/divider2_DetailActivity"/>
+            <ImageView
+                android:id="@+id/chef_image_DetailActivity"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider2_DetailActivity"/>
 
             <TextView
                 android:id="@+id/chef_name_DetailActivity"
@@ -146,7 +146,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chef_image_DetailActivity"/>
-            
+
             <TextView
                 android:id="@+id/chef_introduction_DetailActivity"
                 android:textStyle="italic"
