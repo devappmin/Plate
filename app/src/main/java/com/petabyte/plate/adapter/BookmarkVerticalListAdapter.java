@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,12 +23,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.BookmarkCardViewData;
+import com.petabyte.plate.data.DiningMasterData;
+import com.petabyte.plate.data.UserData;
 import com.petabyte.plate.ui.activity.DetailActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVerticalListAdapter.ViewHolder>{
@@ -63,10 +69,14 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private TextView diningDetailLocation;
         private ImageView diningImage;
         private CheckBox checkBox;
-        private DatabaseReference databaseReference, ref_g, ref_h;
+        private DatabaseReference ref_g, ref_h;
+        private StorageReference storageReference;
         private FirebaseAuth mAuth;
         private FirebaseUser user;
         private Context context;
+
+        private HashMap<String, UserData> userDataMap =  new HashMap<>();
+        private HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
 
         private String uid;
 
@@ -75,7 +85,6 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
             context = itemView.getContext();
 
-            databaseReference = FirebaseDatabase.getInstance().getReference();
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
             diningTitle = (TextView) itemView.findViewById(R.id.dining_title_bookmarkcard);
@@ -96,7 +105,13 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
             diningImage.setBackground(drawable);
             diningImage.setClipToOutline(true);
-            Picasso.get().load(("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=8e789939-497e-4b18-95f4-e526f50e7917")).fit().centerCrop().into(diningImage);
+            storageReference = FirebaseStorage.getInstance().getReference();
+            storageReference.child("dining").child(data.getDiningUID()).child(data.getImageName()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Picasso.get().load(uri).fit().centerCrop().into(diningImage);
+                }
+            });
 
             diningTitle.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -120,17 +135,13 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
-                    getDiningUid(data.getDiningTitle(), new MyCallback() {
-                        @Override
-                        public void onCallback(String diningUid) {
-                            reviseBookmarkStatus(diningUid, isChecked);
-                        }
-                    });
+                    reviseBookmarkStatus(data.getDiningUID(), isChecked);
                 }
             });
         }
 
-        public void reviseBookmarkStatus(final String diningUid, final boolean isChecked) {
+        public void reviseBookmarkStatus (final String diningUid, final boolean isChecked) {
+            getUserData();
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
             ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
@@ -139,86 +150,43 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String userUid = dataSnapshot.getKey();
-                        boolean isRemoved = false;
                         if(userUid.equals(uid)){
                             if(isChecked) {//if not checked before listener runs, add to bookmark
-                                Long size = dataSnapshot.child("Bookmark").getChildrenCount();
-                                ref_g.child(userUid).child("Bookmark").child(Long.toString(size + 1)).setValue(diningUid);
+                                if(!(userDataMap.get(uid).getBookmark().contains(diningUid)))
+                                    ref_g.child(userUid).child("Bookmark").push().setValue(diningUid);
                             } else {//if checked before listener runs, remove from bookmark
-                                for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++) {
-                                    try {
-                                        if (dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString().equals(diningUid)) {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                            isRemoved = true;
-                                        }
-                                    } catch (NullPointerException e) {
-                                        if (dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString().equals(diningUid)) {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                            isRemoved = true;
-                                        }
-                                    }
-                                    if(isRemoved) {
-                                        //update afterward value's index
-                                        if(i != dataSnapshot.child("Bookmark").getChildrenCount()){
-                                            String newDiningUid;
-                                            newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
-                                            ref_g.child(userUid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
-                                        } else {//remove last value
-                                            try {
-                                                dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                            } catch (NullPointerException e) {
-                                                dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                            }
-                                        }
-                                    }
+                                if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                    userDataMap.get(uid).getBookmark().remove(diningUid);
+                                    ref_g.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                                 }
                             }
                         }
                     }
                 }
+
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
             });
 
             ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String userUid = dataSnapshot.getKey();
-                        boolean isRemoved = false;
                         if(userUid.equals(uid)){
                             if(isChecked) {//if not checked before listener runs, add to bookmark
-                                Long size = dataSnapshot.child("Bookmark").getChildrenCount();
-                                ref_h.child(userUid).child("Bookmark").child(Long.toString(size + 1)).setValue(diningUid);
+                                if(!(userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                    userDataMap.get(uid).getBookmark().add(diningUid);
+                                    ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
+                                }
                             } else {//if checked before listener runs, remove from bookmark
-                                for (int i = 1; i <= dataSnapshot.child("Bookmark").getChildrenCount(); i++) {
-                                    try {
-                                        if (dataSnapshot.child("Bookmark").child(Integer.toString(i)).getValue().toString().equals(diningUid)) {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                            isRemoved = true;
-                                        }
-                                    } catch (NullPointerException e) {
-                                        if (dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString().equals(diningUid)) {
-                                            dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                            isRemoved = true;
-                                        }
-                                    }
-                                    if(isRemoved) {
-                                        //update afterward value's index
-                                        if(i != dataSnapshot.child("Bookmark").getChildrenCount()){
-                                            String newDiningUid;
-                                            newDiningUid = dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getValue().toString();
-                                            ref_h.child(userUid).child("Bookmark").child(Integer.toString(i)).setValue(newDiningUid);
-                                        } else {//remove last value
-                                            try {
-                                                dataSnapshot.child("Bookmark").child(Integer.toString(i)).getRef().removeValue();
-                                            } catch (NullPointerException e) {
-                                                dataSnapshot.child("Bookmark").child(Integer.toString(i + 1)).getRef().removeValue();
-                                            }
-                                        }
-                                    }
+                                if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                    userDataMap.get(uid).getBookmark().remove(diningUid);
+                                    ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                                 }
                             }
                         }
@@ -226,27 +194,43 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
             });
         }
 
-        public void getDiningUid(String diningTitle, final MyCallback myCallback){
-            databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-            databaseReference.orderByChild("title").equalTo(diningTitle).addListenerForSingleValueEvent(new ValueEventListener() {
+        private void getUserData(){
+            ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
+            ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
+
+            ref_g.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        myCallback.onCallback(dataSnapshot.getKey());
+                        userDataMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserData.class));
                     }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
-            });
-        }
+                public void onCancelled(@NonNull DatabaseError error) {
 
-        public interface MyCallback {
-            void onCallback(String diningUid);
+                }
+            });
+
+            ref_h.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        userDataMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(UserData.class));
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     }
 }

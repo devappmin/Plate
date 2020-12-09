@@ -11,9 +11,12 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -48,6 +51,7 @@ import com.petabyte.plate.utils.ConnectionCodes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -418,7 +422,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         userReference = FirebaseDatabase.getInstance().getReference("User").child("Host").child(uid);
         storageReference = FirebaseStorage.getInstance().getReference();
 
-
         userReference.child("MyDining").push().setValue(diningUid);//add MyDining
 
         //add Dining information
@@ -441,6 +444,8 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
             diningReference.child("images").child(Integer.toString(i + 1)).setValue(imageNames.get(i));
         }
 
+        diningReference.child("coordinate").child("latitude").setValue(getLatitudeFromAddress(location_editText.getText().toString()));
+        diningReference.child("coordinate").child("longitude").setValue(getLongitudeFromAddress(location_editText.getText().toString()));
         diningReference.child("location").child("location").setValue(location_editText.getText().toString());
         diningReference.child("location").child("detail").setValue(detailLocation_editText.getText().toString());
         diningReference.child("price").setValue(Long.parseLong(price_editText.getText().toString()));
@@ -460,6 +465,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         }
         diningReference.child("subtitle").setValue(subtitle_editText.getText().toString());
         diningReference.child("title").setValue(title_editText.getText().toString());
+        diningReference.child("date").setValue(plans.get(0).substring(0, 10));
     }
 
     //16자리 숫자의 시간 정보를 yyyy-MM-dd HH:mm:ss 형식으로 변환, 순서대로 두 개씩 짝지어 시작 시간, 종료 시간을 나타냄
@@ -484,8 +490,35 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         return dateFormat;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
+    public double getLatitudeFromAddress(String address) {
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> list = null;
+        try {
+            list = geocoder.getFromLocationName(address, 10); // 읽을 개수
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (list != null) {
+            // 해당되는 주소로 인텐트 날리기
+            return list.get(0).getLatitude();
+        } else return 0;
+    }
+
+    public double getLongitudeFromAddress(String address) {
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> list = null;
+        try {
+            list = geocoder.getFromLocationName(address, 10); // 읽을 개수
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (list != null) {
+            // 해당되는 주소로 인텐트 날리기
+            return list.get(0).getLongitude();
+        } else return 0;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         switch (requestCode) {
             case ConnectionCodes.REQUEST_SEARCH_ADDRESS:
