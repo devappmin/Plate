@@ -26,8 +26,7 @@
         android:id="@+id/button_v_number_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/primary_button_background"
-        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/button_radius"
         android:textColor="@android:color/white"
         android:textStyle="bold"
         android:text="@string/submit"/>
