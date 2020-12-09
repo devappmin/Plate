@@ -18,6 +18,7 @@ import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.ui.activity.DetailActivity;
+import com.petabyte.plate.ui.view.HomeHorizontalList;
 import com.petabyte.plate.utils.GlideApp;
 import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
@@ -55,6 +56,12 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
 
     public void addItem(HomeCardData data) {
         datas.add(data);
+    }
+
+    public ArrayList<HomeCardData> getItems() {
+        ArrayList<HomeCardData> temp = new ArrayList<>();
+        temp.addAll(datas);
+        return temp;
     }
 
     public void removeAllItem() {

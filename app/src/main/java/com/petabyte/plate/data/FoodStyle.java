@@ -49,4 +49,17 @@ public enum FoodStyle {
     public static FoodStyle randomLetter()  {
         return VALUES.get(RANDOM.nextInt(SIZE));
     }
+
+    public static FoodStyle[] randomFoodStyles(int size) {
+        FoodStyle[] styles = new FoodStyle[size];
+
+        for (int i = 0; i < size; i++) {
+            styles[i] = VALUES.get(RANDOM.nextInt(SIZE));
+            for (int j = 0; j < i; j++) {
+                if (styles[i] == styles[j]) i--;
+            }
+        }
+
+        return styles;
+    }
 }

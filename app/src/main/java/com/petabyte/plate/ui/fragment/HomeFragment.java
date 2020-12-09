@@ -44,6 +44,7 @@ import com.petabyte.plate.utils.KoreanUtil;
 import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,13 +85,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         // chipTypeList 배열 초기화
         chipTypeList = new HomeHorizontalList[2];
 
-        // 모든 값이 불러왔는지 확인하는 배열 초기화
-        completeLoaded = new boolean[LIST_COUNT];
-        for (int i = 0; i < LIST_COUNT; i++)
-            completeLoaded[i] = false;
-
-        // 뷰가 생성되면 불러온 리스트의 수를 0으로 초기화
-        current = 0;
+        initCompleteLoadedArray();
 
         // 뷰를 불러온다.
         searchButton = (CardView)v.findViewById(R.id.search_card_fm_home);
@@ -126,7 +121,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 // 지금 돌리는 프로그램이 안드로이드 롤리팝(5.0)인지 확인
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), searchButton, "Search");
-                    startActivity(intent, options.toBundle());
+                    Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY, options.toBundle());
                 } else
                     // 롤리팝 이하면 애니메이션 없이 액티비티 호출
                     Objects.requireNonNull(getActivity()).startActivityForResult(intent, ConnectionCodes.REQUEST_SEARCH_ACTIVITY);
@@ -153,12 +148,15 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         imageSlider.setType(HomeAwardsList.TYPE_MODE.IMAGE_SLIDE_MODE);
         imageSlider.removePadding();
 
+        // ChipList를 불러올 때 겹치지 않고 불러오기 위해서 미리 배열 선언
+        FoodStyle[] foodStyles = FoodStyle.randomFoodStyles(2);
+
         // Firebase를 통한 데이터를 불러오는 함수
         loadRecentList(recentList);
         loadPlatePost(postList);
         loadImageSlider(imageSlider);
-        loadChipList(FoodStyle.randomLetter(), chipTypeList[0]);
-        loadChipList(FoodStyle.randomLetter(), chipTypeList[1]);
+        loadChipList(foodStyles[0], chipTypeList[0]);
+        loadChipList(foodStyles[1], chipTypeList[1]);
         loadFoodTypeList("한식 다이닝", foodTypeList);
         loadTodayFood(todayFood);
 
@@ -173,40 +171,66 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return v;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void initCompleteLoadedArray() {
         // 모든 값이 불러왔는지 확인하는 배열 초기화
         completeLoaded = new boolean[LIST_COUNT];
         for (int i = 0; i < LIST_COUNT; i++)
             completeLoaded[i] = false;
-
         // 뷰가 생성되면 불러온 리스트의 수를 0으로 초기화
         current = 0;
     }
 
+    /**
+     * 다이닝 Key 값에서 Timestamp의 값을 추출하는 함수
+     * @param dataSnapshot 추출하고자하는 다이닝의 Datasnapshot
+     * @return 다이닝 Key 값에 적혀있는 Timestamp 값
+     */
+    private Long getTimestamp(DataSnapshot dataSnapshot) {
+        String key = dataSnapshot.getKey();
+        return Long.parseLong(key.substring(key.lastIndexOf("-") + 1));
+    }
+
+    /**
+     * DataSnapshot의 루트를 불러와 자식 노드를 TimeStamp에 맞춰 최신 순으로 정렬하는 메소드
+     * 다이닝 Key 값이 HostUID-Timestamp로 이루어진 것을 이용하여 정렬하는 것이다.
+     * @param root 다이닝 루트 노드
+     * @return 루트 노드의 자식을 최신순으로 정렬한 배열
+     */
+    private DataSnapshot[] sortSnapshot(DataSnapshot root) {
+        // root의 자식을 불러와 ArrayList에 저장
+        List<DataSnapshot> temp = new ArrayList<>();
+        for (DataSnapshot snapshot : root.getChildren()) {
+            temp.add(snapshot);
+        }
+
+        // ArrayList를 배열로 변환
+        DataSnapshot[] array = temp.toArray(new DataSnapshot[temp.size()]);
+
+        // Sorting을 하기 위한 임시 데이터 변수
+        DataSnapshot tmp;
+
+        // Selection Sort를 이용하여 DataSnapshot을 정렬
+        for (int i = 0; i < array.length - 1; i++) {
+            for (int j = i + 1; j < array.length; j++) {
+                if (getTimestamp(array[i]) < getTimestamp(array[j])) {
+                    tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
+                }
+                for (DataSnapshot snapshot : array) Log.d(LogTags.IMPORTANT, getTimestamp(snapshot) + " at i :" + i + ", j : " + j);
+            }
+        }
+
+        return array;
+    }
+
     private void loadRecentList(final HomeHorizontalList mList) {
         mList.setTitle("최근에 올라온 음식이에요.");
-        mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("Dining").limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for (DataSnapshot snapshot : snapshots.getChildren()) {
 
-                    DiningMasterData masterData = snapshot.getValue(DiningMasterData.class);
-                    Log.d(LogTags.IMPORTANT, masterData.getSchedules() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getPrice() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getLocation() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getImages() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getDishes() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getCount() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getBookmark() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getTitle() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getSubtitle() + "");
-                    Log.d(LogTags.IMPORTANT, masterData.getDescription() + "");
-
-
-
-
+                for (DataSnapshot snapshot : sortSnapshot(snapshots)) {
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
                     data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                     mList.addData(data);
@@ -268,7 +292,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         String title = "<font color=#4150b4>#" + KoreanUtil.includeGrammarCheck(foodStyle.label, "</font>은 ", "</font>는 ")
                 + "어떤가요?";
         mList.setTitle(Html.fromHtml(title));
-        mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
@@ -292,7 +316,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void loadFoodTypeList(final String type, final HomeHorizontalList mList) {
         mList.setTitle(type + " 모음");
-        mDatabase.child("Dining").limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
@@ -302,7 +326,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         mList.addData(data);
                     }
                 }
-
+                Log.d(LogTags.POINT, current + "");
                 completeLoaded[current++] = true;
                 checkAllLoaded();
             }
@@ -347,6 +371,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             // 검색창을 보여줌.
             searchButton.setVisibility(View.VISIBLE);
 
+            // Loaded Array를 다시 전부 초기화
+            initCompleteLoadedArray();
+
             // 만약에 Swipe를 통해서 Refreshing을 하고 있던거였으면 false로 바꿈.
             if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
@@ -389,11 +416,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         scrollView.setVisibility(View.GONE);
         searchButton.setVisibility(View.GONE);
 
-        // 로딩확인 초기화
-        for(int i = 0; i < LIST_COUNT; i++)
-            completeLoaded[i] = false;
-        current = 0;
-
         // 모든 리스트 데이터 삭제
         recentList.removeAllData();
         postList.removeAllData();
@@ -402,12 +424,14 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         chipTypeList[1].removeAllData();
         foodTypeList.removeAllData();
 
+        FoodStyle[] styles = FoodStyle.randomFoodStyles(2);
+
         // 리스트에 값 다시 입력
         loadRecentList(recentList);
         loadPlatePost(postList);
         loadImageSlider(imageSlider);
-        loadChipList(FoodStyle.randomLetter(), chipTypeList[0]);
-        loadChipList(FoodStyle.randomLetter(), chipTypeList[1]);
+        loadChipList(styles[0], chipTypeList[0]);
+        loadChipList(styles[1], chipTypeList[1]);
         loadFoodTypeList("한식 다이닝", foodTypeList);
         loadTodayFood(todayFood);
     }

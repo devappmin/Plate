@@ -1,8 +1,12 @@
 package com.petabyte.plate.ui.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Spanned;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,7 +21,12 @@ import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.adapter.HomeHorizontalListAdapter;
 import com.petabyte.plate.data.HomeCardData;
+import com.petabyte.plate.ui.activity.MoreListActivity;
 import com.petabyte.plate.utils.CustomAlignSnapHelper;
+import com.petabyte.plate.utils.LogTags;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create custom horizontal recycler view
@@ -33,6 +42,7 @@ public class HomeHorizontalList extends ConstraintLayout {
 
     // View 변수
     private TextView titleView;
+    private ConstraintLayout moreButton;
 
     // Firebase 관련 변수
     private StorageReference mStorage;
@@ -64,6 +74,8 @@ public class HomeHorizontalList extends ConstraintLayout {
 
         recyclerView = (RecyclerView)this.findViewById(R.id.recycler_view_v_homehorizontal);
         titleView = (TextView)this.findViewById(R.id.title_tv_v_homehorizontal);
+        moreButton = (ConstraintLayout) this.findViewById(R.id.title_layout_v_homehorizontal);
+
 
         // 부드러운 스크롤이 아닌 item 단위로 스크롤을 하기 위해 적용
         SnapHelper helper = new CustomAlignSnapHelper(2);
@@ -80,6 +92,16 @@ public class HomeHorizontalList extends ConstraintLayout {
         recyclerAdapter = new HomeHorizontalListAdapter();
         recyclerAdapter.setReference(mStorage);
         recyclerView.setAdapter(recyclerAdapter);
+
+        // 더보기 버튼을 누르면 리스트 뷰로 이동
+        moreButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), MoreListActivity.class);
+                intent.putParcelableArrayListExtra("data", recyclerAdapter.getItems());
+                getContext().startActivity(intent);
+            }
+        });
     }
 
     public void setTitle(String title) {

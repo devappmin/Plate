@@ -141,7 +141,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="20dp"
                 android:clipToPadding="false">
 
                 <!-- region SUBMIT DINING -->
@@ -149,6 +148,7 @@
                     android:id="@+id/add_dining_cv_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -201,7 +201,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginBottom="20dp"
                     android:foreground="?android:attr/selectableItemBackground"
                     app:cardBackgroundColor="@color/colorPrimary"
                     app:cardCornerRadius="10dp"
@@ -248,7 +248,8 @@
                     android:id="@+id/recent_hh_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:clipToPadding = "false"/>
                 <!-- endregion RECENT LIST -->
 
@@ -257,6 +258,7 @@
                     android:id="@+id/awards_ha_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:paddingBottom="40dp"
                     android:clipToPadding = "false"/>
                 <!-- endregion POST LIST -->
@@ -266,7 +268,7 @@
                     android:id="@+id/food_type_hh_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginBottom="20dp"
                     android:clipToPadding = "false"/>
                 <!-- endregion FOOD TYPE LIST -->
 
@@ -275,14 +277,16 @@
                     android:id="@+id/chip_type_hh_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:clipToPadding = "false"/>
 
                 <com.petabyte.plate.ui.view.HomeHorizontalList
                     android:id="@+id/chip_type_2_hh_fm_home"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:clipToPadding = "false"/>
                 <!-- endregion FOOD STYLE LIST -->
 
@@ -291,6 +295,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:text="Plate: By Everyone은\nCOVID-19 방역 방침을 준수합니다."/>
 
                 <View
