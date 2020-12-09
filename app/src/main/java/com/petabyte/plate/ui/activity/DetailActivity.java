@@ -349,11 +349,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
                             if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
-                                ref_h.child(uid).child("Bookmark").push().setValue(userDataMap.get(uid).getBookmark());
+                                ref_h.child(uid).child("Bookmark").push().setValue(diningUid);
                             }
                         } else {//if checked before listener runs, remove from bookmark
                             if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
-                                userDataMap.get(uid).getBookmark().remove(diningUid);
+                                userDataMap.get(uid).getBookmark().values().remove(diningUid);
                                 ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                             }
                         }
