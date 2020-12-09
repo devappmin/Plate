@@ -117,7 +117,6 @@ public class ReservationCheckActivity extends AppCompatActivity {
 
     // firebase db 에서 data를 가져와서 item을 세팅
     private void initData() {
-        String currentTime = String.valueOf(System.currentTimeMillis());
         mDatabase = FirebaseDatabase.getInstance().getReference()
                 .child("User").child(MEMBER_TYPE).child(UID).child("Reservation");
 
@@ -131,7 +130,7 @@ public class ReservationCheckActivity extends AppCompatActivity {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
                     String timeKey = datasnapshot.getKey();
                     diningUID = datasnapshot.child("DiningUID").getValue().toString();
-                    reservationTime = convertTimestamp((long) datasnapshot.child("Reservation").getValue());
+                    reservationTime = convertTimestamp(Long.parseLong(String.valueOf(datasnapshot.child("Reservation").getValue())));
                     reservationStatus = datasnapshot.child("Status").getValue().toString();
                     diningTitle = diningMasterDataMap.get(diningUID).getTitle();
                     diningLocation = (String) diningMasterDataMap.get(diningUID).getLocation().get("detail");

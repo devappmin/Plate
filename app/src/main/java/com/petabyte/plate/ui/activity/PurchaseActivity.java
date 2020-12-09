@@ -113,6 +113,7 @@ public class PurchaseActivity extends AppCompatActivity {
                 reservationMap.put("DiningUID", reservDUID);
                 reservationMap.put("Reservation", String.valueOf(reservTime));
                 reservationMap.put("Status", "입금대기중");
+                reservationMap.put("Review", "FALSE");
 
                 DatabaseReference reserv_ref = FirebaseDatabase.getInstance().getReference("User");
                 reserv_ref.child(MEMBER_TYPE).child(UID).child("Reservation").child(currentTime).setValue(reservationMap)
@@ -129,7 +130,6 @@ public class PurchaseActivity extends AppCompatActivity {
                                 finish();
                             }
                         });
-
                // Log.d("Result", UID+" / "+MEMBER_TYPE+" / "+reservName);
             }
         });

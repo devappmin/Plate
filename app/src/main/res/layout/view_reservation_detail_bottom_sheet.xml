@@ -10,6 +10,16 @@
     android:paddingBottom="40dp">
 
     <ImageButton
+        android:id="@+id/button_v_detail_reservation_bottom_sheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_home_24"
+        android:background="@android:color/transparent"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
         android:id="@+id/button_v_exit_reservation_bottom_sheet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

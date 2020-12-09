@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -37,6 +38,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.ReservationCardData;
+import com.petabyte.plate.ui.activity.DetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,7 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
     private String UID;
     private String MEMBER_TYPE;
     private String RESERVATION_KEY;
+    private String title;
 
     private FirebaseUser user;
     private DatabaseReference reference;
@@ -57,6 +60,7 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
     private LinearLayout dishList;
     private Button cancelButton;
     private ImageButton exitButton;
+    private ImageButton detailButton;
 
     private DialogInterface.OnDismissListener onDismissListener;
 
@@ -67,9 +71,12 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
         this.position = adapterPosition;
         this.user = FirebaseAuth.getInstance().getCurrentUser();
         this.UID = user.getUid();
+
+        // adapter의 현재 position에 따라 datas의 값 가져옴
         this.dishes = datas.get(position).getDishes();
         this.MEMBER_TYPE = datas.get(position).getMemtype();
         this.RESERVATION_KEY = datas.get(position).getTimeKey();
+        this.title = datas.get(position).getTitle();
     }
 
     @Nullable
@@ -80,6 +87,7 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
         dishList = (LinearLayout) rootView.findViewById(R.id.linear_layout_dishList_reservation_bottom_sheet);
         cancelButton = (Button) rootView.findViewById(R.id.button_v_cancel_reservation_bottom_sheet);
         exitButton = (ImageButton) rootView.findViewById(R.id.button_v_exit_reservation_bottom_sheet);
+        detailButton = (ImageButton) rootView.findViewById(R.id.button_v_detail_reservation_bottom_sheet);
         return rootView;
     }
 
@@ -97,6 +105,16 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
                 reference = FirebaseDatabase.getInstance().getReference("User").child(MEMBER_TYPE).child(UID).child("Reservation");
                 // 예약 취소
                 makeDialog("정말 이 다이닝의 예약을 취소하시겠어요?");
+            }
+        });
+
+        // 자세히보기 버튼 클릭시 실행되는 함수
+        detailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mActivity, DetailActivity.class);
+                intent.putExtra("title", title);
+                startActivity(intent);
             }
         });
 
