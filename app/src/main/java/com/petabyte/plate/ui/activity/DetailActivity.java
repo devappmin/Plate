@@ -26,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -47,6 +49,7 @@ import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.data.UserData;
 import com.petabyte.plate.ui.view.DetailTimeListBottomSheet;
 import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
+import com.petabyte.plate.utils.GlideApp;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -83,12 +86,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private StorageReference storageReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private RequestManager mGlideRequestManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         context = this;
+        mGlideRequestManager = GlideApp.with(this);
 
         intent = getIntent();
         diningName = intent.getStringExtra("title");
@@ -273,16 +278,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         getChefUid(new MyCallback() {//get Chef UID
             @Override
             public void onCallback(String chefUid) {
-                storageReference = FirebaseStorage.getInstance().getReference();
-                storageReference.child("user").child("host").child(chefUid + ".png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        chefImage.setBackground(new ShapeDrawable((new OvalShape())));
-                        chefImage.setClipToOutline(true);
-                        Picasso.get().load(uri).fit().centerCrop().into(chefImage);
-                    }
-                });
-
+                storageReference = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/").getReference("user").child("host");
                 databaseReference = FirebaseDatabase.getInstance().getReference();
                 //get Host user Information
                 databaseReference.child("User").child("Host").orderByKey().equalTo(chefUid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -290,6 +286,22 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     public void onDataChange(@NonNull DataSnapshot snapshots) {
                         for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
                             String rateString = dataSnapshot.child("Profile").child("Rating").getValue().toString();
+                            String profileImageName = dataSnapshot.child("Profile").child("Image").getValue().toString();
+                            if(!profileImageName.equals("DEFAULT")){
+                                // set image with GlideApp
+                                mGlideRequestManager
+                                        .load(storageReference.child(profileImageName))
+                                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                        .skipMemoryCache(true)
+                                        .circleCrop()
+                                        .into(chefImage);
+                            }else{
+                                //Log.d("result", "setProfileImage >> host, NO CUSTOM IMAGE UPLOADED!");
+                                mGlideRequestManager
+                                        .load(getResources().getDrawable(R.drawable.ic_character))
+                                        .circleCrop()
+                                        .into(chefImage);
+                            }
                             double rate = Double.parseDouble(rateString);
                             Long ratingCount = (Long) dataSnapshot.child("Profile").child("RatingCount").getValue();
                             chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
