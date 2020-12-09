@@ -98,6 +98,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         intent = getIntent();
         diningName = intent.getStringExtra("title");
+        diningUid = intent.getStringExtra("diningUid");
         isChecked = intent.getBooleanExtra("checked", false);
 
         dishImageList = (LinearLayout)findViewById(R.id.linear_layout_dishImage_DetailActivity);
@@ -136,19 +137,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     Snackbar.make(buttonView, "찜 목록에 추가하였습니다.", 3000).show();
                 else
                     Snackbar.make(buttonView, "찜 목록에서 삭제하였습니다.", 3000).show();
-                getDiningMasterData();
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        reviseBookmarkStatus(diningUid, isChecked);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
+                reviseBookmarkStatus(diningUid, isChecked);
             }
         });
     }
@@ -159,25 +148,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             finish();
         }
         else if(v == purchaseButton) {
-            //start, dininguid, title
-            getDiningMasterData();
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("title", diningName);
-                    bundle.putString("diningUid", diningUid);
-                    bundle.putString("date", diningDate);
-                    DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
-                    bottomSheet.setArguments(bundle);
-                    bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
+            Bundle bundle = new Bundle();
+            bundle.putString("title", diningName);
+            bundle.putString("diningUid", diningUid);
+            bundle.putString("date", diningDate);
+            DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
+            bottomSheet.setArguments(bundle);
+            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
         }
     }
 
@@ -299,7 +276,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                             storageReference.child(profileImageName).getDownloadUrl().addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Picasso.get().load(R.drawable.ic_character).fit().centerCrop().into(chefImage);
+                                    Picasso.get().load(R.drawable.ic_character).placeholder(R.drawable.ic_character).fit().centerCrop().into(chefImage);
                                 }
                             });
                             double rate = Double.parseDouble(rateString);
@@ -334,9 +311,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     String userUid = dataSnapshot.getKey();
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
-                            if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
-                                ref_g.child(uid).child("Bookmark").push().setValue(userDataMap.get(uid).getBookmark());
-                            }
+                            if(userDataMap.get(uid).getBookmark() != null) {
+                                if (!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                    ref_g.child(uid).child("Bookmark").push().setValue(diningUid);
+                                }
+                            } else
+                                ref_g.child(uid).child("Bookmark").push().setValue(diningUid);
                         } else {//if checked before listener runs, remove from bookmark
                             if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
                                 userDataMap.get(uid).getBookmark().remove(diningUid);
@@ -360,9 +340,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     String userUid = dataSnapshot.getKey();
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
-                            if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                            if(userDataMap.get(uid).getBookmark() != null) {
+                                if (!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                    ref_h.child(uid).child("Bookmark").push().setValue(diningUid);
+                                }
+                            } else
                                 ref_h.child(uid).child("Bookmark").push().setValue(diningUid);
-                            }
                         } else {//if checked before listener runs, remove from bookmark
                             if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
                                 userDataMap.get(uid).getBookmark().values().remove(diningUid);
@@ -415,12 +398,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private void getDiningMasterData(){
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.orderByKey().equalTo(diningUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
                     diningMasterData = datasnapshot.getValue(DiningMasterData.class);
-                    diningUid = datasnapshot.getKey();
                     diningDate = datasnapshot.child("date").getValue().toString();
                 }
             }

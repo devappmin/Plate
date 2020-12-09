@@ -145,8 +145,8 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                         if (item.contains(dish))
                             containsItem = true;
                     }
+                    dish_editText.getText().clear();
                     if(!containsItem) {
-                        dish_editText.getText().clear();
                         dishes.add(dish);
                         Chip chip = new Chip(dishes_chipGroup.getContext());
                         chip.setText(dish);
@@ -243,8 +243,16 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                             mMonth = monthOfYear + 1;
                             mDay = dayOfMonth;
 
+
                             // date_time 문자열에 YYMMDD를 삽입
-                            date = mYear - 2000 + "/" + mMonth + "/" + mDay;
+                            if(mMonth < 10 && mDay < 10)
+                                date = mYear - 2000 + "/0" + mMonth + "/0" + mDay;
+                            else if (mMonth < 10)
+                                date = mYear - 2000 + "/0" + mMonth + "/" + mDay;
+                            else if (mDay < 10)
+                                date = mYear - 2000 + "/" + mMonth + "/0" + mDay;
+                            else
+                                date = mYear - 2000 + "/" + mMonth + "/" + mDay;
 
                             date_editText.setText(date);
                         }
@@ -453,6 +461,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         DatabaseReference scheduleReference = diningReference.child("schedules").push();
         for (int i = 0; i < plans.size(); i++) {
             Long timestamp = Timestamp.valueOf(plans.get(i)).getTime();
+            Log.d("타스", timestamp.toString());
             if((i % 2) == 0) {
                 scheduleReference = diningReference.child("schedules").push();
                 scheduleReference.child("start").setValue(timestamp);
@@ -460,6 +469,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
             else
                 scheduleReference.child("end").setValue(timestamp);
         }
+
         for(int i = 0; i < selectedStyles.size(); i++) {
             diningReference.child("style").child(Integer.toString(i + 1)).setValue(selectedStyles.get(i).replace("#", ""));
         }
@@ -478,6 +488,8 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                     + " " + times.get(i).substring(8, 10)
                     + ":" + times.get(i).substring(10, 12)
                     + ":00";
+            Log.d("바꾸기전", times.get(i));
+            Log.d("시작", startString);
             dateFormat.add(startString);
             String endString = times.get(i).substring(0, 4)
                     + "-" + times.get(i).substring(4, 6)
