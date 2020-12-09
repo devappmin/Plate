@@ -207,18 +207,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         DataSnapshot[] array = temp.toArray(new DataSnapshot[temp.size()]);
 
         // Sorting을 하기 위한 임시 데이터 변수
-        int max;
         DataSnapshot tmp;
 
         // Selection Sort를 이용하여 DataSnapshot을 정렬
         for (int i = 0; i < array.length - 1; i++) {
-            max = i;
             for (int j = i + 1; j < array.length; j++) {
-                if (getTimestamp(array[i]) > getTimestamp(array[j]))
-                    max = j;
-                tmp = array[i];
-                array[i] = array[j];
-                array[j] = tmp;
+                if (getTimestamp(array[i]) < getTimestamp(array[j])) {
+                    tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
+                }
+                for (DataSnapshot snapshot : array) Log.d(LogTags.IMPORTANT, getTimestamp(snapshot) + " at i :" + i + ", j : " + j);
             }
         }
 
