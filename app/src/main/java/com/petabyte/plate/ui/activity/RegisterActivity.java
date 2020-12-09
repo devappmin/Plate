@@ -150,17 +150,21 @@ public class RegisterActivity extends AppCompatActivity {
                                                 type = "Host";
                                                 bundleData.putString("MEMBER_TYPE", "HOST");
                                                 reference.child(type).child(uid).child("Status").setValue("WAITING");
+                                                reference.child(type).child(uid).child("Bookmark").setValue("0");
+                                                reference.child(type).child(uid).child("Reservation").setValue("0");
+                                                reference.child(type).child(uid).child("MyDining").setValue("0");
+                                                map.put("Rating", "0");
+                                                map.put("RatingCount", "0");
                                                 map.put("Description", "안녕하세요. " + name +"입니다.");
                                             }else{
                                                 type = "Guest";
                                                 bundleData.putString("MEMBER_TYPE", "GUEST");
+                                                reference.child(type).child(uid).child("Bookmark").setValue("0");
+                                                reference.child(type).child(uid).child("Reservation").setValue("0");
                                                 intent.putExtra("MEMBER_TYPE", "GUEST");
                                             }
                                             map.put("Name", name);
                                             map.put("Image", "DEFAULT");
-                                            map.put("Rating", "0");
-                                            map.put("RatingCount", "0");
-
                                             reference.child(type).child(uid).child("Profile").setValue(map);
 
                                             intent = new Intent(RegisterActivity.this, RegisterInfoActivity.class);
