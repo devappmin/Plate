@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         chipTypeList = new HomeHorizontalList[2];
 
         initCompleteLoadedArray();
-
+        
         // 뷰를 불러온다.
         searchButton = (CardView)v.findViewById(R.id.search_card_fm_home);
         applyCardView = (CardView)v.findViewById(R.id.apply_cv_fm_home);
@@ -164,10 +164,10 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         // 값은 userType String에 저장됨.
         getUserType();
 
-        //region 지원하기 카드뷰 관련 코드
+        // 지원하기 카드뷰 관련 코드
         Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/plate-f5144.appspot.com/o/chef.png?alt=media&token=2e0e6f43-2523-482e-82ff-f5cd5ad54e19")
                 .fit().centerCrop().into(applyImage);
-        //endregion
+
         return v;
     }
 
@@ -226,12 +226,13 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void loadRecentList(final HomeHorizontalList mList) {
         mList.setTitle("최근에 올라온 음식이에요.");
-        mDatabase.child("Dining").limitToLast(10).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
 
                 for (DataSnapshot snapshot : sortSnapshot(snapshots)) {
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
+                    data.setDiningUID(snapshot.getKey());
                     data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                     mList.addData(data);
                 }
@@ -298,6 +299,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (((List<String>)snapshot.child("style").getValue()).contains(foodStyle.toString())) {
                         HomeCardData data = snapshot.getValue(HomeCardData.class);
+                        data.setDiningUID(snapshot.getKey());
                         data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                         mList.addData(data);
                     }
@@ -322,6 +324,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (snapshot.child("subtitle").getValue(String.class).equals(type)) {
                         HomeCardData data = snapshot.getValue(HomeCardData.class);
+                        data.setDiningUID(snapshot.getKey());
                         data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                         mList.addData(data);
                     }
@@ -346,7 +349,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 String path = snapshot.child("Home").child("Todays Food").getValue(String.class);
                 String title = snapshot.child("Dining").child(path).child("title").getValue(String.class);
                 String image = path + "/" + snapshot.child("Dining").child(path).child("images/1").getValue(String.class);
-                view.launch(title, image);
+                view.launch(title, image, path);
 
                 completeLoaded[current++] = true;
                 checkAllLoaded();

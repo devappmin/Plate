@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
 public class HomeCardData implements Parcelable {
     private String title;
     private String subtitle;
@@ -61,6 +63,22 @@ public class HomeCardData implements Parcelable {
     public void setPrice(long price) {
         this.price = price;
     }
+
+    // region Exclude
+    @Exclude
+    private String diningUID;
+
+    @Exclude
+    public void setDiningUID(String diningUID) {
+        this.diningUID = diningUID;
+    }
+
+    @Exclude
+    public String getDiningUID() {
+        return diningUID;
+    }
+
+    // endregion
 
     // region PARCELABLE
 
