@@ -322,10 +322,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     String userUid = dataSnapshot.getKey();
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
-                            if(!(userDataMap.get(uid).getBookmark().contains(diningUid)))
-                                ref_g.child(userUid).child("Bookmark").push().setValue(diningUid);
+                            if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                ref_g.child(uid).child("Bookmark").push().setValue(userDataMap.get(uid).getBookmark());
+                            }
                         } else {//if checked before listener runs, remove from bookmark
-                            if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                            if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
                                 userDataMap.get(uid).getBookmark().remove(diningUid);
                                 ref_g.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                             }
@@ -347,12 +348,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     String userUid = dataSnapshot.getKey();
                     if(userUid.equals(uid)){
                         if(isChecked) {//if not checked before listener runs, add to bookmark
-                            if(!(userDataMap.get(uid).getBookmark().contains(diningUid))) {
-                                userDataMap.get(uid).getBookmark().add(diningUid);
-                                ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
+                            if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                ref_h.child(uid).child("Bookmark").push().setValue(userDataMap.get(uid).getBookmark());
                             }
                         } else {//if checked before listener runs, remove from bookmark
-                            if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                            if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
                                 userDataMap.get(uid).getBookmark().remove(diningUid);
                                 ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                             }

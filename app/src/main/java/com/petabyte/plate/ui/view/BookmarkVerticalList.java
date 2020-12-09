@@ -154,7 +154,7 @@ public class BookmarkVerticalList extends ConstraintLayout {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (String uid : userDataMap.get(uid).getBookmark()) {
+                for (String uid : userDataMap.get(uid).getBookmark().values()) {
                     if(uid != null) {
                         String diningTitle = diningMasterDataMap.get(uid).getTitle();
                         String diningSubTitle = diningMasterDataMap.get(uid).getSubtitle();

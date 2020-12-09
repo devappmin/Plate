@@ -102,9 +102,9 @@ public class DetailTimeListBottomSheet extends BottomSheetDialogFragment {
                 Collections.sort(schedules, new Comparator<Map<String, Double>>() {
                     @Override
                     public int compare(Map<String, Double> o1, Map<String, Double> o2) {
-                        if (o1.get("start") > o2.get("start")) {
+                        if (o1.get("start") < o2.get("start")) {
                             return -1;
-                        } else if (o1.get("start") < o2.get("start")) {
+                        } else if (o1.get("start") > o2.get("start")) {
                             return 1;
                         }
                         return 0;

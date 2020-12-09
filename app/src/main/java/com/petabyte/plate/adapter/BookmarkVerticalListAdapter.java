@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -62,6 +63,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
+        private CardView cardView;
         private TextView diningTitle;
         private TextView diningSubtitle;
         private TextView diningDate;
@@ -69,10 +71,12 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private TextView diningDetailLocation;
         private ImageView diningImage;
         private CheckBox checkBox;
+
         private DatabaseReference ref_g, ref_h;
         private StorageReference storageReference;
         private FirebaseAuth mAuth;
         private FirebaseUser user;
+
         private Context context;
 
         private HashMap<String, UserData> userDataMap =  new HashMap<>();
@@ -87,6 +91,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
+            cardView = (CardView) itemView.findViewById(R.id.card_view_bookmarkcard);
             diningTitle = (TextView) itemView.findViewById(R.id.dining_title_bookmarkcard);
             diningSubtitle = (TextView) itemView.findViewById(R.id.dining_subtitle_bookmarkcard);
             diningDate = (TextView) itemView.findViewById(R.id.dining_date_bookmarkcard);
@@ -110,6 +115,16 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 @Override
                 public void onSuccess(Uri uri) {
                     Picasso.get().load(uri).fit().centerCrop().into(diningImage);
+                }
+            });
+
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), DetailActivity.class);
+                    intent.putExtra("title", diningTitle.getText().toString());
+                    intent.putExtra("checked", checkBox.isChecked());
+                    v.getContext().startActivity(intent);
                 }
             });
 
@@ -154,10 +169,11 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                         String userUid = dataSnapshot.getKey();
                         if(userUid.equals(uid)){
                             if(isChecked) {//if not checked before listener runs, add to bookmark
-                                if(!(userDataMap.get(uid).getBookmark().contains(diningUid)))
-                                    ref_g.child(userUid).child("Bookmark").push().setValue(diningUid);
+                                if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                    ref_g.child(uid).child("Bookmark").push().setValue(userDataMap.get(uid).getBookmark());
+                                }
                             } else {//if checked before listener runs, remove from bookmark
-                                if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
+                                if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
                                     userDataMap.get(uid).getBookmark().remove(diningUid);
                                     ref_g.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                                 }
@@ -179,13 +195,12 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                         String userUid = dataSnapshot.getKey();
                         if(userUid.equals(uid)){
                             if(isChecked) {//if not checked before listener runs, add to bookmark
-                                if(!(userDataMap.get(uid).getBookmark().contains(diningUid))) {
-                                    userDataMap.get(uid).getBookmark().add(diningUid);
-                                    ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
+                                if(!(userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                    ref_h.child(uid).child("Bookmark").push().setValue(diningUid);
                                 }
                             } else {//if checked before listener runs, remove from bookmark
-                                if((userDataMap.get(uid).getBookmark().contains(diningUid))) {
-                                    userDataMap.get(uid).getBookmark().remove(diningUid);
+                                if((userDataMap.get(uid).getBookmark().values().contains(diningUid))) {
+                                    userDataMap.get(uid).getBookmark().values().remove(diningUid);
                                     ref_h.child(uid).child("Bookmark").setValue(userDataMap.get(uid).getBookmark());
                                 }
                             }
