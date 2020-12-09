@@ -192,14 +192,14 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     final String selectedItem = items[which];
+                    final String foodStyle = FoodStyle.getFoodStyle(selectedItem.replace("#", "")).name();
                     //chip의 중복 추가를 방지하기 위해 selectedStyles로 관리
                     boolean containsItem = false;
                     for (String item : selectedStyles) {
-                        if (item.contains(selectedItem))
+                        if (item.contains(foodStyle))
                             containsItem = true;
                     }
                     if (!containsItem) {
-                        final String foodStyle = FoodStyle.getFoodStyle(selectedItem.replace("#", "")).name();
                         selectedStyles.add(foodStyle);
                         style_editText.setText(selectedItem);
                         //add chip to chipgroup
