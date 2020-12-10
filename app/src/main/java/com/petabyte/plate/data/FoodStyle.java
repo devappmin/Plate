@@ -1,5 +1,6 @@
 package com.petabyte.plate.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,16 @@ public enum FoodStyle {
         }
 
         return null;
+    }
+
+    public static ArrayList<FoodStyle> getFoodStyles(ArrayList<String> strings) {
+        ArrayList<FoodStyle> styles = new ArrayList<>();
+
+        for (String label : strings) {
+            styles.add(FoodStyle.getFoodStyle(label));
+        }
+
+        return styles;
     }
 
     private static final List<FoodStyle> VALUES = Collections.unmodifiableList(Arrays.asList(values()));

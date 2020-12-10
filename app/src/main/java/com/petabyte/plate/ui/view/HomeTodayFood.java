@@ -59,7 +59,7 @@ public class HomeTodayFood extends CardView {
         opacityView.setBackgroundColor(Color.parseColor(color));
     }
 
-    public void launch(final String title, final String image) {
+    public void launch(final String title, final String image, final String diningUid) {
         titleTextView.setText(title);
         Log.i(LogTags.IMPORTANT, title +" , " + image);
         GlideApp.with(this).load(mStorage.child("dining/" + image)).centerCrop().into(imageView);
@@ -69,6 +69,7 @@ public class HomeTodayFood extends CardView {
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), DetailActivity.class);
                 intent.putExtra("title", title);
+                intent.putExtra("diningUid", diningUid);
                 getContext().startActivity(intent);
             }
         });
