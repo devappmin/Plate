@@ -67,8 +67,7 @@ public class BookmarkFragment extends Fragment {
         bookmarkVerticalList = (BookmarkVerticalList)v.findViewById(R.id.bookmarkList_BookmarkFragment);
         loadingSkeletonView = (LottieAnimationView)v.findViewById(R.id.loading_lottie_Bookmarkfragment);
 
-        loadingSkeletonView.setVisibility(View.VISIBLE);
-        loadingSkeletonView.setSpeed(1f);
+        loadingSkeletonView.setVisibility(View.GONE);
 
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
@@ -149,8 +148,8 @@ public class BookmarkFragment extends Fragment {
                     }
                     bookmarkCardViewData.setDiningDate(bookmarkCardViewData.getDiningDate() + dayOfWeek);
                     bookmarkVerticalList.addData(bookmarkCardViewData);
-                    loadingSkeletonView.setVisibility(View.GONE);
                 }
+                loadingSkeletonView.setVisibility(View.GONE);
             }
 
             @Override

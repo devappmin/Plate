@@ -81,7 +81,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private TextView diningPrice;
     private Button purchaseButton;
     private CheckBox bookmarkBox;
-    private boolean isChecked;
 
     private DatabaseReference databaseReference, ref_g, ref_h;
     private StorageReference storageReference;
@@ -96,7 +95,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         intent = getIntent();
         diningUid = intent.getStringExtra("diningUid");
-        isChecked = intent.getBooleanExtra("checked", false);
 
         dishImageList = (LinearLayout)findViewById(R.id.linear_layout_dishImage_DetailActivity);
         dishList = (LinearLayout)findViewById(R.id.linear_layout_dishList_DetailActivity);
@@ -115,25 +113,30 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         purchaseButton = (Button)findViewById(R.id.purchase_button_DetailActivity);
         bookmarkBox = (CheckBox)findViewById(R.id.checkbox_DetailActivity);
 
-        bookmarkBox.setChecked(isChecked);
-
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
+
+        setCheckBoxStatus();
         getDiningImage();
         getDiningInformation();
         getChefInformation();
 
+
         cancelButton.setOnClickListener(this);
         purchaseButton.setOnClickListener(this);
-        bookmarkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        bookmarkBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
-                if(isChecked)
-                    Snackbar.make(buttonView, "찜 목록에 추가하였습니다.", 3000).show();
-                else
-                    Snackbar.make(buttonView, "찜 목록에서 삭제하였습니다.", 3000).show();
-                reviseBookmarkStatus(diningUid, isChecked);
+            public void onClick(View v) {
+                if(bookmarkBox.isChecked()) {
+                    Snackbar.make(v, "찜 목록에 추가하였습니다.", 3000).show();
+                    bookmarkBox.setChecked(true);
+                }
+                else {
+                    Snackbar.make(v, "찜 목록에서 삭제하였습니다.", 3000).show();
+                    bookmarkBox.setChecked(false);
+                }
+                reviseBookmarkStatus(diningUid, bookmarkBox.isChecked());
             }
         });
     }
@@ -396,5 +399,27 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    private void setCheckBoxStatus() {
+        getUserData();mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        uid = user.getUid();
+        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(userDataMap.get(uid).getBookmark().values().contains(diningUid))
+                    bookmarkBox.setChecked(true);
+                else
+                    bookmarkBox.setChecked(false);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }
