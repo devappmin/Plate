@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,6 +44,7 @@ public class BookmarkFragment extends Fragment {
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
     private BookmarkVerticalList bookmarkVerticalList;
+    private LottieAnimationView loadingSkeletonView;
 
     private DatabaseReference databaseReference, ref_g, ref_h;
     private FirebaseAuth mAuth;
@@ -61,11 +63,15 @@ public class BookmarkFragment extends Fragment {
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
         collapsingToolbarLayout = (CollapsingToolbarLayout)v.findViewById(R.id.collapsing_toolbar_BookmarkFragment);
+        swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.refresh_BookmarkFragment);
+        bookmarkVerticalList = (BookmarkVerticalList)v.findViewById(R.id.bookmarkList_BookmarkFragment);
+        loadingSkeletonView = (LottieAnimationView)v.findViewById(R.id.loading_lottie_Bookmarkfragment);
+
+        loadingSkeletonView.setVisibility(View.VISIBLE);
+        loadingSkeletonView.setSpeed(1f);
+
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
-        bookmarkVerticalList = (BookmarkVerticalList)v.findViewById(R.id.bookmarkList_BookmarkFragment);
-
-        swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.refresh_BookmarkFragment);
         swipeRefreshLayout.setColorSchemeColors(
                 getResources().getColor(R.color.colorPrimary),
                 getResources().getColor(R.color.colorPrimaryDark),
@@ -74,6 +80,8 @@ public class BookmarkFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                loadingSkeletonView.setVisibility(View.VISIBLE);
+                loadingSkeletonView.setSpeed(1f);
                 bookmarkVerticalList.removeAllData();
                 getDiningData();
                 swipeRefreshLayout.setRefreshing(false);
@@ -141,6 +149,7 @@ public class BookmarkFragment extends Fragment {
                     }
                     bookmarkCardViewData.setDiningDate(bookmarkCardViewData.getDiningDate() + dayOfWeek);
                     bookmarkVerticalList.addData(bookmarkCardViewData);
+                    loadingSkeletonView.setVisibility(View.GONE);
                 }
             }
 
