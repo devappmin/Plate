@@ -31,10 +31,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningMasterData;
+import com.petabyte.plate.data.DiningStyle;
 import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.data.HomeAwardsData;
 import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.data.ImageSlideData;
+import com.petabyte.plate.ui.activity.AddDiningPlanActivity;
 import com.petabyte.plate.ui.activity.SearchActivity;
 import com.petabyte.plate.ui.view.HomeAwardsList;
 import com.petabyte.plate.ui.view.HomeHorizontalList;
@@ -52,6 +54,10 @@ import java.util.Objects;
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
+    // HomeHorizontalList에서 아이템을 불러올 때 최대 10개(0~9개)를 불러오게 한다.
+    private static final int MAX_ITEM_COUNT = 9;
+
+    // 모든 커스텀뷰가 로딩이 됐는지 확인하기 위한 변수
     public static final int LIST_COUNT = 7;
     public static int current;
     private boolean[] completeLoaded;
@@ -133,6 +139,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onClick(View v) {
                 // Start AddDiningPlanActivity here..
+                Intent intent = new Intent(getContext(), AddDiningPlanActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -157,7 +165,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         loadImageSlider(imageSlider);
         loadChipList(foodStyles[0], chipTypeList[0]);
         loadChipList(foodStyles[1], chipTypeList[1]);
-        loadFoodTypeList("한식 다이닝", foodTypeList);
+        loadFoodTypeList(DiningStyle.randomDining().label, foodTypeList);
         loadTodayFood(todayFood);
 
         // 유저가 게스트인지 호스트인지 알아온다.
@@ -229,12 +237,16 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
+                int loadCount = 0;
 
                 for (DataSnapshot snapshot : sortSnapshot(snapshots)) {
                     HomeCardData data = snapshot.getValue(HomeCardData.class);
                     data.setDiningUID(snapshot.getKey());
                     data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                     mList.addData(data);
+
+                    // 최대 10개만 불러온다.
+                    if (loadCount++ >= MAX_ITEM_COUNT) break;
                 }
 
                 completeLoaded[current++] = true;
@@ -296,12 +308,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
+                int loadCount = 0;
+
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (((List<String>)snapshot.child("style").getValue()).contains(foodStyle.toString())) {
                         HomeCardData data = snapshot.getValue(HomeCardData.class);
                         data.setDiningUID(snapshot.getKey());
                         data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                         mList.addData(data);
+
+                        // 최대 10개만 불러온다.
+                        if(loadCount++ >= MAX_ITEM_COUNT) break;
                     }
                 }
 
@@ -321,12 +338,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
+                int loadCount = 0;
+
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (snapshot.child("subtitle").getValue(String.class).equals(type)) {
                         HomeCardData data = snapshot.getValue(HomeCardData.class);
                         data.setDiningUID(snapshot.getKey());
                         data.setImageUri(snapshot.getKey() + "/" + snapshot.child("images/1").getValue(String.class));
                         mList.addData(data);
+
+                        // 최대 10개만 불러온다.
+                        if (loadCount++ >= MAX_ITEM_COUNT) break;
                     }
                 }
                 Log.d(LogTags.POINT, current + "");
@@ -435,7 +457,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         loadImageSlider(imageSlider);
         loadChipList(styles[0], chipTypeList[0]);
         loadChipList(styles[1], chipTypeList[1]);
-        loadFoodTypeList("한식 다이닝", foodTypeList);
+        loadFoodTypeList(DiningStyle.randomDining().label, foodTypeList);
         loadTodayFood(todayFood);
     }
 }

@@ -2,6 +2,7 @@ package com.petabyte.plate.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.petabyte.plate.R;
 import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.ui.activity.DetailActivity;
 import com.petabyte.plate.utils.GlideApp;
+import com.petabyte.plate.utils.LogTags;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -70,24 +72,27 @@ public class MoreListAdapter extends RecyclerView.Adapter<MoreListAdapter.ViewHo
 
             view = itemView;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(view.getContext(), DetailActivity.class);
-                    intent.putExtra("title", titleTextView.getText().toString());
-                    view.getContext().startActivity(intent);
-                }
-            });
         }
 
         @SuppressLint("SetTextI18n")
-        private void onBind(HomeCardData data, StorageReference reference) {
+        private void onBind(final HomeCardData data, final StorageReference reference) {
             titleTextView.setText(data.getTitle());
             subtitleTextView.setText(data.getSubtitle());
             descriptionTextView.setText(data.getDescription());
             priceTextView.setText(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
 
             GlideApp.with(view.getContext()).load(reference.child("dining/" + data.getImageUri())).fitCenter().centerCrop().into(imageView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(view.getContext(), DetailActivity.class);
+                    Log.d(LogTags.IMPORTANT, data.getTitle() + ", " + data.getDiningUID());
+                    intent.putExtra("title", data.getTitle());
+                    intent.putExtra("diningUid", data.getDiningUID());
+                    view.getContext().startActivity(intent);
+                }
+            });
         }
     }
 }

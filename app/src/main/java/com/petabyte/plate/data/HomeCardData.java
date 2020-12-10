@@ -88,6 +88,7 @@ public class HomeCardData implements Parcelable {
         description = in.readString();
         imageUri = in.readString();
         price = in.readLong();
+        diningUID = in.readString();
     }
 
     @Override
@@ -102,6 +103,7 @@ public class HomeCardData implements Parcelable {
         dest.writeString(description);
         dest.writeString(imageUri);
         dest.writeLong(price);
+        dest.writeString(diningUID);
     }
 
     public static final Creator<HomeCardData> CREATOR = new Creator<HomeCardData>() {

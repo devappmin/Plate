@@ -93,9 +93,9 @@ public class RecommendChipGroup extends ConstraintLayout {
         return foodStyles;
     }
 
-    public List<String> getSelectedChipsLabel() {
+    public ArrayList<String> getSelectedChipsLabel() {
         List<Integer> selectedList = chipGroup.getCheckedChipIds();
-        List<String> labels = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
 
         for(int id : selectedList) {
             Chip chip = chipGroup.findViewById(id);
