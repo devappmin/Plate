@@ -5,12 +5,14 @@ public class ReservationCardData {
     private String memtype;
     private String status;
     private String title;
-    private String timestamp;
+    private long timestamp;
     private String location;
     private String timekey;
+    private String review;
     private List<String> dishes;
+    private String diningUID;
 
-    public ReservationCardData(String memtype, String timekey, String status, String title, String timestamp, String location, List<String> dishes) {
+    public ReservationCardData(String memtype, String timekey, String status, String title, long timestamp, String location, List<String> dishes, String review, String diningUID) {
         this.memtype = memtype;             //멤버타입
         this.timekey = timekey;             //예약이 등록된 서버 시간
         this.status = status;               //현재 상태 (입금대기중-결제완료-예약취소)
@@ -18,6 +20,8 @@ public class ReservationCardData {
         this.timestamp = timestamp;         //예약시간
         this.location = location;           //다이닝 위치
         this.dishes = dishes;               //다이닝 코스 목록
+        this.review = review;               //리뷰 작성 여부
+        this.diningUID = diningUID;
     }
 
     public String getMemtype() {
@@ -48,10 +52,10 @@ public class ReservationCardData {
         this.title = title;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
-    public void setTimestamp(String description) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -67,5 +71,19 @@ public class ReservationCardData {
     }
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getReview() {
+        return review;
+    }
+    public void SetReview(String review) {
+        this.review = review;
+    }
+
+    public String getDiningUID() {
+        return diningUID;
+    }
+    public void SetDiningUID(String diningUID) {
+        this.diningUID = diningUID;
     }
 }

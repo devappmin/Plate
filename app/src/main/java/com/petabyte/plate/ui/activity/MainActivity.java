@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView    bottomNavigationView;
     private Fragment[]              fragments;
 
+    private Bundle bundle = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +55,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             case R.id.action_result:
                 if (fragments[1] == null) {
                     fragments[1] = new ResultFragment();
-                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_main, fragments[1]).commit();
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_main, fragments[1], "result").commit();
                 }
                 fragment = fragments[1];
+                if (bundle != null)
+                    fragment.setArguments(bundle);
+
                 break;
 
             case R.id.action_bookmark:
@@ -103,7 +108,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ConnectionCodes.REQUEST_SEARCH_ACTIVITY && resultCode == RESULT_OK) {
-            Log.d(LogTags.IMPORTANT, data.getIntExtra("people", 0) + " in Activity + " + requestCode + " & " + resultCode);
+            bundle = new Bundle();
+            bundle.putLong("timestamp", data.getLongExtra("timestamp", 0));
+            bundle.putInt("people", data.getIntExtra("people", 0));
+            bundle.putString("search", data.getStringExtra("search"));
+            bundle.putStringArrayList("foodStyles", data.getStringArrayListExtra("foodStyles"));
+            bundle.putString("location", data.getStringExtra("location"));
+
+
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("result");
+            if (fragment != null)
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+
+            if (fragments[1] != null) fragments[1] = null;
             bottomNavigationView.setSelectedItemId(R.id.action_result);
         }
     }

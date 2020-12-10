@@ -61,7 +61,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     private Context context;
     private Intent intent;
-    private String uid, diningUid, diningDate;
+    private String uid, diningUid;
     private DiningMasterData diningMasterData;
     private HashMap<String, UserData> userDataMap =  new HashMap<>();
 
@@ -87,14 +87,12 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private StorageReference storageReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private RequestManager mGlideRequestManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         context = this;
-        mGlideRequestManager = GlideApp.with(this);
 
         intent = getIntent();
         diningUid = intent.getStringExtra("diningUid");
@@ -146,15 +144,26 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             finish();
         }
         else if(v == purchaseButton) {
-            Bundle bundle = new Bundle();
-            bundle.putString("diningUid", diningUid);
-            bundle.putString("date", diningDate);
-            DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
-            bottomSheet.setArguments(bundle);
-            bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("date", diningMasterData.getDate());
+                    bundle.putString("title", diningTitle.getText().toString());
+                    bundle.putString("diningUid", diningUid);
+                    DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
+                    bottomSheet.setArguments(bundle);
+                    bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     }
-
 
     public void getDiningImage() {
         getDiningMasterData();
@@ -163,7 +172,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 storageReference = FirebaseStorage.getInstance().getReference();
-                for(int i = 0; i < diningMasterData.getImages().size() - 1; i++) {
+                for (int i = 0; i < diningMasterData.getImages().size() - 1; i++) {
                     String imageName = diningMasterData.getImages().get(i + 1);
                     storageReference.child("dining").child(diningUid).child(imageName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
@@ -231,66 +240,42 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    //get chef UID
-    public void getChefUid(final MyCallback myCallback) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByKey().equalTo(diningUid).addListenerForSingleValueEvent(new ValueEventListener() {
+    public void getChefInformation() {
+        storageReference = FirebaseStorage.getInstance().getReference("user").child("host");
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        //get Host user Information
+        databaseReference.child("User").child("Host").orderByKey().equalTo(diningUid.substring(0, 28)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for(DataSnapshot dataSnapshot : snapshots.getChildren()){
-                    String chefUid = dataSnapshot.getKey().substring(0, 28);
-                    myCallback.onCallback(chefUid);
+                for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
+                    String rateString = dataSnapshot.child("Profile").child("Rating").getValue().toString();
+                    String profileImageName = dataSnapshot.child("Profile").child("Image").getValue().toString();
+                    storageReference.child(profileImageName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            chefImage.setBackground(new ShapeDrawable(new OvalShape()));
+                            chefImage.setClipToOutline(true);
+                            Picasso.get().load(uri).fit().centerCrop().into(chefImage);
+                        }
+                    });
+                    storageReference.child(profileImageName).getDownloadUrl().addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Picasso.get().load(R.drawable.ic_character).placeholder(R.drawable.ic_character).fit().centerCrop().into(chefImage);
+                        }
+                    });
+                    double rate = Double.parseDouble(rateString);
+                    Long ratingCount = (Long) dataSnapshot.child("Profile").child("RatingCount").getValue();
+                    chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
+                    chefIntroduction.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
+                    rating.setText(String.format("유저 평점\n" + "%.1f" + " / 5.0 (" + ratingCount + "명 참여)", rate));
+                    ratingBar.setRating(((float) rate));
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
-    }
-
-    public void getChefInformation() {
-        getChefUid(new MyCallback() {//get Chef UID
-            @Override
-            public void onCallback(String chefUid) {
-                storageReference = FirebaseStorage.getInstance("gs://plate-f5144.appspot.com/").getReference("user").child("host");
-                databaseReference = FirebaseDatabase.getInstance().getReference();
-                //get Host user Information
-                databaseReference.child("User").child("Host").orderByKey().equalTo(chefUid).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshots) {
-                        for(DataSnapshot dataSnapshot : snapshots.getChildren()) {
-                            String rateString = dataSnapshot.child("Profile").child("Rating").getValue().toString();
-                            String profileImageName = dataSnapshot.child("Profile").child("Image").getValue().toString();
-                            storageReference.child(profileImageName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    chefImage.setBackground(new ShapeDrawable(new OvalShape()));
-                                    chefImage.setClipToOutline(true);
-                                    Picasso.get().load(uri).fit().centerCrop().into(chefImage);
-                                }
-                            });
-                            storageReference.child(profileImageName).getDownloadUrl().addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Picasso.get().load(R.drawable.ic_character).placeholder(R.drawable.ic_character).fit().centerCrop().into(chefImage);
-                                }
-                            });
-                            double rate = Double.parseDouble(rateString);
-                            Long ratingCount = (Long) dataSnapshot.child("Profile").child("RatingCount").getValue();
-                            chefName.setText(dataSnapshot.child("Profile").child("Name").getValue().toString());
-                            chefIntroduction.setText("\"" + dataSnapshot.child("Profile").child("Description").getValue().toString() + "\"");
-                            rating.setText(String.format("유저 평점\n" + "%.1f" + " / 5.0 (" + ratingCount + "명 참여)", rate));
-                            ratingBar.setRating(((float) rate));
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
             }
         });
     }
@@ -394,6 +379,11 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    public int toDp(int size) {
+        float scale = getResources().getDisplayMetrics().density;
+        return (int)(size * scale + 0.5f);
+    }
+
     private void getDiningMasterData(){
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
         databaseReference.orderByKey().equalTo(diningUid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -401,20 +391,10 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
                     diningMasterData = datasnapshot.getValue(DiningMasterData.class);
-                    diningDate = datasnapshot.child("date").getValue().toString();
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
-    }
-
-    public int toDp(int size) {
-        float scale = getResources().getDisplayMetrics().density;
-        return (int)(size * scale + 0.5f);
-    }
-
-    public interface MyCallback {
-        void onCallback(String chefUid);
     }
 }

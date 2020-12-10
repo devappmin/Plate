@@ -48,11 +48,12 @@ public class ReservationCheckActivity extends AppCompatActivity {
     HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
 
     private String diningUID;
-    private String reservationTime;
+    private long reservationTime;
     private String reservationStatus;
     private String diningTitle;
     private String diningLocation;
     private List<String> dishes;
+    private String review;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +97,6 @@ public class ReservationCheckActivity extends AppCompatActivity {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
                     // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
                     diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
-
-                    Log.d("ji1dev", datasnapshot.getKey());
                 }
             }
             @Override
@@ -117,7 +116,6 @@ public class ReservationCheckActivity extends AppCompatActivity {
 
     // firebase db 에서 data를 가져와서 item을 세팅
     private void initData() {
-        String currentTime = String.valueOf(System.currentTimeMillis());
         mDatabase = FirebaseDatabase.getInstance().getReference()
                 .child("User").child(MEMBER_TYPE).child(UID).child("Reservation");
 
@@ -131,15 +129,17 @@ public class ReservationCheckActivity extends AppCompatActivity {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
                     String timeKey = datasnapshot.getKey();
                     diningUID = datasnapshot.child("DiningUID").getValue().toString();
-                    reservationTime = convertTimestamp((long) datasnapshot.child("Reservation").getValue());
+                    //reservationTime = convertTimestamp(Long.parseLong(String.valueOf(datasnapshot.child("Reservation").getValue())));
+                    reservationTime = Long.parseLong(String.valueOf(datasnapshot.child("Reservation").getValue()));
                     reservationStatus = datasnapshot.child("Status").getValue().toString();
                     diningTitle = diningMasterDataMap.get(diningUID).getTitle();
                     diningLocation = (String) diningMasterDataMap.get(diningUID).getLocation().get("detail");
                     dishes = diningMasterDataMap.get(diningUID).getDishes();
+                    review = datasnapshot.child("Review").getValue().toString();
 
                     // recycler adapter에 item 추가
                     ReservationCardData data = new ReservationCardData(MEMBER_TYPE,
-                            timeKey, reservationStatus, diningTitle, reservationTime, diningLocation, dishes);
+                            timeKey, reservationStatus, diningTitle, reservationTime, diningLocation, dishes, review, diningUID);
                     recyclerAdapter.addItem(data);
                     recyclerAdapter.notifyDataSetChanged();
                 }
@@ -160,12 +160,5 @@ public class ReservationCheckActivity extends AppCompatActivity {
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public String convertTimestamp(long time) {
-        String pattern = "yyyy-MM-dd HH:mm";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        String date = (String) formatter.format(new Timestamp(time));
-        return date;
     }
 }

@@ -91,28 +91,28 @@ public class HomeHorizontalListAdapter extends RecyclerView.Adapter<HomeHorizont
             descriptionTextView = (TextView)itemView.findViewById(R.id.description_tv_v_homecard);
             imageView = (ImageView)itemView.findViewById(R.id.image_v_homecard);
             priceTextView = (TextView)itemView.findViewById(R.id.price_tv_v_homecard);
-
-            // Add CardView's ClickListener here..
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(itemView.getContext(), DetailActivity.class);
-                    intent.putExtra("title", titleTextView.getText().toString());
-                    itemView.getContext().startActivity(intent);
-                }
-            });
         }
 
         @SuppressLint("SetTextI18n")
-        private void onBind(HomeCardData data, StorageReference reference) {
+        private void onBind(final HomeCardData data, StorageReference reference) {
 
             titleTextView.setText(data.getTitle());
             subtitleTextView.setText(data.getSubtitle());
             descriptionTextView.setText(data.getDescription());
             priceTextView.setText(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
 
-            Log.d(LogTags.IMPORTANT, data.getImageUri());
             GlideApp.with(itemView.getContext()).load(reference.child("dining/" + data.getImageUri())).fitCenter().centerCrop().into(imageView);
+
+            // Add CardView's ClickListener here..
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(itemView.getContext(), DetailActivity.class);
+                    intent.putExtra("diningUid", data.getDiningUID());
+                    intent.putExtra("title", data.getTitle());
+                    itemView.getContext().startActivity(intent);
+                }
+            });
         }
     }
 }

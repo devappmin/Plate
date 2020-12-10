@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/textDarkSecondary"
                 android:layout_marginStart="5dp"
-                app:layout_constraintLeft_toRightOf="@+id/dining_title_DetailActivity"
+                app:layout_constraintStart_toEndOf="@id/dining_title_DetailActivity"
                 app:layout_constraintBaseline_toBaselineOf="@+id/dining_title_DetailActivity"/>
 
             <com.google.android.material.chip.ChipGroup

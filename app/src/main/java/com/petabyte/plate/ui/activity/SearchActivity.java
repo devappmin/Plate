@@ -12,12 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.petabyte.plate.R;
-import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
 import com.petabyte.plate.ui.view.NumberPickerBottomSheet;
 import com.petabyte.plate.ui.view.RecommendChipGroup;
@@ -37,11 +37,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private CardView    peopleCardView;
     private CardView    dateCardView;
     private CardView    locationCardView;
+    private EditText    searchEditText;
     private TextView    peopleTextView;
     private TextView    dateTextView;
     private TextView    locationTextView;
     private Button      submitButton;
 
+    private String      location;
     private String      date_time;
     private int         mYear;
     private int         mMonth;
@@ -60,7 +62,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         dateCardView = (CardView)findViewById(R.id.date_cv_av_search);
         locationCardView = (CardView)findViewById(R.id.location_cv_av_search);
         submitButton = (Button)findViewById(R.id.search_btn_av_search);
-
+        searchEditText = (EditText)findViewById(R.id.search_et_av_search);
         peopleTextView = (TextView)findViewById(R.id.people_tv_av_search);
         dateTextView = (TextView)findViewById(R.id.date_tv_av_search);
         locationTextView = (TextView)findViewById(R.id.location_tv_av_search);
@@ -77,7 +79,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         if (view == cancelButton)
-            finish();
+            finishAfterTransition();
         else if (view == peopleCardView) {
             NumberPickerBottomSheet bottomSheet = new NumberPickerBottomSheet(1, 50);
             bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
@@ -91,21 +93,16 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
         else if (view == submitButton) {
             Intent intent = new Intent();
-            intent.putExtra("year", mYear);
-            intent.putExtra("month", mMonth);
-            intent.putExtra("day", mDay);
-            intent.putExtra("hour", mHour);
-            intent.putExtra("minute", mMinute);
+            intent.putExtra("timestamp", convertDateToTimestamp(mYear, mMonth, mDay, mHour, mMinute));
             intent.putExtra("people", people);
-
-            for (FoodStyle foodStyle : chipGroup.getSelectedChips()) {
-                Log.d(LogTags.IMPORTANT, foodStyle.label);
-            }
-
+            intent.putStringArrayListExtra("foodStyles", chipGroup.getSelectedChipsLabel());
+            intent.putExtra("location", location);
+            intent.putExtra("search", searchEditText.getText().toString());
             setResult(RESULT_OK, intent);
             finish();
         }
     }
+
 
     /**
      * Datepicker 다이얼로그를 호출하는 함수
@@ -183,20 +180,27 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
      * @return Timestamp로 변환한 날짜 값
      * @throws ParseException
      */
-    private long convertDateToTimestamp(int year, int month, int day, int hour, int minute) throws ParseException {
+    private long convertDateToTimestamp(int year, int month, int day, int hour, int minute) {
         // 년도 ~ 분까지 전부 저장하는 문자열 생성
         String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute;
 
         // Dateformat을 만들고 dateStr의 값을 삽입
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        Date date = (Date)dateFormat.parse(dateStr);
+        Date date = null;
+        try {
+            date = (Date)dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         // Timestamp 값을 리턴하는데 date 값에 문제가 있으면 0 리턴
-        return date != null ? date.getTime() : 0;
+        return date != null ? date.getTime() : -1;
     }
 
     @Override
     public void onLocationPickerSelected(String address) {
+        location = address;
+
         locationTextView.setText(address);
         locationTextView.setTypeface(null, Typeface.BOLD);
         locationTextView.setTextColor(getResources().getColor(R.color.colorPrimary));

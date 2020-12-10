@@ -435,7 +435,6 @@ public class MyPageFragment extends Fragment {
                                 }
                             }
                         });
-
                         dialog.dismiss();
                     }
                 });
