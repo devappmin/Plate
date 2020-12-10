@@ -61,6 +61,10 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         datas.add(data);
     }
 
+    public void removeAllItem() {
+        datas = new ArrayList<>();
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private CardView cardView;
@@ -110,6 +114,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
             diningImage.setBackground(drawable);
             diningImage.setClipToOutline(true);
+            checkBox.setChecked(true);
             storageReference = FirebaseStorage.getInstance().getReference();
             storageReference.child("dining").child(data.getDiningUID()).child(data.getImageName()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
