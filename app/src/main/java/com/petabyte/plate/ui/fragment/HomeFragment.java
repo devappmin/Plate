@@ -44,6 +44,7 @@ import com.petabyte.plate.utils.KoreanUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -230,6 +231,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return array;
     }
 
+    private List<DataSnapshot> reverseSnapshot(DataSnapshot root) {
+        List<DataSnapshot> temp = new ArrayList<>();
+        for (DataSnapshot snapshot : root.getChildren()) {
+            temp.add(snapshot);
+        }
+        Collections.reverse(temp);
+
+        return temp;
+    }
+
+
     private void loadRecentList(final HomeHorizontalList mList) {
         mList.setTitle("최근에 올라온 음식이에요.");
         mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -262,7 +274,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mDatabase.child("Home").child("Plate Post").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for (DataSnapshot snapshot : snapshots.getChildren()) {
+                for (DataSnapshot snapshot : reverseSnapshot(snapshots)) {
                     HomeAwardsData data = snapshot.getValue(HomeAwardsData.class);
                     mList.addData(data);
                 }
