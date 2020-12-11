@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/welcome_tv_register_welcome"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:textColor="@color/textDarkPrimary"

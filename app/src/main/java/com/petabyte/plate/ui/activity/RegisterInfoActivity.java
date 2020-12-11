@@ -42,6 +42,13 @@ public class RegisterInfoActivity extends AppCompatActivity {
         }
 
         String welcome_msg = "수많은 다이닝이 "+name+"님을 기다리고 있어요!";
+
+        if (bundleData.getString("APPLY") != null) {
+            welcome_msg = "셰프 지원을 해주셔서 감사합니다.\n당신의 다이닝을 통해 많은 사람들을 만족시키고 즐거움을 선사하세요";
+            TextView temp = (TextView)findViewById(R.id.welcome_tv_register_welcome);
+            temp.setText("셰프가 되신 것을 환영합니다.");
+        }
+
         welcome_text.setText(welcome_msg);
 
         btn_start.setOnClickListener(new View.OnClickListener(){
