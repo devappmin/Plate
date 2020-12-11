@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -52,10 +54,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ResultFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class ResultFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
 
     private CardView searchButton;
     private TextView searchTextView;
+    private LottieAnimationView loadingAnimation;
 
     private DatabaseReference databaseReference;
 
@@ -102,7 +105,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
                 searchTextBuilder.append(searchLocation + "/");
             }
 
-            if (bundle.getStringArrayList("foodStyles") != null) foodStyles = FoodStyle.getFoodStyles(bundle.getStringArrayList("foodStyles"));
+            if (bundle.getStringArrayList("foodStyles") != null)
+                foodStyles = FoodStyle.getFoodStyles(bundle.getStringArrayList("foodStyles"));
 
             searchTextBuilder.deleteCharAt(searchTextBuilder.lastIndexOf("/"));
         }
@@ -111,6 +115,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         searchButton = (CardView)v.findViewById(R.id.search_card_fm_result);
         searchTextView = (TextView)v.findViewById(R.id.search_tv_fm_result);
         mapView = (MapView)v.findViewById(R.id.map_view_fm_result);
+        loadingAnimation = (LottieAnimationView)v.findViewById(R.id.loading_lottie_fm_result);
 
         mapView.getMapAsync(this);
 
@@ -202,9 +207,9 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
         if (googleMap != null){
             this.googleMap = googleMap;
-            this.googleMap.setOnMarkerClickListener(this);
+            this.googleMap.setOnInfoWindowClickListener(this);
+            this.googleMap.setInfoWindowAdapter(this);
         }
-
 
         LatLng currentPost = null;
 
@@ -217,6 +222,9 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         }
 
         loadDatabaseWithException(null);
+
+        mapView.setVisibility(View.VISIBLE);
+        loadingAnimation.setVisibility(View.GONE);
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPost, 13));
     }
@@ -280,7 +288,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(location);
-
+        markerOptions.title(data.getTitle());
+        markerOptions.snippet(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
         Marker marker = googleMap.addMarker(markerOptions);
         marker.setTag(data);
     }
@@ -306,13 +315,30 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         });
     }
 
+
     @Override
-    public boolean onMarkerClick(Marker marker) {
+    public void onInfoWindowClick(Marker marker) {
         ResultDetailData data = (ResultDetailData)marker.getTag();
         ResultDetailBottomSheet bottomSheet = new ResultDetailBottomSheet(data);
 
         bottomSheet.show(getFragmentManager(), bottomSheet.getTag());
+    }
 
-        return false;
+    @Override
+    public View getInfoWindow(Marker marker) {
+        View v = View.inflate(getContext(), R.layout.view_result_marker_info, null);
+
+        TextView title = (TextView)v.findViewById(R.id.title_tv_v_marker_info);
+        TextView price = (TextView)v.findViewById(R.id.price_tv_v_marker_info);
+
+        title.setText(marker.getTitle());
+        price.setText(marker.getSnippet());
+        return v;
+    }
+
+    @Override
+    public View getInfoContents(Marker marker) {
+
+        return null;
     }
 }

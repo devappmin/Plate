@@ -231,6 +231,11 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return array;
     }
 
+    /**
+     * Datasnapshot child를 뒤집기 위한 메소드
+     * @param root Root DataSnapshot
+     * @return Reversed DataSnapshot
+     */
     private List<DataSnapshot> reverseSnapshot(DataSnapshot root) {
         List<DataSnapshot> temp = new ArrayList<>();
         for (DataSnapshot snapshot : root.getChildren()) {
