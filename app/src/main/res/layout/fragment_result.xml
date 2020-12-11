@@ -30,5 +30,10 @@
             android:textSize="18sp" />
     </androidx.cardview.widget.CardView>
 
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/map_view_fm_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.MapFragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

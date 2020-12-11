@@ -6,18 +6,17 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -30,7 +29,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
-import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.DiningStyle;
 import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.data.HomeAwardsData;
@@ -43,13 +41,10 @@ import com.petabyte.plate.ui.view.HomeHorizontalList;
 import com.petabyte.plate.ui.view.HomeTodayFood;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.KoreanUtil;
-import com.petabyte.plate.utils.LogTags;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -62,6 +57,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public static int current;
     private boolean[] completeLoaded;
 
+    private TextView addDiningPlanTextView;
+    private ConstraintLayout addDiningPlanBackground;
     private CardView searchButton;
     private CardView applyCardView;
     private CardView addDiningPlanCardView;
@@ -94,6 +91,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         initCompleteLoadedArray();
         
         // 뷰를 불러온다.
+        addDiningPlanBackground = (ConstraintLayout)v.findViewById(R.id.add_dining_layout_fm_home);
+        addDiningPlanTextView = (TextView) v.findViewById(R.id.add_dining_tv_fm_home);
         searchButton = (CardView)v.findViewById(R.id.search_card_fm_home);
         applyCardView = (CardView)v.findViewById(R.id.apply_cv_fm_home);
         addDiningPlanCardView = (CardView)v.findViewById(R.id.add_dining_cv_fm_home);
@@ -225,7 +224,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     array[i] = array[j];
                     array[j] = tmp;
                 }
-                for (DataSnapshot snapshot : array) Log.d(LogTags.IMPORTANT, getTimestamp(snapshot) + " at i :" + i + ", j : " + j);
             }
         }
 
@@ -351,7 +349,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         if (loadCount++ >= MAX_ITEM_COUNT) break;
                     }
                 }
-                Log.d(LogTags.POINT, current + "");
                 completeLoaded[current++] = true;
                 checkAllLoaded();
             }
@@ -419,8 +416,16 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String userType = snapshot.child("Guest").hasChild(userUID) ? "Guest" : "Host";
 
-                if (userType.equals("Host"))
+                if (userType.equals("Host")) {
                     applyCardView.setVisibility(View.GONE);
+
+                    if (snapshot.child(userType).child(userUID).child("Status").getValue(String.class).equals("WAITING")) {
+
+                        addDiningPlanCardView.setEnabled(false);
+                        addDiningPlanBackground.setBackgroundColor(Color.DKGRAY);
+                        addDiningPlanTextView.setText(addDiningPlanTextView.getText().toString() + "\n[심사 진행 중]");
+                    }
+                }
 
                 if (userType.equals("Guest"))
                     addDiningPlanCardView.setVisibility(View.GONE);
