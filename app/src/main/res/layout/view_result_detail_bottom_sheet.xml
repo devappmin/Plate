@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="32dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="40dp">
+
+    <ImageButton
+        android:id="@+id/exit_ib_result_detail_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_cancel_24"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/title_tv_result_detail_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="우리끼끼"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        app:layout_constraintTop_toBottomOf="@id/exit_ib_result_detail_bs"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/subtitle_tv_result_detail_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="한식 다이닝"
+        android:textColor="@color/textDarkDisabled"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/title_tv_result_detail_bs"
+        app:layout_constraintBottom_toBottomOf="@id/title_tv_result_detail_bs"/>
+
+    <TextView
+        android:id="@+id/date_tv_result_detail_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="2020년 12월 22일"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/title_tv_result_detail_bs"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/location_tv_result_detail_bs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="상도센트럴파크아파트 123동 1234"
+        android:textSize="18sp"
+        android:textColor="@color/textDarkPrimary"
+        app:layout_constraintTop_toBottomOf="@id/date_tv_result_detail_bs"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/price_tv_result_detail_bs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="48sp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/colorPrimary"
+        android:text="50,000원"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/location_tv_result_detail_bs"/>
+
+
+    <Button
+        android:id="@+id/detail_bt_result_detail_bs"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_radius"
+        android:textColor="@android:color/white"
+        android:text="@string/see_detail"
+        app:layout_constraintTop_toBottomOf="@id/price_tv_result_detail_bs"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

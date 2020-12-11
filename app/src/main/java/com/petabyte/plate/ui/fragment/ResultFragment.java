@@ -36,8 +36,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.FoodStyle;
+import com.petabyte.plate.data.ResultDetailData;
 import com.petabyte.plate.ui.activity.DetailActivity;
 import com.petabyte.plate.ui.activity.SearchActivity;
+import com.petabyte.plate.ui.view.ResultDetailBottomSheet;
 import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.LogTags;
 
@@ -251,19 +253,36 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
     /**
      * 지도에 마커를 찍어주는 함수
+     * 하지만 해당 마커를 입력해도 아무런 창이 뜨지 않는다.
+     *
      * @param context 적용시키고자 하는 context
      * @param strAddress 주소 문자열
      * @param title 마커에 표시할 타이틀
      */
-    public void addMarker(Context context, String strAddress, String title, String uid) {
+    public void addMarker(Context context, String strAddress, String title) {
         LatLng location = getLocationFromAddress(context, strAddress);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(location);
         markerOptions.title(title);
 
+        googleMap.addMarker(markerOptions);
+    }
+
+    /**
+     * ResultDetailData를 통해 지도에 마커를 찍어주는 함수
+     *
+     * @param context 적용시키고자 하는 context
+     * @param data 파이어베이스 데이터가 들어있는 ResultDetailData 변수
+     */
+    public void addMarker(Context context, ResultDetailData data) {
+        LatLng location = getLocationFromAddress(context, data.getLocation().get("location"));
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(location);
+
         Marker marker = googleMap.addMarker(markerOptions);
-        marker.setTag(uid);
+        marker.setTag(data);
     }
 
 
@@ -273,11 +292,9 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
             public void onDataChange(@NonNull DataSnapshot snapshots) {
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (snapshot.child("location").child("location").getValue(String.class) != null) {
-                        DiningMasterData masterData = snapshot.getValue(DiningMasterData.class);
-                        addMarker(getContext(),
-                                masterData.getLocation().get("location"),
-                                masterData.getTitle(),
-                                snapshot.getKey());
+                        ResultDetailData detailData = snapshot.getValue(ResultDetailData.class);
+                        detailData.setDiningUID(snapshot.getKey());
+                        addMarker(getContext(), detailData);
                     }
                 }
             }
@@ -291,10 +308,11 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Intent intent = new Intent(getContext(), DetailActivity.class);
-        intent.putExtra("title", marker.getTitle());
-        intent.putExtra("diningUid", (String)marker.getTag());
-        startActivity(intent);
+        ResultDetailData data = (ResultDetailData)marker.getTag();
+        ResultDetailBottomSheet bottomSheet = new ResultDetailBottomSheet(data);
+
+        bottomSheet.show(getFragmentManager(), bottomSheet.getTag());
+
         return false;
     }
 }
