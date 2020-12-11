@@ -133,7 +133,8 @@ public class ReservationCheckActivity extends AppCompatActivity {
                     reservationTime = Long.parseLong(String.valueOf(datasnapshot.child("Reservation").getValue()));
                     reservationStatus = datasnapshot.child("Status").getValue().toString();
                     diningTitle = diningMasterDataMap.get(diningUID).getTitle();
-                    diningLocation = (String) diningMasterDataMap.get(diningUID).getLocation().get("detail");
+                    diningLocation = (String) diningMasterDataMap.get(diningUID).getLocation().get("location")
+                            +" "+(String) diningMasterDataMap.get(diningUID).getLocation().get("detail");
                     dishes = diningMasterDataMap.get(diningUID).getDishes();
                     review = datasnapshot.child("Review").getValue().toString();
 
