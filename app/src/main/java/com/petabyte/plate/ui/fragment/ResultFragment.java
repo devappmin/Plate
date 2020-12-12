@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,6 +69,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
 
     // Created but never called.
     private ConstraintLayout bottomSheet;
+    private BottomSheetBehavior bottomSheetBehavior;
 
     private RecyclerView bottomSheetRecyclerView;
     private ResultBottomSheetListAdapter recyclerAdapter;
@@ -140,7 +142,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
                 foodStyles = FoodStyle.getFoodStyles(bundle.getStringArrayList("foodStyles"));
 
             searchTextBuilder.deleteCharAt(searchTextBuilder.lastIndexOf("/"));
-        }
+        } else
+            searchValue = "";
         // endregion
 
         searchButton = (CardView)v.findViewById(R.id.search_card_fm_result);
@@ -150,12 +153,16 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
         bottomSheet = (ConstraintLayout)v.findViewById(R.id.recommend_bottom_sheet_fm_result);
         bottomSheetRecyclerView = (RecyclerView)v.findViewById(R.id.recommend_rv_fm_result);
 
+        // Bottom Sheet 내부에 있는 Recycler View를 연결시켜주는 부분
         layoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL, false);
         bottomSheetRecyclerView.setLayoutManager(layoutManager);
-
         recyclerAdapter = new ResultBottomSheetListAdapter();
         bottomSheetRecyclerView.setAdapter(recyclerAdapter);
 
+        // Bottom Sheet와 BottomSheetBehavior 간의 연결
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
+        // 지도를 시작하는 부분
         mapView.getMapAsync(this);
 
         searchTextView.setText(searchTextBuilder);
@@ -431,14 +438,28 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
 
+        boolean state = false;
+
         recyclerAdapter.removeAllData();
         for (Marker marker : markerList) {
             if (Math.abs(marker.getPosition().latitude - cameraPosition.target.latitude) * (Math.pow(cameraPosition.zoom, 2) / 169) < 0.04 &&
             Math.abs(marker.getPosition().longitude - cameraPosition.target.longitude) * (Math.pow(cameraPosition.zoom, 2) / 169) < 0.04) {
                 // 현재 화면에 있는 그나마 가까운 marker 리스트
                 recyclerAdapter.addData((ResultDetailData)marker.getTag());
+
+                if (!state) state = true;
             }
         }
+
+        if (!state) {
+            bottomSheetBehavior.setHideable(true);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        } else {
+            bottomSheetBehavior.setHideable(false);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+
+
         recyclerAdapter.notifyDataSetChanged();
     }
 
@@ -479,6 +500,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
             loadingAnimation.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.GONE);
             mapView.setVisibility(View.GONE);
+            bottomSheet.setVisibility(View.GONE);
         }
 
         /**
@@ -534,6 +556,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
             // 전부 추가했으면 지도와 검색 버튼을 보여주고 Lottie 애니메이션을 숨긴다.
             mapView.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.VISIBLE);
+            bottomSheet.setVisibility(View.VISIBLE);
             loadingAnimation.setVisibility(View.GONE);
         }
     }
