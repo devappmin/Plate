@@ -1,17 +1,16 @@
-package com.petabyte.plate.ui.fragment;
-
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+package com.petabyte.plate.ui.activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.airbnb.lottie.LottieAnimationView;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
+
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,14 +20,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
-import com.petabyte.plate.data.BookmarkCardViewData;
+import com.petabyte.plate.adapter.DiningManagementAdapter;
+import com.petabyte.plate.data.DiningManagementCardData;
 import com.petabyte.plate.data.DiningMasterData;
-import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.data.UserData;
-import com.petabyte.plate.ui.view.BookmarkVerticalList;
-import com.petabyte.plate.ui.view.HomeAwardsList;
-import com.petabyte.plate.ui.view.HomeHorizontalList;
-import com.petabyte.plate.utils.LogTags;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,87 +33,83 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
+public class DiningManagementActivity extends AppCompatActivity {
 
-public class BookmarkFragment extends Fragment {
-
+    private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private BookmarkVerticalList bookmarkVerticalList;
-    private LottieAnimationView loadingSkeletonView;
+
+    private RecyclerView recyclerView;
+    private DiningManagementAdapter recyclerAdapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     private DatabaseReference databaseReference, ref_g, ref_h;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private String uid;
-
     private HashMap<String, UserData> userDataMap =  new HashMap<>();
     private HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
-    private ArrayList<BookmarkCardViewData> dataList = new ArrayList<>();
+    private ArrayList<DiningManagementCardData> dataList = new ArrayList<>();
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_bookmark, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dining_management);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        collapsingToolbarLayout = (CollapsingToolbarLayout)v.findViewById(R.id.collapsing_toolbar_BookmarkFragment);
-        swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.refresh_BookmarkFragment);
-        bookmarkVerticalList = (BookmarkVerticalList)v.findViewById(R.id.bookmarkList_BookmarkFragment);
-        loadingSkeletonView = (LottieAnimationView)v.findViewById(R.id.loading_lottie_Bookmarkfragment);
-
-        loadingSkeletonView.setVisibility(View.GONE);
-
+        collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar_diningManage);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
-        swipeRefreshLayout.setColorSchemeColors(
-                getResources().getColor(R.color.colorPrimary),
-                getResources().getColor(R.color.colorPrimaryDark),
-                getResources().getColor(R.color.colorAccent)
-        );
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadingSkeletonView.setVisibility(View.VISIBLE);
-                loadingSkeletonView.setSpeed(1f);
-                bookmarkVerticalList.removeAllData();
-                getDiningData();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+        toolbar = (Toolbar)findViewById(R.id.toolbar_diningManage);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        return v;
     }
 
-    public void getDiningData() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        initRecycler();
+        initData();
+    }
+
+    private void initRecycler(){
+        recyclerView = (RecyclerView)findViewById(R.id.recycler_view_diningManage);
+        recyclerAdapter = new DiningManagementAdapter(this.getSupportFragmentManager(), this);
+        recyclerAdapter.removeAllItem();
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,true);
+        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+    }
+
+    //get dining Data
+    public void initData() {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         uid = user.getUid();
         getUserData();
         getDiningMasterData();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dataList = new ArrayList<>();
-                if(userDataMap.get(uid).getBookmark() != null && diningMasterDataMap.size() != 0) {
-                    for (String uid : userDataMap.get(uid).getBookmark().values()) {
+                if(userDataMap.get(uid).getMyDining() != null) {
+                    for (String uid : userDataMap.get(uid).getMyDining().values()) {
                         String diningTitle = diningMasterDataMap.get(uid).getTitle();
-                        String diningSubTitle = diningMasterDataMap.get(uid).getSubtitle();
                         String diningDate = diningMasterDataMap.get(uid).getDate();
                         String diningLocation = diningMasterDataMap.get(uid).getLocation().get("location");
-                        String diningDetailLocation = diningMasterDataMap.get(uid).getLocation().get("detail");
-                        String imageName = diningMasterDataMap.get(uid).getImages().get(1);
-                        BookmarkCardViewData data = new BookmarkCardViewData(diningTitle, diningSubTitle, diningDate, diningLocation, diningDetailLocation, imageName, uid);
+                        int currentReservationCount = diningMasterDataMap.get(uid).getCount().get("current");
+                        DiningManagementCardData data = new DiningManagementCardData(diningTitle, diningDate, diningLocation, uid, currentReservationCount);
                         dataList.add(data);
                     }
                 }
                 Collections.sort(dataList);
-                for (BookmarkCardViewData bookmarkCardViewData : dataList) {
+                for (DiningManagementCardData diningManagementCardData : dataList) {
                     String dayOfWeek = "";
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Date date = new Date();
                     try {
-                        date = dateFormat.parse(bookmarkCardViewData.getDiningDate());
+                        date = dateFormat.parse(diningManagementCardData.getDiningDate());
                     } catch (ParseException e) {
                     }
                     Calendar calendar = Calendar.getInstance();
@@ -146,10 +137,10 @@ public class BookmarkFragment extends Fragment {
                             dayOfWeek = " 토요일";
                             break;
                     }
-                    bookmarkCardViewData.setDiningDate(bookmarkCardViewData.getDiningDate() + dayOfWeek);
-                    bookmarkVerticalList.addData(bookmarkCardViewData);
+                    diningManagementCardData.setDiningDate(diningManagementCardData.getDiningDate() + dayOfWeek);
+                    recyclerAdapter.addItem(diningManagementCardData);
+                    recyclerAdapter.notifyDataSetChanged();
                 }
-                loadingSkeletonView.setVisibility(View.GONE);
             }
 
             @Override
@@ -194,17 +185,37 @@ public class BookmarkFragment extends Fragment {
 
     private void getDiningMasterData(){
         diningMasterDataMap.clear();
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Dining");
-        database.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("Dining");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
-                    // key, value 쌍을 diningUID, DiningMasterData 클래스로 지정하여 hashmap에 저장함
                     diningMasterDataMap.put(datasnapshot.getKey(), datasnapshot.getValue(DiningMasterData.class));
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    public void addData(DiningManagementCardData data) {
+        recyclerAdapter.addItem(data);
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    public void removeAllData() {
+        recyclerAdapter.removeAllItem();
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

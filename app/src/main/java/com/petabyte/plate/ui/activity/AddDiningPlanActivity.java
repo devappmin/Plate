@@ -17,7 +17,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -30,8 +32,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
@@ -62,7 +66,9 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
 
     private Context context;
 
-    private ImageButton cancelButton;
+    private Toolbar toolbar;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+
     private EditText title_editText;
     private EditText subtitle_editText;
     private EditText description_editText;
@@ -105,7 +111,8 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_add_dining_plan);
         context = this;
 
-        cancelButton = (ImageButton)findViewById(R.id.cancel_button_addPlan);
+        collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar_addPlan);
+        toolbar = (Toolbar)findViewById(R.id.toolbar_addPlan);
         title_editText = (EditText)findViewById(R.id.editText_title_addPlan);
         subtitle_editText = (EditText)findViewById(R.id.editText_subtitle_addPlan);
         description_editText = (EditText)findViewById(R.id.editText_description_addPlan);
@@ -126,7 +133,11 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         addDishImage = (ImageView)findViewById(R.id.add_dish_image_view_addPlan);
         submitButton = (Button)findViewById(R.id.submit_button_addPlan);
 
-        cancelButton.setOnClickListener(this);
+
+        collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         style_editText.setOnClickListener(this);
         location_editText.setOnClickListener(this);
         date_editText.setOnClickListener(this);
@@ -179,9 +190,7 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onClick(final View v) {
-        if (v == cancelButton) {
-            finish();
-        } else if (v == location_editText) {
+        if (v == location_editText) {
             Intent i = new Intent(AddDiningPlanActivity.this, SearchAddressActivity.class);
             startActivityForResult(i, ConnectionCodes.REQUEST_SEARCH_ADDRESS);
         } else if (v == style_editText) {
@@ -414,6 +423,8 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                 Snackbar.make(v, "모든 항목들을 채워 주세요.", 3000).show();
             } else {
                 uploadDiningInformation();
+                Toast toast = Toast.makeText(getApplicationContext(), "다이닝을 추가하였습니다.", Toast.LENGTH_LONG);
+                toast.show();
                 finish();
             }
         }
@@ -578,5 +589,16 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

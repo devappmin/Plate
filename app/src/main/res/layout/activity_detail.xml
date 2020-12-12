@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/textDarkSecondary"
                 android:layout_marginStart="5dp"
-                app:layout_constraintLeft_toRightOf="@+id/dining_title_DetailActivity"
+                app:layout_constraintStart_toEndOf="@id/dining_title_DetailActivity"
                 app:layout_constraintBaseline_toBaselineOf="@+id/dining_title_DetailActivity"/>
 
             <com.google.android.material.chip.ChipGroup
@@ -125,6 +125,7 @@
 
             <ImageView
                 android:id="@+id/chef_image_DetailActivity"
+                android:src="@drawable/ic_character"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:layout_marginTop="30dp"
@@ -252,7 +253,7 @@
                 android:text="결제하기"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:background="@drawable/detail_activity_round_button"
+                android:background="@drawable/detail_bottom_sheet_button"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="80dp"
                 android:layout_marginBottom="15dp"

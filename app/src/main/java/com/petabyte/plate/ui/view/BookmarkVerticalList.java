@@ -76,7 +76,7 @@ public class BookmarkVerticalList extends ConstraintLayout {
         init();
     }
 
-    private void init() {
+    public void init() {
         inflate(getContext(), R.layout.view_bookmarkverticallist, this);
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -154,6 +154,7 @@ public class BookmarkVerticalList extends ConstraintLayout {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                dataList = new ArrayList<>();
                 if(userDataMap.get(uid).getBookmark() != null) {
                     for (String uid : userDataMap.get(uid).getBookmark().values()) {
                         String diningTitle = diningMasterDataMap.get(uid).getTitle();
@@ -211,5 +212,15 @@ public class BookmarkVerticalList extends ConstraintLayout {
 
             }
         });
+    }
+
+    public void addData(BookmarkCardViewData data) {
+        recyclerAdapter.addItem(data);
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    public void removeAllData() {
+        recyclerAdapter.removeAllItem();
+        recyclerAdapter.notifyDataSetChanged();
     }
 }

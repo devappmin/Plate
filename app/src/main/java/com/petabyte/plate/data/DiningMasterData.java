@@ -20,7 +20,7 @@ public class DiningMasterData {
     private List<String> style;
     private HashMap<String, Integer> count;
     private HashMap<String, String> location;
-    private HashMap<String, Double> coordinator;
+    private HashMap<String, Double> coordinate;
     private HashMap<String, Map<String, Double>> schedules;
 
     @Exclude private int dishCount = 0;
@@ -41,14 +41,14 @@ public class DiningMasterData {
         dishes =  new ArrayList<>();
         images = new ArrayList<>();
         style = new ArrayList<>();
-        coordinator = new HashMap<>();
+        coordinate = new HashMap<>();
         location = new HashMap<>();
         schedules = new HashMap<>();
     }
 
     public DiningMasterData(int bookmark, int price, String date, String title, String subtitle, String description, List<String> dishes,
                             List<String> images, List<String> style, HashMap<String, Integer> count, HashMap<String, String> location,
-                            HashMap<String, Double> coordinator, HashMap<String, Map<String, Double>> schedules, int dishCount, int imageCount) {
+                            HashMap<String, Double> coordinate, HashMap<String, Map<String, Double>> schedules, int dishCount, int imageCount) {
         this.bookmark = bookmark;
         this.price = price;
         this.date = date;
@@ -60,7 +60,7 @@ public class DiningMasterData {
         this.style = style;
         this.count = count;
         this.location = location;
-        this.coordinator = coordinator;
+        this.coordinate = coordinate;
         this.schedules = schedules;
         this.dishCount = dishCount;
         this.imageCount = imageCount;
@@ -183,12 +183,12 @@ public class DiningMasterData {
         this.location = location;
     }
 
-    public HashMap<String, Double> getCoordinator() {
-        return coordinator;
+    public HashMap<String, Double> getCoordinate() {
+        return coordinate;
     }
 
-    public void setCoordinator(HashMap<String, Double> coordinator) {
-        this.coordinator = coordinator;
+    public void setCoordinate(HashMap<String, Double> coordinate) {
+        this.coordinate = coordinate;
     }
 
     public HashMap<String, Map<String, Double>> getSchedules() {

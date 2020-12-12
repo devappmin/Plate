@@ -6,20 +6,15 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
-import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -32,12 +27,11 @@ import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.ui.activity.PurchaseActivity;
 
-import java.nio.DoubleBuffer;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -59,7 +53,7 @@ public class DetailTimeListBottomSheet extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_detail_time_list_bottom_sheet, container, false);
+        View v = inflater.inflate(R.layout.view_detail_time_list_bottom_sheet, container, false);
         context = v.getContext();
 
         title = (TextView)v.findViewById(R.id.title_DetailBottomSheet);
@@ -91,49 +85,56 @@ public class DetailTimeListBottomSheet extends BottomSheetDialogFragment {
             }
         });
 
-        getDiningMasterData();
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.orderByKey().equalTo(diningUid_String).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(Map<String, Double> schedule : diningMasterData.getSchedules().values()){
-                    schedules.add(schedule);
-                }
-                Collections.sort(schedules, new Comparator<Map<String, Double>>() {
-                    @Override
-                    public int compare(Map<String, Double> o1, Map<String, Double> o2) {
-                        if (o1.get("start") < o2.get("start")) {
-                            return -1;
-                        } else if (o1.get("start") > o2.get("start")) {
-                            return 1;
-                        }
-                        return 0;
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    diningMasterData = dataSnapshot.getValue(DiningMasterData.class);
+                    for (Map<String, Double> schedule : diningMasterData.getSchedules().values()) {
+                        schedules.add(schedule);
                     }
-                });
-                for(int i = 0; i < schedules.size(); i++) {
-                    final long startTime = schedules.get(i).get("start").longValue();
-                    long endTime = schedules.get(i).get("end").longValue();
-                    RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, toDp(50));
-                    params.setMarginStart(toDp(20));
-                    String date = getTime(startTime) + " ~ " + getTime(endTime);
-                    RadioButton radioButton = new RadioButton(context);
-                    ColorStateList colorStateList = new ColorStateList(
-                            new int[][]{
-                                    new int[]{android.R.attr.state_enabled} //enabled
-                            },
-                            new int[] {getResources().getColor(R.color.colorPrimary) }
-                    );
-                    radioButton.setButtonTintList(colorStateList);
-                    radioButton.setText(date);
-                    radioButton.setTextSize(17);
-                    radioButton.setOnClickListener(new View.OnClickListener() {
+                    Collections.sort(schedules, new Comparator<Map<String, Double>>() {
                         @Override
-                        public void onClick(View v) {
-                            startTimestamp = startTime;
+                        public int compare(Map<String, Double> o1, Map<String, Double> o2) {
+                            if (o1.get("start") < o2.get("start")) {
+                                return -1;
+                            } else if (o1.get("start") > o2.get("start")) {
+                                return 1;
+                            }
+                            return 0;
                         }
                     });
-                    radioButton.setLayoutParams(params);
-                    radioGroup.addView(radioButton);
+                    Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+                    Log.d("cu", Long.toString(currentTimestamp.getTime()));
+                    for (int i = 0; i < schedules.size(); i++) {
+                        final long startTime = schedules.get(i).get("start").longValue();
+                        long endTime = schedules.get(i).get("end").longValue();
+                        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, toDp(50));
+                        params.setMarginStart(toDp(20));
+                        String date = getTime(startTime) + " ~ " + getTime(endTime);
+                        RadioButton radioButton = new RadioButton(context);
+                        ColorStateList colorStateList = new ColorStateList(
+                                new int[][]{
+                                        new int[]{android.R.attr.state_enabled} //enabled
+                                },
+                                new int[]{getResources().getColor(R.color.colorPrimary)}
+                        );
+                        radioButton.setButtonTintList(colorStateList);
+                        radioButton.setText(date);
+                        radioButton.setTextSize(17);
+                        if(startTime < currentTimestamp.getTime()) { //현재 시간보다 과거의 다이닝이라면
+                            radioButton.setEnabled(false);
+                        }
+                        radioButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startTimestamp = startTime;
+                            }
+                        });
+                        radioButton.setLayoutParams(params);
+                        radioGroup.addView(radioButton);
+                    }
                 }
             }
 
@@ -151,22 +152,6 @@ public class DetailTimeListBottomSheet extends BottomSheetDialogFragment {
         cal.setTimeInMillis(timeStamp);
         String date = DateFormat.format("aa hh:mm", cal).toString();
         return date;
-    }
-
-
-    private void getDiningMasterData(){
-        String diningName = this.getArguments().getString("title");
-        databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
-        databaseReference.orderByChild("title").equalTo(diningName).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot datasnapshot: snapshot.getChildren()){
-                    diningMasterData = datasnapshot.getValue(DiningMasterData.class);
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
     }
 
     public int toDp(int size) {

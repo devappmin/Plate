@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -61,6 +64,10 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         datas.add(data);
     }
 
+    public void removeAllItem() {
+        datas = new ArrayList<>();
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private CardView cardView;
@@ -72,7 +79,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private ImageView diningImage;
         private CheckBox checkBox;
 
-        private DatabaseReference ref_g, ref_h;
+        private DatabaseReference databaseReference, ref_g, ref_h;
         private StorageReference storageReference;
         private FirebaseAuth mAuth;
         private FirebaseUser user;
@@ -99,6 +106,8 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningDetailLocation = (TextView) itemView.findViewById(R.id.dining_detail_location_bookmarkcard);
             diningImage = (ImageView) itemView.findViewById(R.id.dining_image_bookmarkcard);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
+
+            diningTitle.setSelected(true);
         }
 
         private void onBind(final BookmarkCardViewData data) {
@@ -110,6 +119,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             GradientDrawable drawable = (GradientDrawable)context.getDrawable(R.drawable.image_radius);
             diningImage.setBackground(drawable);
             diningImage.setClipToOutline(true);
+            checkBox.setChecked(true);
             storageReference = FirebaseStorage.getInstance().getReference();
             storageReference.child("dining").child(data.getDiningUID()).child(data.getImageName()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
@@ -122,20 +132,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), DetailActivity.class);
-                    intent.putExtra("title", diningTitle.getText().toString());
                     intent.putExtra("diningUid", data.getDiningUID());
-                    intent.putExtra("checked", checkBox.isChecked());
-                    v.getContext().startActivity(intent);
-                }
-            });
-
-            diningTitle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), DetailActivity.class);
-                    intent.putExtra("title", diningTitle.getText().toString());
-                    intent.putExtra("diningUid", data.getDiningUID());
-                    intent.putExtra("checked", checkBox.isChecked());
                     v.getContext().startActivity(intent);
                 }
             });
@@ -152,6 +149,46 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+                    if(checkBox.isChecked()) {
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
+                        databaseReference.runTransaction(new Transaction.Handler() {
+                            @NonNull
+                            @Override
+                            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                DiningMasterData data = currentData.getValue(DiningMasterData.class);
+                                if(data == null)
+                                    return Transaction.success(currentData);
+                                data.setBookmark(data.getBookmark() + 1);
+                                currentData.setValue(data);
+                                return Transaction.success(currentData);
+                            }
+
+                            @Override
+                            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+
+                            }
+                        });
+                    }
+                    else {
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
+                        databaseReference.runTransaction(new Transaction.Handler() {
+                            @NonNull
+                            @Override
+                            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                DiningMasterData data = currentData.getValue(DiningMasterData.class);
+                                if(data == null)
+                                    return Transaction.success(currentData);
+                                data.setBookmark(data.getBookmark() - 1);
+                                currentData.setValue(data);
+                                return Transaction.success(currentData);
+                            }
+
+                            @Override
+                            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+
+                            }
+                        });
+                    }
                     reviseBookmarkStatus(data.getDiningUID(), isChecked);
                 }
             });
@@ -161,7 +198,6 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             getUserData();
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
-            //databasereference. ~~ dininguid. profile/ratingcount++;
             ref_g = FirebaseDatabase.getInstance().getReference("User").child("Guest");
             ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
             uid = user.getUid();
