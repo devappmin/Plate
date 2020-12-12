@@ -365,7 +365,13 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                         if (item.contains(timeNumber))
                             containsItem = true;
                     }
-                    if(!containsItem) {
+                    if(containsItem) {
+                        Snackbar.make(v, "이미 입력한 시간이에요.", 3000).show();
+                    }
+                    else if(checkIfOverlapped(timeNumber)) {
+                        Snackbar.make(v, "기존에 입력한 시간과 겹쳐요.", 3000).show();
+                    }
+                    else{
                         times.add(timeNumber);
                         Chip chip = new Chip(times_chipGroup.getContext());
                         chip.setText(time);
@@ -384,8 +390,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                         });
                         times_chipGroup.addView(chip);
                         date_editText.setEnabled(false);
-                    } else {
-                        Snackbar.make(v, "이미 입력한 시간이에요.", 3000).show();
                     }
                 }
             }
@@ -486,6 +490,29 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         diningReference.child("subtitle").setValue(subtitle_editText.getText().toString());
         diningReference.child("title").setValue(title_editText.getText().toString());
         diningReference.child("date").setValue(plans.get(0).substring(0, 10));
+    }
+
+    public boolean checkIfOverlapped (String timeNumber) {
+        int pass = 0;
+        if(times.size() == 0)
+            return false;
+        for(String item : times) {
+            Integer startTimeInList = Integer.parseInt(item.substring(8,12));
+            Integer endTimeInList = Integer.parseInt(item.substring(12));
+            Integer newStartTime = Integer.parseInt(timeNumber.substring(8, 12));
+            Integer newEndTime = Integer.parseInt(timeNumber.substring(12));
+            //새로 추가할 시작시간과 종료시간이 모두 기존의 시간보다 이전이거나 이후일 경우에만 pass값 증가
+            if(newStartTime <= startTimeInList && newEndTime <= startTimeInList) {
+                pass++;
+            }
+            else if(newStartTime >= endTimeInList && newEndTime >= endTimeInList) {
+                pass++;
+            }
+        }
+        if(pass == times.size())//모두 통과한 경우 false 반환
+            return false;
+        else
+            return true;
     }
 
     //16자리 숫자의 시간 정보를 yyyy-MM-dd HH:mm:ss 형식으로 변환, 순서대로 두 개씩 짝지어 시작 시간, 종료 시간을 나타냄
