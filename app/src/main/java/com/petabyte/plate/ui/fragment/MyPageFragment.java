@@ -48,6 +48,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.petabyte.plate.R;
 import com.petabyte.plate.ui.activity.AddDiningPlanActivity;
+import com.petabyte.plate.ui.activity.DiningManagementActivity;
 import com.petabyte.plate.ui.activity.LoginActivity;
 import com.petabyte.plate.ui.activity.ReservationCheckActivity;
 import com.petabyte.plate.utils.GlideApp;
@@ -64,6 +65,7 @@ public class MyPageFragment extends Fragment {
     private ImageView image_userpics;
 
     private TextView btn_check_reserve;
+    private TextView btn_manage_dining;
     private TextView btn_add_dining;
     private TextView btn_edit_desc;
     private TextView btn_logout;
@@ -96,6 +98,7 @@ public class MyPageFragment extends Fragment {
         text_usertype = (TextView)v.findViewById(R.id.text_v_mypage_usertype);
         image_userpics = (ImageView)v.findViewById(R.id.image_v_mypage_userimg);
         btn_check_reserve = (TextView)v.findViewById(R.id.text_v_mypage_check_reservation);
+        btn_manage_dining = (TextView)v.findViewById(R.id.text_v_mypage_manage_dining);
         btn_add_dining = (TextView)v.findViewById(R.id.text_v_mypage_add_dining);
         btn_edit_desc = (TextView)v.findViewById(R.id.text_v_mypage_edit_description);
         btn_edit_pw = (TextView)v.findViewById(R.id.text_v_mypage_edit_pw);
@@ -122,6 +125,13 @@ public class MyPageFragment extends Fragment {
                         getActivity(), ReservationCheckActivity.class)
                         .putExtra("UID", UID)
                         .putExtra("MEMBER_TYPE", MEMBER_TYPE));
+            }
+        });
+
+        btn_manage_dining.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), DiningManagementActivity.class));
             }
         });
 
@@ -232,6 +242,7 @@ public class MyPageFragment extends Fragment {
                         text_usermail.setText(user.getEmail());
                         MEMBER_TYPE = "Host";
                         setProfileImage();
+                        btn_manage_dining.setVisibility(View.VISIBLE);
                         btn_add_dining.setVisibility(View.VISIBLE);
                         btn_edit_desc.setVisibility(View.VISIBLE);
 
@@ -239,6 +250,9 @@ public class MyPageFragment extends Fragment {
                             btn_add_dining.setTextColor(Color.GRAY);
                             btn_add_dining.setText("다이닝 일정 추가 [심사 진행중]");
                             btn_add_dining.setEnabled(false);
+                            btn_manage_dining.setTextColor(Color.GRAY);
+                            btn_manage_dining.setText("다이닝 일정 관리 [심사 진행중]");
+                            btn_manage_dining.setEnabled(false);
                         }
                     }
                 }

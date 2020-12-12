@@ -53,7 +53,9 @@ import com.petabyte.plate.ui.view.LocationPickerBottomSheet;
 import com.petabyte.plate.utils.GlideApp;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -152,7 +154,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("date", diningMasterData.getDate());
+                    bundle.putString("date", diningMasterData.getDate());
                     bundle.putString("title", diningTitle.getText().toString());
                     bundle.putString("diningUid", diningUid);
                     DetailTimeListBottomSheet bottomSheet = new DetailTimeListBottomSheet();
@@ -259,12 +261,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                             chefImage.setBackground(new ShapeDrawable(new OvalShape()));
                             chefImage.setClipToOutline(true);
                             Picasso.get().load(uri).fit().centerCrop().into(chefImage);
-                        }
-                    });
-                    storageReference.child(profileImageName).getDownloadUrl().addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Picasso.get().load(R.drawable.ic_character).placeholder(R.drawable.ic_character).fit().centerCrop().into(chefImage);
                         }
                     });
                     double rate = Double.parseDouble(rateString);
@@ -394,6 +390,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot datasnapshot: snapshot.getChildren()){
                     diningMasterData = datasnapshot.getValue(DiningMasterData.class);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    Date time = new Date();
+                    String currentDate = format.format(time);
+                    if(diningMasterData.getDate().compareTo(currentDate) < 0) {
+                        purchaseButton.setEnabled(false);
+                        purchaseButton.setText("완료된 다이닝입니다.");
+                    }
                 }
             }
             @Override
@@ -402,17 +405,22 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void setCheckBoxStatus() {
-        getUserData();mAuth = FirebaseAuth.getInstance();
+        getUserData();
+        mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         uid = user.getUid();
         databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(userDataMap.get(uid).getBookmark().values().contains(diningUid))
-                    bookmarkBox.setChecked(true);
-                else
-                    bookmarkBox.setChecked(false);
+                if(userDataMap.size() != 0) {
+                    if (userDataMap.get(uid).getBookmark() != null) {
+                        if (userDataMap.get(uid).getBookmark().values().contains(diningUid))
+                            bookmarkBox.setChecked(true);
+                        else
+                            bookmarkBox.setChecked(false);
+                    }
+                }
             }
 
             @Override

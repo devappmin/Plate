@@ -14,15 +14,32 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.DiningManagementActivity"></activity>
-        <activity android:name=".ui.activity.ReservationCheckActivity" />
-        <activity android:name=".ui.activity.MoreListActivity" />
 
         <service
             android:name=".service.NewpostService"
             android:enabled="true"
             android:exported="true" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCBM6w_H3TCpctU5Q93-OOfhSLW9Y7pX28" />
+
+        <activity android:name=".SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activity.DiningManagementActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.ReservationCheckActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.MoreListActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.ScrollableImageActivity"
             android:screenOrientation="portrait" />
@@ -44,18 +61,6 @@
         <activity
             android:name=".ui.activity.SearchAddressActivity"
             android:screenOrientation="portrait" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCBM6w_H3TCpctU5Q93-OOfhSLW9Y7pX28" />
-
-        <activity android:name=".SplashActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ui.activity.DetailActivity"
             android:screenOrientation="portrait" />

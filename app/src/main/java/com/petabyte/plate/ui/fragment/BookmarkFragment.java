@@ -100,7 +100,7 @@ public class BookmarkFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dataList = new ArrayList<>();
-                if(userDataMap.get(uid).getBookmark() != null) {
+                if(userDataMap.get(uid).getBookmark() != null && diningMasterDataMap.size() != 0) {
                     for (String uid : userDataMap.get(uid).getBookmark().values()) {
                         String diningTitle = diningMasterDataMap.get(uid).getTitle();
                         String diningSubTitle = diningMasterDataMap.get(uid).getSubtitle();

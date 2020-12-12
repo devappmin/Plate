@@ -6,20 +6,15 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
-import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -32,13 +27,11 @@ import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.ui.activity.PurchaseActivity;
 
-import java.nio.DoubleBuffer;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -60,7 +53,7 @@ public class DetailTimeListBottomSheet extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_detail_time_list_bottom_sheet, container, false);
+        View v = inflater.inflate(R.layout.view_detail_time_list_bottom_sheet, container, false);
         context = v.getContext();
 
         title = (TextView)v.findViewById(R.id.title_DetailBottomSheet);

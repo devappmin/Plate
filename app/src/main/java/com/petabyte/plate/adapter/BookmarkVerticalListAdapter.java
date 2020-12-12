@@ -103,6 +103,8 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
             diningDetailLocation = (TextView) itemView.findViewById(R.id.dining_detail_location_bookmarkcard);
             diningImage = (ImageView) itemView.findViewById(R.id.dining_image_bookmarkcard);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkbox_bookmarkcard);
+
+            diningTitle.setSelected(true);
         }
 
         private void onBind(final BookmarkCardViewData data) {
@@ -127,20 +129,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), DetailActivity.class);
-                    intent.putExtra("title", diningTitle.getText().toString());
                     intent.putExtra("diningUid", data.getDiningUID());
-                    intent.putExtra("checked", checkBox.isChecked());
-                    v.getContext().startActivity(intent);
-                }
-            });
-
-            diningTitle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), DetailActivity.class);
-                    intent.putExtra("title", diningTitle.getText().toString());
-                    intent.putExtra("diningUid", data.getDiningUID());
-                    intent.putExtra("checked", checkBox.isChecked());
                     v.getContext().startActivity(intent);
                 }
             });
