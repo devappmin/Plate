@@ -24,11 +24,13 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -36,6 +38,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.FoodStyle;
@@ -81,6 +85,11 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
     Date cvSearchTimestamp, cvStartTimestamp; // MM월 dd일 HH시 패턴으로 변환된 사용자 입력 Timestamp
     SimpleDateFormat formatter; // Timestamp 비교에 사용될 객체
 
+    // marker의 개수에 따라 동적으로 지도의 move와 zoom level을 설정해 주기 위한 변수
+    LatLngBounds bounds;
+    CameraUpdate cu;
+    boolean moveCameraFlag = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -103,7 +112,6 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
             if (bundle.getLong("timestamp") >= 0) {
                 searchTimestamp = bundle.getLong(("timestamp"));
-                Log.d("ji1dev", String.valueOf(searchTimestamp));
                 try {
                     cvSearchTimestamp = formatter.parse(convertTimestamp(searchTimestamp));
                 } catch (ParseException e) { e.printStackTrace(); }
@@ -135,8 +143,6 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         mapView.getMapAsync(this);
 
         searchTextView.setText(searchTextBuilder);
-
-
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -233,13 +239,12 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
         if (searchLocation != null && searchLocation != "") {
             currentPost = getLocationFromAddress(getContext(), searchLocation);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPost, 13));
+            moveCameraFlag = true;
         } else {
-            currentPost = getLocationFromAddress(getContext(), "서울");
+            //currentPost = getLocationFromAddress(getContext(), "서울");
         }
-
         loadDatabaseWithException(null);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPost, 13));
     }
 
     /**
@@ -317,48 +322,60 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
                         ResultDetailData detailData = snapshot.getValue(ResultDetailData.class);
                         detailData.setDiningUID(snapshot.getKey());
 
-                        long maxPeople = detailData.getCount().get("max");
-                        long currentPeople = detailData.getCount().get("current");
+                        // 키워드 입력으로 검색
+                        if(!searchValue.equals("")){
+                            if(detailData.getTitle().contains(searchValue)){
+                                //Log.d("ji1dev", "키워드 포함된 다이닝 타이틀:"+detailData.getTitle());
+                                datums.add(detailData);
+                            }
 
-                        Boolean flag = false; // 예약 가능한 스케쥴이 있는지 체크하는 플래그
+                        // 기타 필터링 조건으로 검색
+                        }else{
+                            long maxPeople = detailData.getCount().get("max");
+                            long currentPeople = detailData.getCount().get("current");
 
-                        // 현재 예약 가능한 인원수와 입력된 인원수를 비교하여 남은 자리가 있는 다이닝인지 필터링
-                        if(currentPeople + searchPeople <= maxPeople){
+                            Boolean flag = false; // 예약 가능한 스케쥴이 있는지 체크하는 플래그
 
-                            //Log.d("ji1dev", "다이닝 타이틀:"+detailData.getTitle());
-                            //Log.d("ji1dev", "선택인원:"+searchPeople+", 현재인원:"+currentPeople+", 최대인원:"+maxPeople);
+                            // 현재 예약 가능한 인원수와 입력된 인원수를 비교하여 남은 자리가 있는 다이닝인지 필터링
+                            if(currentPeople + searchPeople <= maxPeople){
 
-                            // 다이닝 스케쥴과 입력된 날짜 및 시간을 비교하여 가능한 시간대가 있는지 필터링 후 marker 추가함
-                            if(searchTimestamp != null) {
+                                //Log.d("ji1dev", "다이닝 타이틀:"+detailData.getTitle());
+                                //Log.d("ji1dev", "선택인원:"+searchPeople+", 현재인원:"+currentPeople+", 최대인원:"+maxPeople);
+
+                                // 다이닝 스케쥴과 입력된 날짜 및 시간을 비교하여 가능한 시간대가 있는지 필터링 후 marker 추가함
+                                if(searchTimestamp != null) {
                                     for(Map<String, Long> startTime : detailData.getSchedules().values()) {
 
-                                    // 다이닝 스케쥴의 시작시간을 Date객체로 변환
-                                    try {
-                                        cvStartTimestamp = formatter.parse(convertTimestamp(startTime.get("start")));
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
-                                    }
+                                        // 다이닝 스케쥴의 시작시간을 Date객체로 변환
+                                        try {
+                                            cvStartTimestamp = formatter.parse(convertTimestamp(startTime.get("start")));
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
 
-                                    // 사용자 입력 시간이 스케쥴에 등록된 시간보다 이후이면 flag 활성화
-                                    if (cvSearchTimestamp.before(cvStartTimestamp) || cvSearchTimestamp.equals(cvStartTimestamp)) {
-                                        //Log.d("ji1dev", "예약가능시간 : "+convertTimestamp(startTime.get("start")));
-                                        flag = true;
-                                    }
+                                        // 사용자 입력 시간이 스케쥴에 등록된 시간보다 이후이면 flag 활성화
+                                        if (cvSearchTimestamp.before(cvStartTimestamp) || cvSearchTimestamp.equals(cvStartTimestamp)) {
+                                            //Log.d("ji1dev", "예약가능시간 : "+convertTimestamp(startTime.get("start")));
+                                            flag = true;
+                                        }
 
-                                    // 사용자 입력 시간 이후에 스케쥴이 있는 다이닝은 marker를 추가함
-                                    if(flag){
-                                        //addMarker(getContext(), detailData);
-                                        datums.add(detailData);
+                                        // 사용자 입력 시간 이후에 스케쥴이 있는 다이닝은 marker를 추가함
+                                        if(flag){
+                                            //addMarker(getContext(), detailData);
+                                            datums.add(detailData);
+                                            break;
+                                        }
                                     }
+                                }else{
+                                    // 유저 입력 timestamp 가 존재하지 않으면 위치와 인원 정보만 필터링 뒤 marker 생성
+                                    //addMarker(getContext(), detailData);
+                                    datums.add(detailData);
                                 }
-                            }else{
-                                // 유저 입력 timestamp 가 존재하지 않으면 위치와 인원 정보만 필터링 뒤 marker 생성
-                                //addMarker(getContext(), detailData);
-                                datums.add(detailData);
                             }
                         }
                     }
                 }
+
                 DrawMarkers drawMarkers = new DrawMarkers(getContext(), datums);
                 drawMarkers.execute();
             }
@@ -409,7 +426,6 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         protected void onPreExecute() {
             super.onPreExecute();
             options = new ArrayList<>();
-
             loadingAnimation.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.GONE);
             mapView.setVisibility(View.GONE);
@@ -417,16 +433,18 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
         @Override
         protected Boolean doInBackground(Void... voids) {
+            LatLngBounds.Builder latlngBounds = LatLngBounds.builder();
             for (ResultDetailData data : datum) {
                 LatLng location = getLocationFromAddress(context, data.getLocation().get("location"));
-
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(location);
                 markerOptions.title(data.getTitle());
                 markerOptions.snippet(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
                 options.add(markerOptions);
+                latlngBounds.include(location);
             }
 
+            bounds = latlngBounds.build();
             return true;
         }
 
@@ -437,6 +455,15 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
             for (int i = 0; i < options.size(); i++) {
                 Marker marker = googleMap.addMarker(options.get(i));
                 marker.setTag(datum.get(i));
+            }
+
+            // moveCamera를 수행하지 않은 경우 (위치 기반으로 검색을 하지 않은 모든 경우) marker기반 동적으로 위치를 잡아준다
+            if(moveCameraFlag == false){
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+                int padding = (int) (width * 0.2);
+                cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                googleMap.moveCamera(cu);
             }
 
             mapView.setVisibility(View.VISIBLE);

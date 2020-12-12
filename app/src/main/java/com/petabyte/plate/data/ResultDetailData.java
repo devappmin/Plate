@@ -1,12 +1,12 @@
 package com.petabyte.plate.data;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.google.firebase.database.Exclude;
-
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResultDetailData implements Serializable {
+public class ResultDetailData {
     private int price;
     private String date;
     private String title;
@@ -15,7 +15,8 @@ public class ResultDetailData implements Serializable {
     private HashMap<String, Long> count;
     private HashMap<String, Map<String, Long>> schedules;
 
-    @Exclude private String diningUID;
+    @Exclude
+    private String diningUID;
 
     public ResultDetailData() {
     }
