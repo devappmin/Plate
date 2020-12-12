@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.firebase.database.Exclude;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ResultDetailData {
@@ -11,6 +12,7 @@ public class ResultDetailData {
     private String date;
     private String title;
     private String subtitle;
+    private List<String> images;
     private HashMap<String, String> location;
     private HashMap<String, Long> count;
     private HashMap<String, Map<String, Long>> schedules;
@@ -23,7 +25,7 @@ public class ResultDetailData {
 
     public ResultDetailData(int price, String date, String title, String subtitle,
                             HashMap<String, String> location, HashMap<String, Long> count,
-                            HashMap<String, Map<String, Long>> schedules) {
+                            HashMap<String, Map<String, Long>> schedules, List<String> images) {
         this.price = price;
         this.date = date;
         this.title = title;
@@ -31,6 +33,7 @@ public class ResultDetailData {
         this.location = location;
         this.count = count;
         this.schedules = schedules;
+        this.images = images;
     }
 
     @Exclude
@@ -97,5 +100,13 @@ public class ResultDetailData {
 
     public void setSchedules(HashMap<String, Map<String, Long>> schedules) {
         this.schedules = schedules;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 }

@@ -1,7 +1,6 @@
 package com.petabyte.plate.ui.fragment;
 
 import android.app.ActivityOptions;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -9,9 +8,6 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +17,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.maps.CameraUpdate;
@@ -29,6 +28,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -38,13 +38,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.clustering.ClusterManager;
 import com.petabyte.plate.R;
-import com.petabyte.plate.data.DiningMasterData;
+import com.petabyte.plate.adapter.ResultBottomSheetListAdapter;
 import com.petabyte.plate.data.FoodStyle;
 import com.petabyte.plate.data.ResultDetailData;
-import com.petabyte.plate.ui.activity.DetailActivity;
 import com.petabyte.plate.ui.activity.SearchActivity;
 import com.petabyte.plate.ui.view.ResultDetailBottomSheet;
 import com.petabyte.plate.utils.ConnectionCodes;
@@ -55,18 +52,27 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class ResultFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
+public class ResultFragment extends Fragment implements OnMapReadyCallback,
+                                                        GoogleMap.OnInfoWindowClickListener,
+                                                        GoogleMap.InfoWindowAdapter,
+                                                        GoogleMap.OnCameraChangeListener {
 
     private CardView searchButton;
     private TextView searchTextView;
+
+    // Created but never called.
+    private ConstraintLayout bottomSheet;
+
+    private RecyclerView bottomSheetRecyclerView;
+    private ResultBottomSheetListAdapter recyclerAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+
     private LottieAnimationView loadingAnimation;
 
     private DatabaseReference databaseReference;
@@ -81,6 +87,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
     private MapView mapView = null;
     private GoogleMap googleMap = null;
+
+    private List<Marker> markerList;
 
     Date cvSearchTimestamp, cvStartTimestamp; // MM월 dd일 HH시 패턴으로 변환된 사용자 입력 Timestamp
     SimpleDateFormat formatter; // Timestamp 비교에 사용될 객체
@@ -139,6 +147,14 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         searchTextView = (TextView)v.findViewById(R.id.search_tv_fm_result);
         mapView = (MapView)v.findViewById(R.id.map_view_fm_result);
         loadingAnimation = (LottieAnimationView)v.findViewById(R.id.loading_lottie_fm_result);
+        bottomSheet = (ConstraintLayout)v.findViewById(R.id.recommend_bottom_sheet_fm_result);
+        bottomSheetRecyclerView = (RecyclerView)v.findViewById(R.id.recommend_rv_fm_result);
+
+        layoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL, false);
+        bottomSheetRecyclerView.setLayoutManager(layoutManager);
+
+        recyclerAdapter = new ResultBottomSheetListAdapter();
+        bottomSheetRecyclerView.setAdapter(recyclerAdapter);
 
         mapView.getMapAsync(this);
 
@@ -230,6 +246,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
             this.googleMap = googleMap;
             this.googleMap.setOnInfoWindowClickListener(this);
             this.googleMap.setInfoWindowAdapter(this);
+            this.googleMap.setOnCameraChangeListener(this);
             this.googleMap.getUiSettings().setRotateGesturesEnabled(false);
         }
 
@@ -411,35 +428,78 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         return null;
     }
 
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+
+        recyclerAdapter.removeAllData();
+        for (Marker marker : markerList) {
+            if (Math.abs(marker.getPosition().latitude - cameraPosition.target.latitude) * (Math.pow(cameraPosition.zoom, 2) / 169) < 0.04 &&
+            Math.abs(marker.getPosition().longitude - cameraPosition.target.longitude) * (Math.pow(cameraPosition.zoom, 2) / 169) < 0.04) {
+                // 현재 화면에 있는 그나마 가까운 marker 리스트
+                recyclerAdapter.addData((ResultDetailData)marker.getTag());
+            }
+        }
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 지도에 마커를 찍는 AsyncTask
+     * 클래스의 인자로 Context와 ResultDetailData의 리스트를 받는다.
+     *
+     * AsyncTask를 사용하여 지도를 로딩하는데 리소스를 많이 차지하는 부분을
+     * 작업 스레드로 옮기고 그 동안에 LottieAnimation을 보여줘서 로딩하는 화면을 보여준다.
+     */
     private class DrawMarkers extends AsyncTask<Void, Void, Boolean> {
 
         private Context context;
         private List<ResultDetailData> datum;
         private List<MarkerOptions> options;
 
+        /**
+         * DrawMarkers의 생성자
+         * @param context 해당 Fragment의 Context
+         * @param datum 마커에 관한 정보를 갖고 있는 ResultDetailData 리스트
+         */
         public DrawMarkers(Context context, List<ResultDetailData> datum) {
             this.context = context;
             this.datum = datum;
         }
 
+        /**
+         * 맵을 다 불러오기 이전에 맵과 검색 창을 숨기고
+         * Lottie Animation을 보여줘서 로딩하는 UI를 보여준다.
+         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             options = new ArrayList<>();
+            markerList = new ArrayList<>();
+
             loadingAnimation.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.GONE);
             mapView.setVisibility(View.GONE);
         }
 
+        /**
+         * 백그라운드에서 할 일
+         */
         @Override
         protected Boolean doInBackground(Void... voids) {
             LatLngBounds.Builder latlngBounds = LatLngBounds.builder();
+
+            // datum에서 데이터를 끌어모은다.
             for (ResultDetailData data : datum) {
+                // data의 지역 값을 통해서 위도와 경도를 알아낸다.
                 LatLng location = getLocationFromAddress(context, data.getLocation().get("location"));
+
+                // MarkerOption을 통해서 마커에 관한 정보를 입력받는다.
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(location);
                 markerOptions.title(data.getTitle());
                 markerOptions.snippet(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
+
+                // options 리스트에 해당 MarkerOption을 추가한다.
                 options.add(markerOptions);
                 latlngBounds.include(location);
             }
@@ -448,13 +508,18 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
             return true;
         }
 
+        /**
+         * 백그라운드에서 처리한 것이 끝이 났을 경우 할 일
+         */
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
 
+            // 백그라운드에서 갖고 온 options 리스트를 통해서 마커를 생성한다.
             for (int i = 0; i < options.size(); i++) {
                 Marker marker = googleMap.addMarker(options.get(i));
                 marker.setTag(datum.get(i));
+                markerList.add(marker);
             }
 
             // moveCamera를 수행하지 않은 경우 (위치 기반으로 검색을 하지 않은 모든 경우) marker기반 동적으로 위치를 잡아준다
@@ -466,6 +531,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
                 googleMap.moveCamera(cu);
             }
 
+            // 전부 추가했으면 지도와 검색 버튼을 보여주고 Lottie 애니메이션을 숨긴다.
             mapView.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.VISIBLE);
             loadingAnimation.setVisibility(View.GONE);
