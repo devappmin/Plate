@@ -1,6 +1,7 @@
 package com.petabyte.plate.ui.fragment;
 
 import android.app.ActivityOptions;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -311,6 +313,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         databaseReference.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
+                List<ResultDetailData> datums = new ArrayList<>();
+
                 for (DataSnapshot snapshot : snapshots.getChildren()) {
                     if (snapshot.child("location").child("location").getValue(String.class) != null) {
                         ResultDetailData detailData = snapshot.getValue(ResultDetailData.class);
@@ -346,16 +350,20 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
                                     // 사용자 입력 시간 이후에 스케쥴이 있는 다이닝은 marker를 추가함
                                     if(flag){
-                                        addMarker(getContext(), detailData);
+                                        //addMarker(getContext(), detailData);
+                                        datums.add(detailData);
                                     }
                                 }
                             }else{
                                 // 유저 입력 timestamp 가 존재하지 않으면 위치와 인원 정보만 필터링 뒤 marker 생성
-                                addMarker(getContext(), detailData);
+                                //addMarker(getContext(), detailData);
+                                datums.add(detailData);
                             }
                         }
                     }
                 }
+                DrawMarkers drawMarkers = new DrawMarkers(getContext(), datums);
+                drawMarkers.execute();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
@@ -387,5 +395,57 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
     public View getInfoContents(Marker marker) {
 
         return null;
+    }
+
+    private class DrawMarkers extends AsyncTask<Void, Void, Boolean> {
+
+        private Context context;
+        private ProgressDialog progressDialog;
+        private List<ResultDetailData> datum;
+        private List<MarkerOptions> options;
+
+        public DrawMarkers(Context context, List<ResultDetailData> datum) {
+            this.context = context;
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Loading Markers...");
+            progressDialog.setCancelable(false);
+            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Horizontal);
+
+            this.datum = datum;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            options = new ArrayList<>();
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            for (ResultDetailData data : datum) {
+                LatLng location = getLocationFromAddress(context, data.getLocation().get("location"));
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(location);
+                markerOptions.title(data.getTitle());
+                markerOptions.snippet(String.format(Locale.KOREA, "%,d", data.getPrice()) + "원");
+                options.add(markerOptions);
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+
+            for (int i = 0; i < options.size(); i++) {
+                Marker marker = googleMap.addMarker(options.get(i));
+                marker.setTag(datum.get(i));
+            }
+
+            progressDialog.dismiss();
+        }
     }
 }
