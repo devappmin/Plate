@@ -175,6 +175,8 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
                 public void onClick(View v) {
                     if(data.getCurrentReservationCount() == 0) {
                         deleteDining(data);
+                        notifyItemRemoved(getAdapterPosition());
+                        Snackbar.make(v, "다이닝을 삭제했어요.", Snackbar.LENGTH_LONG).show();
                     } else {
                         Snackbar.make(v, "다이닝 삭제는 예약되어 있는 사람이 없을 때만 가능해요.", Snackbar.LENGTH_LONG).show();
                     }

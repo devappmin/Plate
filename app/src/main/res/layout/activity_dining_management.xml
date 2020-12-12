@@ -39,6 +39,16 @@
         app:lottie_autoPlay="true"
         app:lottie_fileName="loading_skeleton.json"/>
 
+    <TextView
+        android:id="@+id/no_dining_text_diningManage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="300dp"
+        android:textSize="20sp"
+        android:text="아직 등록된 다이닝이 없어요.\n수많은 게스트들이 회원님을 기다리고 있어요!"/>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refresh_diningManage"
         android:layout_width="match_parent"

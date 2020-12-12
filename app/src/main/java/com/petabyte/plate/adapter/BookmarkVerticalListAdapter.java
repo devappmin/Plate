@@ -69,7 +69,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         datas = new ArrayList<>();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private CardView cardView;
         private TextView diningTitle;

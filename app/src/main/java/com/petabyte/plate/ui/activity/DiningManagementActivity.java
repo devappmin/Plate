@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -40,8 +41,9 @@ public class DiningManagementActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private LottieAnimationView loadingSkeletonView;
 
+    private TextView noDiningText;
+    private LottieAnimationView loadingSkeletonView;
     private RecyclerView recyclerView;
     private DiningManagementAdapter recyclerAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -59,6 +61,7 @@ public class DiningManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dining_management);
 
+        noDiningText = (TextView)findViewById(R.id.no_dining_text_diningManage);
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.refresh_diningManage);
         loadingSkeletonView = (LottieAnimationView)findViewById(R.id.loading_lottie_diningManage);
         collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar_diningManage);
@@ -164,6 +167,7 @@ public class DiningManagementActivity extends AppCompatActivity {
                     recyclerAdapter.addItem(diningManagementCardData);
                     recyclerAdapter.notifyDataSetChanged();
                 }
+                if(recyclerAdapter.getItemCount()==0) noDiningText.setVisibility(View.VISIBLE);
                 loadingSkeletonView.setVisibility(View.GONE);
             }
 
