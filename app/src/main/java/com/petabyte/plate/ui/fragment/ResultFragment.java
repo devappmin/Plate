@@ -339,7 +339,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
                                     }
 
                                     // 사용자 입력 시간이 스케쥴에 등록된 시간보다 이후이면 flag 활성화
-                                    if (cvSearchTimestamp.before(cvStartTimestamp)) {
+                                    if (cvSearchTimestamp.before(cvStartTimestamp) || cvSearchTimestamp.equals(cvStartTimestamp)) {
                                         //Log.d("ji1dev", "예약가능시간 : "+convertTimestamp(startTime.get("start")));
                                         flag = true;
                                     }
