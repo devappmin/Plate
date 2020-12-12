@@ -433,7 +433,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     String currentDate = format.format(time);
                     if(diningMasterData.getDate().compareTo(currentDate) < 0) {
                         purchaseButton.setEnabled(false);
-                        purchaseButton.setText("완료된 다이닝입니다.");
+                        purchaseButton.setText("종료된 다이닝입니다.");
                     }
                 }
             }

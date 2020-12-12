@@ -87,7 +87,30 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="6dp"
             app:layout_constraintTop_toBottomOf="@id/calendar_diningManageCard"
-            app:layout_constraintStart_toEndOf="@id/marker_diningManageCard" />
+            app:layout_constraintStart_toEndOf="@id/marker_diningManageCard"/>
+
+        <ImageView
+            android:id="@+id/people_diningManageCard"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_baseline_group_24"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="21dp"
+            app:tint="@color/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@id/marker_diningManageCard"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/reserved_count_diningManageCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="예약 인원 수"
+            android:textColor="@color/textDarkPrimary"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="6dp"
+            app:layout_constraintTop_toBottomOf="@id/marker_diningManageCard"
+            app:layout_constraintStart_toEndOf="@id/people_diningManageCard"/>
 
         <TextView
             android:id="@+id/delete_text_diningManageCard"
@@ -98,7 +121,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/location_diningManageCard"
+            app:layout_constraintTop_toBottomOf="@id/people_diningManageCard"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView

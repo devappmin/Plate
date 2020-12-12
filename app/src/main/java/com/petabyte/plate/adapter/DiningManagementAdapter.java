@@ -90,6 +90,7 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
         private TextView diningTitle;
         private TextView diningDate;
         private TextView diningLocation;
+        private TextView reservedCount;
         private TextView detailText;
         private TextView deleteText;
 
@@ -98,6 +99,7 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
         private FirebaseUser user;
 
         private HashMap<String, UserData> userDataMap =  new HashMap<>();
+        private int currentReservationCount;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -107,6 +109,7 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
             diningTitle = (TextView)itemView.findViewById(R.id.title_diningManageCard);
             diningDate = (TextView)itemView.findViewById(R.id.date_diningManageCard);
             diningLocation = (TextView)itemView.findViewById(R.id.location_diningManageCard);
+            reservedCount = (TextView)itemView.findViewById(R.id.reserved_count_diningManageCard);
             detailText = (TextView)itemView.findViewById(R.id.detail_text_diningManageCard);
             deleteText = (TextView)itemView.findViewById(R.id.delete_text_diningManageCard);
         }
@@ -115,6 +118,7 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
             diningTitle.setText(data.getDiningTitle());
             diningDate.setText(data.getDiningDate());
             diningLocation.setText(data.getDiningLocation());
+            reservedCount.setText(data.getCurrentReservationCount() + "명 예약 완료");
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             Date time = new Date();
