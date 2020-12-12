@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -39,6 +40,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -118,7 +121,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-
         setCheckBoxStatus();
         getDiningImage();
         getDiningInformation();
@@ -133,10 +135,46 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 if(bookmarkBox.isChecked()) {
                     Snackbar.make(v, "찜 목록에 추가하였습니다.", 3000).show();
                     bookmarkBox.setChecked(true);
+                    databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(diningUid);
+                    databaseReference.runTransaction(new Transaction.Handler() {
+                        @NonNull
+                        @Override
+                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                            DiningMasterData data = currentData.getValue(DiningMasterData.class);
+                            if(data == null)
+                                return Transaction.success(currentData);
+                            data.setBookmark(data.getBookmark() + 1);
+                            currentData.setValue(data);
+                            return Transaction.success(currentData);
+                        }
+
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+
+                        }
+                    });
                 }
                 else {
                     Snackbar.make(v, "찜 목록에서 삭제하였습니다.", 3000).show();
                     bookmarkBox.setChecked(false);
+                    databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(diningUid);
+                    databaseReference.runTransaction(new Transaction.Handler() {
+                        @NonNull
+                        @Override
+                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                            DiningMasterData data = currentData.getValue(DiningMasterData.class);
+                            if(data == null)
+                                return Transaction.success(currentData);
+                            data.setBookmark(data.getBookmark() - 1);
+                            currentData.setValue(data);
+                            return Transaction.success(currentData);
+                        }
+
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+
+                        }
+                    });
                 }
                 reviseBookmarkStatus(diningUid, bookmarkBox.isChecked());
             }
