@@ -12,6 +12,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:clickable="true"
+        android:visibility="gone"
         android:nestedScrollingEnabled="true"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
@@ -47,6 +48,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:lottie_loop="true"
         app:lottie_autoPlay="true"
-        app:lottie_fileName="loading_skeleton.json"/>
+        app:lottie_fileName="map_skeleton.json"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

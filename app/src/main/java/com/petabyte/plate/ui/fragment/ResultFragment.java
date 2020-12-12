@@ -239,9 +239,6 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
         loadDatabaseWithException(null);
 
-        mapView.setVisibility(View.VISIBLE);
-        loadingAnimation.setVisibility(View.GONE);
-
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPost, 13));
     }
 
@@ -400,17 +397,11 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
     private class DrawMarkers extends AsyncTask<Void, Void, Boolean> {
 
         private Context context;
-        private ProgressDialog progressDialog;
         private List<ResultDetailData> datum;
         private List<MarkerOptions> options;
 
         public DrawMarkers(Context context, List<ResultDetailData> datum) {
             this.context = context;
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Loading Markers...");
-            progressDialog.setCancelable(false);
-            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Horizontal);
-
             this.datum = datum;
         }
 
@@ -418,7 +409,10 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         protected void onPreExecute() {
             super.onPreExecute();
             options = new ArrayList<>();
-            progressDialog.show();
+
+            loadingAnimation.setVisibility(View.VISIBLE);
+            searchButton.setVisibility(View.GONE);
+            mapView.setVisibility(View.GONE);
         }
 
         @Override
@@ -445,7 +439,9 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
                 marker.setTag(datum.get(i));
             }
 
-            progressDialog.dismiss();
+            mapView.setVisibility(View.VISIBLE);
+            searchButton.setVisibility(View.VISIBLE);
+            loadingAnimation.setVisibility(View.GONE);
         }
     }
 }
