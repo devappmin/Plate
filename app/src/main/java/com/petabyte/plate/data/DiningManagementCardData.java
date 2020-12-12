@@ -11,7 +11,6 @@ public class DiningManagementCardData implements Comparable<DiningManagementCard
     @Override
     public int compareTo(DiningManagementCardData o) {
         return o.getDiningDate().compareTo(this.getDiningDate());
-        //return this.getDiningDate().compareTo(o.getDiningDate());
     }
 
     public DiningManagementCardData() {
