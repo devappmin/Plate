@@ -4,6 +4,7 @@ import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ResultDetailData implements Serializable {
     private int price;
@@ -11,18 +12,24 @@ public class ResultDetailData implements Serializable {
     private String title;
     private String subtitle;
     private HashMap<String, String> location;
+    private HashMap<String, Long> count;
+    private HashMap<String, Map<String, Long>> schedules;
 
     @Exclude private String diningUID;
 
     public ResultDetailData() {
     }
 
-    public ResultDetailData(int price, String date, String title, String subtitle, HashMap<String, String> location) {
+    public ResultDetailData(int price, String date, String title, String subtitle,
+                            HashMap<String, String> location, HashMap<String, Long> count,
+                            HashMap<String, Map<String, Long>> schedules) {
         this.price = price;
         this.date = date;
         this.title = title;
         this.subtitle = subtitle;
         this.location = location;
+        this.count = count;
+        this.schedules = schedules;
     }
 
     @Exclude
@@ -73,5 +80,21 @@ public class ResultDetailData implements Serializable {
 
     public void setLocation(HashMap<String, String> location) {
         this.location = location;
+    }
+
+    public HashMap<String, Long> getCount() {
+        return count;
+    }
+
+    public void setCount(HashMap<String, Long> count) {
+        this.count = count;
+    }
+
+    public HashMap<String, Map<String, Long>> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(HashMap<String, Map<String, Long>> schedules) {
+        this.schedules = schedules;
     }
 }

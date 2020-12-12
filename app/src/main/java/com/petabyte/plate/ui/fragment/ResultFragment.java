@@ -46,12 +46,15 @@ import com.petabyte.plate.utils.ConnectionCodes;
 import com.petabyte.plate.utils.LogTags;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class ResultFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
@@ -73,6 +76,9 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
     private MapView mapView = null;
     private GoogleMap googleMap = null;
 
+    Date cvSearchTimestamp, cvStartTimestamp; // MM월 dd일 HH시 패턴으로 변환된 사용자 입력 Timestamp
+    SimpleDateFormat formatter; // Timestamp 비교에 사용될 객체
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,6 +87,9 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         // region GET VALUES FROM BUNDLE
         // 검색한 내용을 검색 버튼에 보여주기 위한 String Builder
         searchTextBuilder = new StringBuilder();
+
+        // Timestamp 변환에 사용되는 SimpleDateFormat객체의 패턴을 정의
+        formatter = new SimpleDateFormat("MM월 dd일 HH시");
 
         // Bundle을 통해서 값을 불러온다.
         Bundle bundle = this.getArguments();
@@ -92,7 +101,11 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
             if (bundle.getLong("timestamp") >= 0) {
                 searchTimestamp = bundle.getLong(("timestamp"));
-                searchTextBuilder.append(getDate(searchTimestamp) + "/");
+                Log.d("ji1dev", String.valueOf(searchTimestamp));
+                try {
+                    cvSearchTimestamp = formatter.parse(convertTimestamp(searchTimestamp));
+                } catch (ParseException e) { e.printStackTrace(); }
+                searchTextBuilder.append(convertTimestamp(searchTimestamp) + "/");
             }
 
             if (bundle.getInt("people") != 0) {
@@ -120,6 +133,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
         mapView.getMapAsync(this);
 
         searchTextView.setText(searchTextBuilder);
+
+
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,10 +210,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
 
     // endregion
 
-    private String getDate(long time) {
-        Calendar cal = Calendar.getInstance(Locale.KOREA);
-        cal.setTimeInMillis(time * 1000);
-        String date = DateFormat.format("MM월 dd일", cal).toString();
+    public String convertTimestamp(long time) {
+        String date = (String) formatter.format(new Timestamp(time));
         return date;
     }
 
@@ -248,12 +261,10 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
             if (address == null) {
                 return null;
             }
-
             Address location = address.get(0);
             p1 = new LatLng(location.getLatitude(), location.getLongitude() );
 
         } catch (IOException ex) {
-
             ex.printStackTrace();
         }
 
@@ -304,15 +315,50 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
                     if (snapshot.child("location").child("location").getValue(String.class) != null) {
                         ResultDetailData detailData = snapshot.getValue(ResultDetailData.class);
                         detailData.setDiningUID(snapshot.getKey());
-                        addMarker(getContext(), detailData);
+
+                        long maxPeople = detailData.getCount().get("max");
+                        long currentPeople = detailData.getCount().get("current");
+
+                        Boolean flag = false; // 예약 가능한 스케쥴이 있는지 체크하는 플래그
+
+                        // 현재 예약 가능한 인원수와 입력된 인원수를 비교하여 남은 자리가 있는 다이닝인지 필터링
+                        if(currentPeople + searchPeople <= maxPeople){
+
+                            //Log.d("ji1dev", "다이닝 타이틀:"+detailData.getTitle());
+                            //Log.d("ji1dev", "선택인원:"+searchPeople+", 현재인원:"+currentPeople+", 최대인원:"+maxPeople);
+
+                            // 다이닝 스케쥴과 입력된 날짜 및 시간을 비교하여 가능한 시간대가 있는지 필터링 후 marker 추가함
+                            if(searchTimestamp != null) {
+                                    for(Map<String, Long> startTime : detailData.getSchedules().values()) {
+
+                                    // 다이닝 스케쥴의 시작시간을 Date객체로 변환
+                                    try {
+                                        cvStartTimestamp = formatter.parse(convertTimestamp(startTime.get("start")));
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    // 사용자 입력 시간이 스케쥴에 등록된 시간보다 이후이면 flag 활성화
+                                    if (cvSearchTimestamp.before(cvStartTimestamp)) {
+                                        //Log.d("ji1dev", "예약가능시간 : "+convertTimestamp(startTime.get("start")));
+                                        flag = true;
+                                    }
+
+                                    // 사용자 입력 시간 이후에 스케쥴이 있는 다이닝은 marker를 추가함
+                                    if(flag){
+                                        addMarker(getContext(), detailData);
+                                    }
+                                }
+                            }else{
+                                // 유저 입력 timestamp 가 존재하지 않으면 위치와 인원 정보만 필터링 뒤 marker 생성
+                                addMarker(getContext(), detailData);
+                            }
+                        }
                     }
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
