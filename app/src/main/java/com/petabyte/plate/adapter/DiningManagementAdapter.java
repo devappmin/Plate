@@ -1,6 +1,8 @@
 package com.petabyte.plate.adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -10,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -172,11 +175,30 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
 
             deleteText.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(final View v) {
                     if(data.getCurrentReservationCount() == 0) {
-                        deleteDining(data);
-                        notifyItemRemoved(getAdapterPosition());
-                        Snackbar.make(v, "다이닝을 삭제했어요.", Snackbar.LENGTH_LONG).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                        builder.setTitle("정말 삭제하시겠습니까?");
+                        builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteDining(data);
+                                notifyItemRemoved(getAdapterPosition());
+                                Snackbar.make(v, "다이닝을 삭제했어요.", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+                        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                        Button negativeButton = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+                        Button positiveButton = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                        positiveButton.setTextColor(v.getResources().getColor(R.color.colorDanger));
+                        negativeButton.setTextColor(v.getResources().getColor(R.color.colorPrimary));
                     } else {
                         Snackbar.make(v, "다이닝 삭제는 예약되어 있는 사람이 없을 때만 가능해요.", Snackbar.LENGTH_LONG).show();
                     }
