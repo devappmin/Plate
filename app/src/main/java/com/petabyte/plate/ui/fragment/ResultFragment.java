@@ -209,6 +209,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback, Goog
             this.googleMap = googleMap;
             this.googleMap.setOnInfoWindowClickListener(this);
             this.googleMap.setInfoWindowAdapter(this);
+            this.googleMap.getUiSettings().setRotateGesturesEnabled(false);
         }
 
         LatLng currentPost = null;

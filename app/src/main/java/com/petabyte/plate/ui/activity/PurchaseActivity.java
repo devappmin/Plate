@@ -51,7 +51,7 @@ public class PurchaseActivity extends AppCompatActivity {
 
     private DiningMasterData diningMasterData;
     private FirebaseUser user;
-    private DatabaseReference ref_h, ref_g;
+    private DatabaseReference ref_h, ref_g, dining_ref, reserv_ref;
     private String UID, MEMBER_TYPE; // UID와 멤버 타입
 
     @Override
@@ -107,30 +107,53 @@ public class PurchaseActivity extends AppCompatActivity {
         submitbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String currentTime = String.valueOf(System.currentTimeMillis());
-                HashMap<Object,String> reservationMap = new HashMap<>();
+                // dining count를 업데이트
+                dining_ref = FirebaseDatabase.getInstance().getReference("Dining").child(reservDUID);
+                Log.d("ji1dev", reservDUID);
+                dining_ref.child("count").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        long srcCount = (long) snapshot.child("current").getValue();
+                        long maxCount = (long) snapshot.child("max").getValue();
 
-                reservationMap.put("DiningUID", reservDUID);
-                reservationMap.put("Reservation", String.valueOf(reservTime));
-                reservationMap.put("Status", "입금대기중");
-                reservationMap.put("Review", "FALSE");
+                        if(maxCount < srcCount+1){
+                            makeDialog("예약이 모두 찼어요.\n다음 다이닝을 기대해주세요!");
+                        }else{
+                            // 예약 인원을 초과하지 않은 경우 진행
+                            dining_ref.child("count/current").setValue(srcCount+1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    String currentTime = String.valueOf(System.currentTimeMillis());
+                                    HashMap<Object,String> reservationMap = new HashMap<>();
 
-                DatabaseReference reserv_ref = FirebaseDatabase.getInstance().getReference("User");
-                reserv_ref.child(MEMBER_TYPE).child(UID).child("Reservation").child(currentTime).setValue(reservationMap)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                makeDialog("성공적으로 예약되었어요!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                makeDialog("예약에 실패했어요.\n잠시 후 다시 시도해주세요.");
-                                finish();
-                            }
-                        });
-               // Log.d("Result", UID+" / "+MEMBER_TYPE+" / "+reservName);
+                                    reservationMap.put("DiningUID", reservDUID);
+                                    reservationMap.put("Reservation", String.valueOf(reservTime));
+                                    reservationMap.put("Status", "입금대기중");
+                                    reservationMap.put("Review", "FALSE");
+
+                                    // 유저의 다이닝 예약 정보를 업데이트
+                                    reserv_ref = FirebaseDatabase.getInstance().getReference("User");
+                                    reserv_ref.child(MEMBER_TYPE).child(UID).child("Reservation").child(currentTime).setValue(reservationMap)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    makeDialog("성공적으로 예약되었어요!");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    makeDialog("예약에 실패했어요.\n잠시 후 다시 시도해주세요.");
+                                                    finish();
+                                                }
+                                            });
+                                }
+                            });
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
             }
         });
     }
