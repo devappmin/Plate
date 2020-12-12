@@ -451,14 +451,11 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
             }
         }
 
-        if (!state) {
-            bottomSheetBehavior.setHideable(true);
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        } else {
-            bottomSheetBehavior.setHideable(false);
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
+        // 만약에 리스트를 하나도 불러오지 못했으면 숨
+        bottomSheetBehavior.setHideable(!state);
 
+        // state의 상태에 따라 Bottom Sheet의 상태도 변환
+        bottomSheetBehavior.setState(state ? BottomSheetBehavior.STATE_COLLAPSED : BottomSheetBehavior.STATE_HIDDEN);
 
         recyclerAdapter.notifyDataSetChanged();
     }
