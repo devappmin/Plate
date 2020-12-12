@@ -15,7 +15,6 @@ import com.petabyte.plate.R;
 
 public class AddDishImageHorizontalList extends ConstraintLayout {
 
-    private ConstraintLayout constraintLayout;
     private ImageView imageView;
     public ImageView removeButton;
 
@@ -45,7 +44,6 @@ public class AddDishImageHorizontalList extends ConstraintLayout {
         View v = layoutInflater.inflate(R.layout.view_add_dish_image, this, false);
         addView(v);
 
-        constraintLayout = (ConstraintLayout) findViewById(R.id.layout_addDish);
         imageView = (ImageView) findViewById(R.id.image_addDish);
         removeButton = (ImageView) findViewById(R.id.remove_addDish);
         imageView.setClipToOutline(true);

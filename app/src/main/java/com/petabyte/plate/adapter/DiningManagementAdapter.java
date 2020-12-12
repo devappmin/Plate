@@ -1,7 +1,6 @@
 package com.petabyte.plate.adapter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -14,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,8 +24,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.DiningManagementCardData;
+import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.UserData;
 import com.petabyte.plate.ui.activity.DetailActivity;
 
@@ -95,11 +96,11 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
         private TextView deleteText;
 
         private DatabaseReference databaseReference, ref_h;
+        private StorageReference storageReference;
         private FirebaseAuth mAuth;
         private FirebaseUser user;
 
         private HashMap<String, UserData> userDataMap =  new HashMap<>();
-        private int currentReservationCount;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -172,10 +173,10 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
             deleteText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(data.getCurrentReservationCount() != 0){
-                        Snackbar.make(v, "예약되어 있는 사람이 있어 삭제할 수 없어요.", Snackbar.LENGTH_LONG).show();
-                    } else {
+                    if(data.getCurrentReservationCount() == 0) {
                         deleteDining(data);
+                    } else {
+                        Snackbar.make(v, "다이닝 삭제는 예약되어 있는 사람이 없을 때만 가능해요.", Snackbar.LENGTH_LONG).show();
                     }
                 }
             });
@@ -183,6 +184,7 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
 
         private void deleteDining(final DiningManagementCardData data) {
             databaseReference = FirebaseDatabase.getInstance().getReference("Dining");
+            storageReference = FirebaseStorage.getInstance().getReference();
             ref_h = FirebaseDatabase.getInstance().getReference("User").child("Host");
             mAuth = FirebaseAuth.getInstance();
             user = mAuth.getCurrentUser();
@@ -192,6 +194,12 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        DiningMasterData diningMasterData = dataSnapshot.getValue(DiningMasterData.class);
+                        for(int i = 1; i < diningMasterData.getImages().size(); i++) {
+                            String imageName = diningMasterData.getImages().get(i);
+                            storageReference.child("dining").child(data.getDiningUid()).child(imageName).delete();
+                        }
+                        storageReference.child("dining").child(data.getDiningUid()).delete();
                         dataSnapshot.getRef().removeValue();
                     }
                 }
@@ -217,6 +225,7 @@ public class DiningManagementAdapter extends RecyclerView.Adapter<DiningManageme
 
                 }
             });
+            storageReference.child("dining").child(data.getDiningUid()).delete();
         }
 
         private void getUserData(){

@@ -106,7 +106,6 @@ public class DetailTimeListBottomSheet extends BottomSheetDialogFragment {
                         }
                     });
                     Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-                    Log.d("cu", Long.toString(currentTimestamp.getTime()));
                     for (int i = 0; i < schedules.size(); i++) {
                         final long startTime = schedules.get(i).get("start").longValue();
                         long endTime = schedules.get(i).get("end").longValue();

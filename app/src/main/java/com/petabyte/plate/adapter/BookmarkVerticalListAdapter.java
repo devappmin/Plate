@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -148,8 +149,9 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
 
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+                public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
                     if(checkBox.isChecked()) {
+                        Toast.makeText(buttonView.getContext(), "찜 목록에 추가하였습니다.", Toast.LENGTH_SHORT).show();
                         databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
                         databaseReference.runTransaction(new Transaction.Handler() {
                             @NonNull
@@ -170,6 +172,7 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                         });
                     }
                     else {
+                        Toast.makeText(buttonView.getContext(), "찜 목록에서 삭제하였습니다.", Toast.LENGTH_SHORT).show();
                         databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
                         databaseReference.runTransaction(new Transaction.Handler() {
                             @NonNull

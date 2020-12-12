@@ -472,7 +472,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
         DatabaseReference scheduleReference = diningReference.child("schedules").push();
         for (int i = 0; i < plans.size(); i++) {
             Long timestamp = Timestamp.valueOf(plans.get(i)).getTime();
-            Log.d("타스", timestamp.toString());
             if((i % 2) == 0) {
                 scheduleReference = diningReference.child("schedules").push();
                 scheduleReference.child("start").setValue(timestamp);
@@ -499,8 +498,6 @@ public class AddDiningPlanActivity extends AppCompatActivity implements View.OnC
                     + " " + times.get(i).substring(8, 10)
                     + ":" + times.get(i).substring(10, 12)
                     + ":00";
-            Log.d("바꾸기전", times.get(i));
-            Log.d("시작", startString);
             dateFormat.add(startString);
             String endString = times.get(i).substring(0, 4)
                     + "-" + times.get(i).substring(4, 6)

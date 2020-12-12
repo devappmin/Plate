@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,6 +39,8 @@ public class DiningManagementActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private LottieAnimationView loadingSkeletonView;
 
     private RecyclerView recyclerView;
     private DiningManagementAdapter recyclerAdapter;
@@ -55,12 +59,31 @@ public class DiningManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dining_management);
 
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.refresh_diningManage);
+        loadingSkeletonView = (LottieAnimationView)findViewById(R.id.loading_lottie_diningManage);
         collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.collapsing_toolbar_diningManage);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
         toolbar = (Toolbar)findViewById(R.id.toolbar_diningManage);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        swipeRefreshLayout.setColorSchemeColors(
+                getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(R.color.colorPrimaryDark),
+                getResources().getColor(R.color.colorAccent)
+        );
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadingSkeletonView.setVisibility(View.VISIBLE);
+                loadingSkeletonView.setSpeed(1f);
+                removeAllData();
+                initData();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
     }
 
@@ -141,6 +164,7 @@ public class DiningManagementActivity extends AppCompatActivity {
                     recyclerAdapter.addItem(diningManagementCardData);
                     recyclerAdapter.notifyDataSetChanged();
                 }
+                loadingSkeletonView.setVisibility(View.GONE);
             }
 
             @Override

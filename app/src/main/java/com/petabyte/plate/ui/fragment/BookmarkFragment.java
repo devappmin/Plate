@@ -1,7 +1,6 @@
 package com.petabyte.plate.ui.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +22,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
 import com.petabyte.plate.data.BookmarkCardViewData;
 import com.petabyte.plate.data.DiningMasterData;
-import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.data.UserData;
 import com.petabyte.plate.ui.view.BookmarkVerticalList;
-import com.petabyte.plate.ui.view.HomeAwardsList;
-import com.petabyte.plate.ui.view.HomeHorizontalList;
-import com.petabyte.plate.utils.LogTags;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
