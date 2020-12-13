@@ -415,6 +415,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
                             // 만약에 datums에 선택한 음식들이 존재하면 tempList 리스트에 값을 추가한다.
                             if (datums.get(i).getStyle().contains(foodStyles.get(j).toString())) {
                                 tempList.add(datums.get(i));
+                                break;
                             }
 
                         }
