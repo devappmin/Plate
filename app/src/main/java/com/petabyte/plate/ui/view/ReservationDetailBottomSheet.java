@@ -115,7 +115,7 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mActivity, DetailActivity.class);
-                intent.putExtra("diningUID", diningUID);
+                intent.putExtra("diningUid", diningUID);
                 startActivity(intent);
             }
         });
