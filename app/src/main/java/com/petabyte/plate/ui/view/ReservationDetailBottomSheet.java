@@ -56,7 +56,7 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
     private String diningUID;
 
     private FirebaseUser user;
-    private DatabaseReference reference;
+    private DatabaseReference reference, dining_ref;
 
     private LinearLayout dishList;
     private Button cancelButton;
@@ -135,7 +135,20 @@ public class ReservationDetailBottomSheet extends BottomSheetDialogFragment {
         d.setPositiveButton("네 취소할래요", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
+                // 예약취소시 User의 예약상태를 변경하고, Dining의 예약가능 인원을 한 자리 늘림
                 reference.child(RESERVATION_KEY).child("Status").setValue("예약취소");
+
+                dining_ref = FirebaseDatabase.getInstance().getReference("Dining").child(diningUID);
+                dining_ref.child("count").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        long srcCount = (long) snapshot.child("current").getValue();
+                        dining_ref.child("count/current").setValue(srcCount-1);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
                 dismiss();
             }
         });

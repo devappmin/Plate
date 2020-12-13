@@ -93,11 +93,27 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
         else if (view == submitButton) {
             Intent intent = new Intent();
-            intent.putExtra("timestamp", convertDateToTimestamp(mYear, mMonth, mDay, mHour, mMinute));
+
+            // 검색을 하더라도 분 단위가 맞지 않을 경우에는 무시하는 경향이 있기 때문에
+            // 분 단위는 삭제를 하고 그 값을 보낸다.
+            // 하지만 mMinute가 안 쓰이는 것이 아닌 CardView에서 선택한 값을 보여주기 위해서와
+            // 이후에 사용할 수도 있기 때문에 이 변수는 놔두지 않고 남긴다.
+            intent.putExtra("timestamp", convertDateToTimestamp(mYear, mMonth, mDay, mHour, 0));
+
+            // 인원 수를 보낸다.
             intent.putExtra("people", people);
+
+            // 음식스타일을 보내는데 String Array 형식으로 보내고
+            // ResultFragment에서 그 값을 String Array로 받아 FoodStyle의 리스트로 변환한다.
             intent.putStringArrayListExtra("foodStyles", chipGroup.getSelectedChipsLabel());
+
+            // 위치 정보를 보낸다.
             intent.putExtra("location", location);
+
+            // 검색 값을 보낸다.
             intent.putExtra("search", searchEditText.getText().toString());
+
+            // 해당 인텐트를 입력하여 ResultFragment에 보내고 현재 엑티비티를 끝낸다.
             setResult(RESULT_OK, intent);
             finish();
         }
@@ -185,7 +201,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         String dateStr = year + "-" + month + "-" + day + " " + hour + ":" + minute;
 
         // Dateformat을 만들고 dateStr의 값을 삽입
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date date = null;
         try {
             date = (Date)dateFormat.parse(dateStr);

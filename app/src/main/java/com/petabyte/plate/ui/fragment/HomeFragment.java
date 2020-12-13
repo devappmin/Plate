@@ -1,6 +1,8 @@
 package com.petabyte.plate.ui.fragment;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,6 +38,7 @@ import com.petabyte.plate.data.HomeAwardsData;
 import com.petabyte.plate.data.HomeCardData;
 import com.petabyte.plate.data.ImageSlideData;
 import com.petabyte.plate.ui.activity.AddDiningPlanActivity;
+import com.petabyte.plate.ui.activity.RegisterInfoActivity;
 import com.petabyte.plate.ui.activity.SearchActivity;
 import com.petabyte.plate.ui.view.HomeAwardsList;
 import com.petabyte.plate.ui.view.HomeHorizontalList;
@@ -44,7 +48,9 @@ import com.petabyte.plate.utils.KoreanUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -76,6 +82,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private NestedScrollView scrollView;
 
     private DatabaseReference mDatabase;
+
+    private String userUID;
 
     @Nullable
     @Override
@@ -143,6 +151,29 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             }
         });
 
+        // 호스트 지원 관련 클릭 리스너
+        applyCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("팝업다이닝 셰프를 지원할까요?").setMessage("셰프가 되어 언제 어디서나 다이닝을 선보이고 수익을 창출할 수 있습니다.");
+
+                builder.setPositiveButton("지원하기", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        changeGuestToHost();
+                    }
+                });
+
+                builder.setNegativeButton("아니요", null);
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+
+        userUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         // PLATE 포스트 관련 설정
         postList.setTitle("PLATE 포스트");
         postList.setBackgroundColor(Color.BLACK, Color.WHITE);
@@ -185,6 +216,49 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             completeLoaded[i] = false;
         // 뷰가 생성되면 불러온 리스트의 수를 0으로 초기화
         current = 0;
+    }
+
+    private void changeGuestToHost() {
+        mDatabase.child("User").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DataSnapshot guestSnapshot = snapshot.child("Guest");
+                DatabaseReference hostReference = mDatabase.child("User").child("Host");
+
+                Map<String, String> bookmark = (Map<String, String>)guestSnapshot.child(userUID).child("Bookmark").getValue();
+                Map<String, String> profile = (Map<String, String>)guestSnapshot.child(userUID).child("Profile").getValue();
+                Map<String, Map<String, String>> reservation = (Map<String, Map<String, String>>)guestSnapshot.child(userUID).child("Reservation").getValue();
+
+                // User에 있는 모든 값을 지운다.
+                guestSnapshot.child(userUID).getRef().removeValue();
+
+                // Host에 추가한다.
+                hostReference.child(userUID).child("Profile").setValue(profile);
+                hostReference.child(userUID).child("Profile").child("Rating").setValue(0);
+                hostReference.child(userUID).child("Profile").child("RatingCount").setValue(0);
+                hostReference.child(userUID).child("Profile").child("Description").setValue("셰프가 되신 것을 환영합니다 :D");
+                hostReference.child(userUID).child("Bookmark").setValue(bookmark);
+                hostReference.child(userUID).child("Reservation").setValue(reservation);
+                hostReference.child(userUID).child("Status").setValue("WAITING");
+
+                // 다이닝 지원 엑티비티 로드
+                Intent intent = new Intent(getActivity(), RegisterInfoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("MEMBER_TYPE", "HOST");
+                bundle.putString("NAME", "셰프");
+                bundle.putString("APPLY", "TRUE");
+                intent.putExtra("REGISTER_DATA", bundle);
+
+                getUserType();
+
+                startActivity(intent);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     /**
@@ -230,6 +304,22 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return array;
     }
 
+    /**
+     * Datasnapshot child를 뒤집기 위한 메소드
+     * @param root Root DataSnapshot
+     * @return Reversed DataSnapshot
+     */
+    private List<DataSnapshot> reverseSnapshot(DataSnapshot root) {
+        List<DataSnapshot> temp = new ArrayList<>();
+        for (DataSnapshot snapshot : root.getChildren()) {
+            temp.add(snapshot);
+        }
+        Collections.reverse(temp);
+
+        return temp;
+    }
+
+
     private void loadRecentList(final HomeHorizontalList mList) {
         mList.setTitle("최근에 올라온 음식이에요.");
         mDatabase.child("Dining").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -262,7 +352,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mDatabase.child("Home").child("Plate Post").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for (DataSnapshot snapshot : snapshots.getChildren()) {
+                for (DataSnapshot snapshot : reverseSnapshot(snapshots)) {
                     HomeAwardsData data = snapshot.getValue(HomeAwardsData.class);
                     mList.addData(data);
                 }
@@ -409,7 +499,6 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
      * 유저가 Host인 경우 다이닝 추가하기 CardView를 보여준다.
      */
     private void getUserType() {
-        final String userUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         mDatabase.child("User").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -418,6 +507,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                 if (userType.equals("Host")) {
                     applyCardView.setVisibility(View.GONE);
+                    addDiningPlanCardView.setVisibility(View.VISIBLE);
 
                     if (snapshot.child(userType).child(userUID).child("Status").getValue(String.class).equals("WAITING")) {
 
