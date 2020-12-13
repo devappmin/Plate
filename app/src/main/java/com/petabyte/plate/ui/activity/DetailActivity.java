@@ -25,6 +25,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -71,6 +78,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private TextView diningDetailLocation;
     private ChipGroup styleChipGroup;
     private TextView diningDescription;
+    private TextView diningLocationMap;
+    private TextView diningDetailLocationMap;
     private ImageView chefImage;
     private TextView chefName;
     private TextView chefIntroduction;
@@ -85,6 +94,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private StorageReference storageReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +116,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         diningDetailLocation = (TextView)findViewById(R.id.dining_detail_location_DetailActivity);
         styleChipGroup = (ChipGroup)findViewById(R.id.chip_group_DetailActivity);
         diningDescription = (TextView)findViewById(R.id.dining_description_DetailActivity);
+        diningLocationMap = (TextView)findViewById(R.id.dining_location_map_DetailActivity);
+        diningDetailLocationMap = (TextView)findViewById(R.id.dining_detail_location_map_DetailActivity);
         chefImage = (ImageView)findViewById(R.id.chef_image_DetailActivity);
         chefName = (TextView)findViewById(R.id.chef_name_DetailActivity);
         chefIntroduction = (TextView)findViewById(R.id.chef_introduction_DetailActivity);
@@ -118,6 +131,34 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
+        getDiningMasterData();
+        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_DetailActivity)).getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(final GoogleMap googleMap) {
+                mMap = googleMap;
+                databaseReference = FirebaseDatabase.getInstance().getReference();
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        LatLng location = new LatLng(diningMasterData.getCoordinate().get("latitude"), diningMasterData.getCoordinate().get("longitude"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));//move camera to location
+                        if (mMap != null) {
+                            MarkerOptions markerOptions = new MarkerOptions();
+                            markerOptions.title(diningMasterData.getTitle());
+                            markerOptions.position(location);
+                            Marker marker = googleMap.addMarker(markerOptions);
+                            marker.showInfoWindow();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+
         setCheckBoxStatus();
         getDiningImage();
         getDiningInformation();
@@ -127,6 +168,15 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(View v) {//주소 textview를 누르면 지도 어플리케이션으로 연결
                 String address = diningLocation.getText().toString().replace(' ', '+');
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q="+address));
+                v.getContext().startActivity(intent);
+            }
+        });
+
+        diningLocationMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String address = diningLocationMap.getText().toString().replace(' ', '+');
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q="+address));
                 v.getContext().startActivity(intent);
             }
@@ -253,16 +303,19 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshots) {
-                for(DataSnapshot dataSnapshot : snapshots.getChildren()){
+                for(final DataSnapshot dataSnapshot : snapshots.getChildren()){
                     diningTitle.setText(dataSnapshot.child("title").getValue().toString());
                     diningSubtitle.setText(dataSnapshot.child("subtitle").getValue().toString());//set subtitle from database
                     diningDate.setText(dataSnapshot.child("date").getValue().toString());
                     diningLocation.setText(dataSnapshot.child("location").child("location").getValue().toString());
                     diningDetailLocation.setText(dataSnapshot.child("location").child("detail").getValue().toString());
+                    diningLocationMap.setText(dataSnapshot.child("location").child("location").getValue().toString());
+                    diningDetailLocationMap.setText(dataSnapshot.child("location").child("detail").getValue().toString());
                     for(int i = 0; i < dataSnapshot.child("style").getChildrenCount(); i++) {
                         FoodStyle style = FoodStyle.valueOf((dataSnapshot.child("style").child(Integer.toString(i + 1)).getValue().toString()));
                         String styleLabel = "#" + style.label;
                         Chip chip = new Chip(styleChipGroup.getContext());
+                        chip.setClickable(false);
                         chip.setText(styleLabel);
                         chip.setTextColor(Color.parseColor("#FFFFFF"));
                         chip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorPrimary)));
@@ -281,6 +334,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     bookmarked.setText(dataSnapshot.child("bookmark").getValue() + "명이 좋아합니다.");
                     diningDescription.setText("\"" + dataSnapshot.child("description").getValue().toString() + "\"");
                     diningPrice.setText(String.format(Locale.KOREA, "%,d", dataSnapshot.child("price").getValue()) + "원");
+
                 }
             }
 

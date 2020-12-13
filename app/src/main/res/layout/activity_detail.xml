@@ -132,25 +132,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/chip_group_DetailActivity"/>
 
-            <LinearLayout
-                android:id="@+id/linear_layout_dishList_DetailActivity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:orientation="vertical"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linear_layout_dishImage_DetailActivity"/>
-
             <TextView
                 android:id="@+id/divider1_DetailActivity"
                 android:layout_width="match_parent"
                 android:layout_height="0.8dp"
-                android:layout_marginTop="30dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:background="@color/colorPrimary"
-                app:layout_constraintTop_toBottomOf="@id/linear_layout_dishList_DetailActivity"
+                app:layout_constraintTop_toBottomOf="@id/linear_layout_dishImage_DetailActivity"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -159,7 +148,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintTop_toBottomOf="@id/divider1_DetailActivity"
@@ -170,7 +159,7 @@
                 android:id="@+id/divider2_DetailActivity"
                 android:layout_width="match_parent"
                 android:layout_height="0.8dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:background="@color/colorPrimary"
@@ -178,6 +167,108 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
+            <TextView
+                android:id="@+id/composition_text_DetailActivity"
+                android:text="다이닝 구성"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textColor="@color/textDarkPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider2_DetailActivity"/>
+
+            <LinearLayout
+                android:id="@+id/linear_layout_dishList_DetailActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="20dp"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/composition_text_DetailActivity"/>
+
+            <TextView
+                android:id="@+id/divider3_DetailActivity"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/linear_layout_dishList_DetailActivity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/location_text_DetailActivity"
+                android:text="위치정보"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textColor="@color/textDarkPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider3_DetailActivity"/>
+
+            <fragment
+                android:id="@+id/map_DetailActivity"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="15dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/location_text_DetailActivity"/>
+
+            <ImageView
+                android:id="@+id/marker2_DetailActivity"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_place_marker"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="21dp"
+                app:tint="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/map_DetailActivity"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/dining_location_map_DetailActivity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="6dp"
+                app:layout_constraintStart_toEndOf="@id/marker2_DetailActivity"
+                app:layout_constraintTop_toBottomOf="@id/map_DetailActivity"/>
+
+            <TextView
+                android:id="@+id/dining_detail_location_map_DetailActivity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textDarkPrimary"
+                android:layout_marginStart="5dp"
+                app:layout_constraintStart_toEndOf="@id/dining_location_map_DetailActivity"
+                app:layout_constraintBaseline_toBaselineOf="@id/dining_location_map_DetailActivity"/>
+
+            <TextView
+                android:id="@+id/divider4_DetailActivity"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/dining_location_map_DetailActivity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <ImageView
                 android:id="@+id/chef_image_DetailActivity"
@@ -187,7 +278,7 @@
                 android:layout_marginTop="30dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider2_DetailActivity"/>
+                app:layout_constraintTop_toBottomOf="@id/divider4_DetailActivity"/>
 
             <TextView
                 android:id="@+id/chef_name_DetailActivity"
@@ -271,7 +362,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/divider3_DetailActivity"
+                android:id="@+id/divider5_DetailActivity"
                 android:layout_width="match_parent"
                 android:layout_height="0.8dp"
                 android:layout_marginTop="0dp"
