@@ -55,8 +55,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.petabyte.plate.ui.view.BookmarkVerticalList
-                    android:id="@+id/bookmarkList_BookmarkFragment"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_BookmarkFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"/>

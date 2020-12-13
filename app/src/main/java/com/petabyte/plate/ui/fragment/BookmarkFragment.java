@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -20,10 +22,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.petabyte.plate.R;
+import com.petabyte.plate.adapter.BookmarkVerticalListAdapter;
 import com.petabyte.plate.data.BookmarkCardViewData;
 import com.petabyte.plate.data.DiningMasterData;
 import com.petabyte.plate.data.UserData;
-import com.petabyte.plate.ui.view.BookmarkVerticalList;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,9 +38,12 @@ import java.util.HashMap;
 
 public class BookmarkFragment extends Fragment {
 
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private BookmarkVerticalListAdapter recyclerAdapter;
+
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private BookmarkVerticalList bookmarkVerticalList;
     private LottieAnimationView loadingSkeletonView;
 
     private DatabaseReference databaseReference, ref_g, ref_h;
@@ -59,8 +64,8 @@ public class BookmarkFragment extends Fragment {
 
         collapsingToolbarLayout = (CollapsingToolbarLayout)v.findViewById(R.id.collapsing_toolbar_BookmarkFragment);
         swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.refresh_BookmarkFragment);
-        bookmarkVerticalList = (BookmarkVerticalList)v.findViewById(R.id.bookmarkList_BookmarkFragment);
         loadingSkeletonView = (LottieAnimationView)v.findViewById(R.id.loading_lottie_Bookmarkfragment);
+        recyclerView = (RecyclerView)v.findViewById(R.id.recycler_BookmarkFragment);
 
         loadingSkeletonView.setVisibility(View.GONE);
 
@@ -76,16 +81,27 @@ public class BookmarkFragment extends Fragment {
             public void onRefresh() {
                 loadingSkeletonView.setVisibility(View.VISIBLE);
                 loadingSkeletonView.setSpeed(1f);
-                bookmarkVerticalList.removeAllData();
-                getDiningData();
+                removeAllData();
+                initData();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
 
+        recyclerInitial();
+        initData();
+
         return v;
     }
 
-    public void getDiningData() {
+    private void recyclerInitial() {
+        layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+
+        recyclerAdapter = new BookmarkVerticalListAdapter();
+        recyclerView.setAdapter(recyclerAdapter);
+    }
+
+    public void initData() {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         uid = user.getUid();
@@ -142,7 +158,8 @@ public class BookmarkFragment extends Fragment {
                             break;
                     }
                     bookmarkCardViewData.setDiningDate(bookmarkCardViewData.getDiningDate() + dayOfWeek);
-                    bookmarkVerticalList.addData(bookmarkCardViewData);
+                    recyclerAdapter.addItem(bookmarkCardViewData);
+                    recyclerAdapter.notifyDataSetChanged();
                 }
                 loadingSkeletonView.setVisibility(View.GONE);
             }
@@ -201,5 +218,15 @@ public class BookmarkFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    public void addData(BookmarkCardViewData data) {
+        recyclerAdapter.addItem(data);
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    public void removeAllData() {
+        recyclerAdapter.removeAllItem();
+        recyclerAdapter.notifyDataSetChanged();
     }
 }

@@ -54,6 +54,61 @@
                 app:layout_constraintStart_toEndOf="@id/dining_title_DetailActivity"
                 app:layout_constraintBaseline_toBaselineOf="@+id/dining_title_DetailActivity"/>
 
+            <ImageView
+                android:id="@+id/calendar_DetailActivity"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_calendar"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="22dp"
+                app:tint="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/dining_subtitle_DetailActivity"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/dining_date_DetailActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textDarkPrimary"
+                android:textSize="14dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintTop_toBottomOf="@id/dining_subtitle_DetailActivity"
+                app:layout_constraintStart_toEndOf="@id/calendar_DetailActivity" />
+
+            <ImageView
+                android:id="@+id/marker_DetailActivity"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_place_marker"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="21dp"
+                app:tint="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/calendar_DetailActivity"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/dining_location_DetailActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="6dp"
+                app:layout_constraintTop_toBottomOf="@id/calendar_DetailActivity"
+                app:layout_constraintStart_toEndOf="@id/marker_DetailActivity"/>
+
+            <TextView
+                android:id="@+id/dining_detail_location_DetailActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textDarkPrimary"
+                android:textSize="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="5dp"
+                app:layout_constraintTop_toBottomOf="@id/calendar_DetailActivity"
+                app:layout_constraintStart_toEndOf="@id/dining_location_DetailActivity"/>
+
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chip_group_DetailActivity"
                 android:layout_width="0dp"
@@ -64,7 +119,7 @@
                 android:theme="@style/AppTheme.Material"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/dining_title_DetailActivity"/>
+                app:layout_constraintTop_toBottomOf="@id/marker_DetailActivity"/>
 
             <LinearLayout
                 android:id="@+id/linear_layout_dishImage_DetailActivity"
@@ -126,7 +181,7 @@
 
             <ImageView
                 android:id="@+id/chef_image_DetailActivity"
-                android:src="@drawable/ic_character"
+                android:src="@drawable/ic_host_character"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:layout_marginTop="30dp"

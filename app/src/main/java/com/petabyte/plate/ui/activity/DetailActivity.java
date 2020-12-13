@@ -66,6 +66,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private ImageButton cancelButton;
     private TextView diningTitle;
     private TextView diningSubtitle;
+    private TextView diningDate;
+    private TextView diningLocation;
+    private TextView diningDetailLocation;
     private ChipGroup styleChipGroup;
     private TextView diningDescription;
     private ImageView chefImage;
@@ -97,6 +100,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         cancelButton = (ImageButton)findViewById(R.id.cancel_button_DetailActivity);
         diningTitle = (TextView)findViewById(R.id.dining_title_DetailActivity);
         diningSubtitle = (TextView)findViewById(R.id.dining_subtitle_DetailActivity);
+        diningDate = (TextView)findViewById(R.id.dining_date_DetailActivity);
+        diningLocation = (TextView)findViewById(R.id.dining_location_DetailActivity);
+        diningDetailLocation = (TextView)findViewById(R.id.dining_detail_location_DetailActivity);
         styleChipGroup = (ChipGroup)findViewById(R.id.chip_group_DetailActivity);
         diningDescription = (TextView)findViewById(R.id.dining_description_DetailActivity);
         chefImage = (ImageView)findViewById(R.id.chef_image_DetailActivity);
@@ -117,6 +123,14 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         getDiningInformation();
         getChefInformation();
 
+        diningLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {//주소 textview를 누르면 지도 어플리케이션으로 연결
+                String address = diningLocation.getText().toString().replace(' ', '+');
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q="+address));
+                v.getContext().startActivity(intent);
+            }
+        });
 
         cancelButton.setOnClickListener(this);
         purchaseButton.setOnClickListener(this);
@@ -242,6 +256,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 for(DataSnapshot dataSnapshot : snapshots.getChildren()){
                     diningTitle.setText(dataSnapshot.child("title").getValue().toString());
                     diningSubtitle.setText(dataSnapshot.child("subtitle").getValue().toString());//set subtitle from database
+                    diningDate.setText(dataSnapshot.child("date").getValue().toString());
+                    diningLocation.setText(dataSnapshot.child("location").child("location").getValue().toString());
+                    diningDetailLocation.setText(dataSnapshot.child("location").child("detail").getValue().toString());
                     for(int i = 0; i < dataSnapshot.child("style").getChildrenCount(); i++) {
                         FoodStyle style = FoodStyle.valueOf((dataSnapshot.child("style").child(Integer.toString(i + 1)).getValue().toString()));
                         String styleLabel = "#" + style.label;

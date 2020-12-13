@@ -65,9 +65,9 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         datas.add(data);
     }
 
-    public void removeAllItem() {
-        datas = new ArrayList<>();
-    }
+    public void removeItem(BookmarkCardViewData data) { datas.remove(data); }
+
+    public void removeAllItem() { datas = new ArrayList<>(); }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -88,7 +88,6 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
         private Context context;
 
         private HashMap<String, UserData> userDataMap =  new HashMap<>();
-        private HashMap<String, DiningMasterData> diningMasterDataMap = new HashMap<>();
 
         private String uid;
 
@@ -147,52 +146,31 @@ public class BookmarkVerticalListAdapter extends RecyclerView.Adapter<BookmarkVe
                 }
             });
 
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-                    if(checkBox.isChecked()) {
-                        Toast.makeText(buttonView.getContext(), "찜 목록에 추가하였습니다.", Toast.LENGTH_SHORT).show();
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
-                        databaseReference.runTransaction(new Transaction.Handler() {
-                            @NonNull
-                            @Override
-                            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                                DiningMasterData data = currentData.getValue(DiningMasterData.class);
-                                if(data == null)
-                                    return Transaction.success(currentData);
-                                data.setBookmark(data.getBookmark() + 1);
-                                currentData.setValue(data);
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "찜 목록에서 삭제하였습니다.", Toast.LENGTH_SHORT).show();
+                    databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
+                    databaseReference.runTransaction(new Transaction.Handler() {
+                        @NonNull
+                        @Override
+                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                            DiningMasterData data = currentData.getValue(DiningMasterData.class);
+                            if(data == null)
                                 return Transaction.success(currentData);
-                            }
+                            data.setBookmark(data.getBookmark() - 1);
+                            currentData.setValue(data);
+                            return Transaction.success(currentData);
+                        }
 
-                            @Override
-                            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
 
-                            }
-                        });
-                    }
-                    else {
-                        Toast.makeText(buttonView.getContext(), "찜 목록에서 삭제하였습니다.", Toast.LENGTH_SHORT).show();
-                        databaseReference = FirebaseDatabase.getInstance().getReference("Dining").child(data.getDiningUID());
-                        databaseReference.runTransaction(new Transaction.Handler() {
-                            @NonNull
-                            @Override
-                            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                                DiningMasterData data = currentData.getValue(DiningMasterData.class);
-                                if(data == null)
-                                    return Transaction.success(currentData);
-                                data.setBookmark(data.getBookmark() - 1);
-                                currentData.setValue(data);
-                                return Transaction.success(currentData);
-                            }
-
-                            @Override
-                            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
-
-                            }
-                        });
-                    }
-                    reviseBookmarkStatus(data.getDiningUID(), isChecked);
+                        }
+                    });
+                    reviseBookmarkStatus(data.getDiningUID(), false);
+                    removeItem(data);
+                    notifyItemRemoved(getAdapterPosition());
                 }
             });
         }
