@@ -121,7 +121,8 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
         if (bundle != null) {
             if (bundle.getString("search") != null) {
                 searchValue = bundle.getString("search");
-                searchTextBuilder.append(searchValue + "/");
+                if (!searchValue.equals(""))
+                    searchTextBuilder.append(searchValue + "/");
             }
 
             if (bundle.getLong("timestamp") >= 0) {
@@ -132,7 +133,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
 
             if (bundle.getInt("people") != 0) {
                 searchPeople = bundle.getInt("people");
-                searchTextBuilder.append(searchPeople + "/");
+                searchTextBuilder.append(searchPeople + "명/");
             }
 
             if (bundle.getString("location") != null) {
@@ -260,8 +261,6 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
         }
 
         LatLng currentPost = null;
-
-        Log.d(LogTags.IMPORTANT, searchLocation + " SEARCH");
 
         if (searchLocation != null && searchLocation != "") {
             currentPost = getLocationFromAddress(getContext(), searchLocation);
@@ -406,7 +405,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
                 }
 
                 // FoodStyle을 통해서 값을 필터링 하는 부분
-                if (foodStyles != null) {
+                if (foodStyles != null && foodStyles.size() != 0) {
 
                     // datum에서 걸러낸 값을 저장하기 위한 리스트
                     List<ResultDetailData> tempList = new ArrayList<>();
