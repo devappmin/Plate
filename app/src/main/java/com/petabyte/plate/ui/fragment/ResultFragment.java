@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class ResultFragment extends Fragment implements OnMapReadyCallback,
                                                         GoogleMap.OnInfoWindowClickListener,
@@ -403,6 +404,28 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
                         }
                     }
                 }
+
+                // FoodStyle을 통해서 값을 필터링 하는 부분
+                if (foodStyles != null) {
+
+                    // datum에서 걸러낸 값을 저장하기 위한 리스트
+                    List<ResultDetailData> tempList = new ArrayList<>();
+
+                    // datums만큼 반복을 하고, 그 내에서 선택한 음식 스타일만큼 반복한다.
+                    for (int i = 0; i < datums.size(); i++) {
+                        for (int j = 0; j < foodStyles.size(); j++) {
+                            // 만약에 datums에 선택한 음식들이 존재하면 tempList 리스트에 값을 추가한다.
+                            if (datums.get(i).getStyle().contains(foodStyles.get(j).toString())) {
+                                tempList.add(datums.get(i));
+                            }
+
+                        }
+                    }
+                    // 걸러낸 리스트를 datums으로 바꾼다.
+                    datums = tempList;
+                }
+
+                // AsyncTask를 호출하여 Marker를 그린다.
                 DrawMarkers drawMarkers = new DrawMarkers(getContext(), datums);
                 drawMarkers.execute();
             }

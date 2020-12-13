@@ -13,6 +13,7 @@ public class ResultDetailData {
     private String title;
     private String subtitle;
     private List<String> images;
+    private List<String> style;
     private HashMap<String, String> location;
     private HashMap<String, Long> count;
     private HashMap<String, Map<String, Long>> schedules;
@@ -25,7 +26,7 @@ public class ResultDetailData {
 
     public ResultDetailData(int price, String date, String title, String subtitle,
                             HashMap<String, String> location, HashMap<String, Long> count,
-                            HashMap<String, Map<String, Long>> schedules, List<String> images) {
+                            HashMap<String, Map<String, Long>> schedules, List<String> images, List<String> style) {
         this.price = price;
         this.date = date;
         this.title = title;
@@ -34,6 +35,7 @@ public class ResultDetailData {
         this.count = count;
         this.schedules = schedules;
         this.images = images;
+        this.style = style;
     }
 
     @Exclude
@@ -108,5 +110,13 @@ public class ResultDetailData {
 
     public void setImages(List<String> images) {
         this.images = images;
+    }
+
+    public List<String> getStyle() {
+        return style;
+    }
+
+    public void setStyle(List<String> style) {
+        this.style = style;
     }
 }
