@@ -121,8 +121,7 @@ public class ResultFragment extends Fragment implements OnMapReadyCallback,
         if (bundle != null) {
             if (bundle.getString("search") != null) {
                 searchValue = bundle.getString("search");
-                if (!searchValue.equals(""))
-                    searchTextBuilder.append(searchValue + "/");
+                searchTextBuilder.append(searchValue + "/");
             }
 
             if (bundle.getLong("timestamp") >= 0) {
